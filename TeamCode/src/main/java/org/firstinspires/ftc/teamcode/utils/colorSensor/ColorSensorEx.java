@@ -19,7 +19,7 @@ import java.util.Map;
  */
 
 public class ColorSensorEx {
-    private final ColorSensor colorSensor;
+    public final ColorSensor colorSensor;
     private final Telemetry telemetry;
 
     // JSON values
@@ -29,7 +29,7 @@ public class ColorSensorEx {
         RED,
         BLUE,
         YELLOW,
-        ORANGE,
+        GREEN,
         PURPLE,
         WHITE,
         BLACK,
@@ -69,7 +69,7 @@ public class ColorSensorEx {
         return closestColor;
     }
 
-    private float[] getHSV() {
+    public float[] getHSV() {
         float r = colorSensor.red();
         float g = colorSensor.green();
         float b = colorSensor.blue();
