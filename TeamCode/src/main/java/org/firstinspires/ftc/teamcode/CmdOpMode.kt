@@ -12,6 +12,7 @@ import com.seattlesolvers.solverslib.gamepad.GamepadKeys
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit
 import org.firstinspires.ftc.teamcode.commands.JoystickCmd
 import org.firstinspires.ftc.teamcode.subsystems.drivetrain.SolversMecanum
+import org.firstinspires.ftc.teamcode.subsystems.indexer.Indexer
 import org.firstinspires.ftc.teamcode.subsystems.intake.Intake
 import org.firstinspires.ftc.teamcode.subsystems.intake.IntakeDirection
 
@@ -34,6 +35,7 @@ class CMDOpMode : CommandOpMode() {
     // Declaring subsystems
     lateinit var mecanum: SolversMecanum
     lateinit var intake: Intake
+    lateinit var indexer: Indexer
 
     // Declaring useful components
     lateinit var controller: GamepadEx
@@ -54,6 +56,8 @@ class CMDOpMode : CommandOpMode() {
 
         intake = Intake(hardwareMap, telemetry)
 
+        indexer = Indexer(hardwareMap, telemetry)
+
         // Initializing controller & button bindings
         controller = GamepadEx(gamepad1)
         configureButtonBindings()
@@ -64,6 +68,16 @@ class CMDOpMode : CommandOpMode() {
         GamepadButton(controller, GamepadKeys.Button.START)
             .whenPressed(InstantCommand({
                 mecanum.resetOtosYaw()
+            }))
+
+        GamepadButton(controller, GamepadKeys.Button.A)
+            .whenPressed(InstantCommand({
+                indexer.rightSlot.feed()
+            }))
+
+        GamepadButton(controller, GamepadKeys.Button.B)
+            .whenPressed(InstantCommand({
+                indexer.rightSlot.home()
             }))
 
         GamepadButton(controller, GamepadKeys.Button.RIGHT_BUMPER)

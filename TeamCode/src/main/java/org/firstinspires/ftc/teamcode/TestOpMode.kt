@@ -1,7 +1,6 @@
 package org.firstinspires.ftc.teamcode
 
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp
-import com.qualcomm.robotcore.hardware.ColorSensor
 import com.qualcomm.robotcore.hardware.NormalizedColorSensor
 import com.seattlesolvers.solverslib.command.CommandOpMode
 import com.seattlesolvers.solverslib.command.CommandScheduler
@@ -28,7 +27,7 @@ class TestOpMode : CommandOpMode() {
     // Here, declare code to be executed right after pressing the INIT button
     override fun initialize() {
         /* Subsystem initialization */
-        colorSensor = hardwareMap.get(NormalizedColorSensor::class.java, IndexerConstants.Ids.colorSensorFront)
+        colorSensor = hardwareMap.get(NormalizedColorSensor::class.java, IndexerConstants.Ids.frontSlotRightSensor)
 
         // Initializing controller & button bindings
         controller = GamepadEx(gamepad1)

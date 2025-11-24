@@ -1,11 +1,9 @@
 package org.firstinspires.ftc.teamcode.utils.colorSensor;
 
-import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.ColorSensor;
 
-import org.firstinspires.ftc.teamcode.subsystems.indexer.Indexer;
 import org.firstinspires.ftc.teamcode.subsystems.indexer.IndexerConstants;
 import org.firstinspires.ftc.teamcode.utils.ReadFile;
 import org.json.JSONObject;
@@ -21,7 +19,7 @@ public class ColorCalibrationJSON extends LinearOpMode {
 
     @Override
     public void runOpMode() {
-        colorSensor = hardwareMap.get(ColorSensor.class, IndexerConstants.Ids.colorSensorFront);
+        colorSensor = hardwareMap.get(ColorSensor.class, IndexerConstants.Ids.frontSlotRightSensor);
 
         telemetry.addLine("Coloca el sensor frente al color y presiona:");
         telemetry.addLine("A=RED | B=BLUE | X=YELLOW | Y=WHITE");
