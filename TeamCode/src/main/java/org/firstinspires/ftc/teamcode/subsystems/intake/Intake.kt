@@ -57,8 +57,9 @@ class Intake(
     // Configuring motors with the custom VelocityEx class
     private fun motorConfig() {
         rightMotor = VelocityMotorEx(
-            hardwareMap.get(Motor::class.java,"rightIntakeMotor"),
+            Motor(hardwareMap, "rightIntakeMotor", 28.0, 6000.0),
             VelocityMotorConfig(
+                direction = Motor.Direction.REVERSE,
                 pidfCoefficients = PIDFController(
                     IntakeConstants.Motor.p,
                     IntakeConstants.Motor.i,
@@ -68,8 +69,9 @@ class Intake(
 
 
         leftMotor = VelocityMotorEx(
-            hardwareMap.get(Motor::class.java,"leftIntakeMotor"),
+            Motor(hardwareMap, "leftIntakeMotor", 28.0, 6000.0),
             VelocityMotorConfig(
+                direction = Motor.Direction.REVERSE,
                 pidfCoefficients = PIDFController(
                     IntakeConstants.Motor.p,
                     IntakeConstants.Motor.i,
