@@ -18,12 +18,12 @@ class IndexerConstants {
         // CS for Color Sensor
         // Therefore fRCS would be front, right Color Sensor
         const val frontSlotRightSensor: String = "fRCS"
-        const val rightSlotRightSensor: String = "mRCS"
-        const val leftSlotRightSensor: String = "bRCS"
+        const val middleSlotRightSensor: String = "mRCS"
+        const val backSlotRightSensor: String = "bRCS"
 
         const val frontSlotLeftSensor: String = "fLCS"
-        const val rightSlotLeftSensor: String = "mLCS"
-        const val leftSlotLeftSensor: String = "bLCS"
+        const val middleSlotLeftSensor: String = "mLCS"
+        const val backSlotLeftSensor: String = "bLCS"
 
     }
 
@@ -32,5 +32,12 @@ class IndexerConstants {
         const val feedPosition: Double = 0.49
         const val homePosition: Double = 0.83
         const val awakePosition: Double = 0.01
+    }
+
+    object Extensions {
+        // Front slot servo: feed = 0.49, home = 0.83
+        const val frontSlotExtension: String = "FrontSlot"
+        const val middleSlotExtension: String = "MiddleSlot"
+        const val backSlotExtension: String = "BackSlot"
     }
 }

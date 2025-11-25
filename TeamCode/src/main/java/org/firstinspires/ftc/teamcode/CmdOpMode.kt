@@ -1,20 +1,16 @@
 package org.firstinspires.ftc.teamcode
 
-import com.bylazar.gamepad.Gamepad
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp
 import com.seattlesolvers.solverslib.command.CommandOpMode
 import com.seattlesolvers.solverslib.command.CommandScheduler
 import com.seattlesolvers.solverslib.command.InstantCommand
-import com.seattlesolvers.solverslib.command.ParallelCommandGroup
 import com.seattlesolvers.solverslib.command.button.GamepadButton
 import com.seattlesolvers.solverslib.gamepad.GamepadEx
 import com.seattlesolvers.solverslib.gamepad.GamepadKeys
-import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit
 import org.firstinspires.ftc.teamcode.commands.JoystickCmd
 import org.firstinspires.ftc.teamcode.subsystems.drivetrain.SolversMecanum
 import org.firstinspires.ftc.teamcode.subsystems.indexer.Indexer
 import org.firstinspires.ftc.teamcode.subsystems.intake.Intake
-import org.firstinspires.ftc.teamcode.subsystems.intake.IntakeDirection
 
 
 // Personally, I chose to run my code using a command-based Op Mode since it works better for me
@@ -50,7 +46,6 @@ class CMDOpMode : CommandOpMode() {
             { controller.leftX },
             { controller.leftY },
             { controller.rightX * 0.8 },
-            { mecanum.getRobotYaw() },
             mecanum
         )
 
@@ -72,12 +67,12 @@ class CMDOpMode : CommandOpMode() {
 
         GamepadButton(controller, GamepadKeys.Button.A)
             .whenPressed(InstantCommand({
-                indexer.rightSlot.feed()
+                indexer.middleSlot.feed()
             }))
 
         GamepadButton(controller, GamepadKeys.Button.B)
             .whenPressed(InstantCommand({
-                indexer.rightSlot.home()
+                indexer.middleSlot.home()
             }))
 
         GamepadButton(controller, GamepadKeys.Button.RIGHT_BUMPER)
@@ -89,7 +84,11 @@ class CMDOpMode : CommandOpMode() {
     }
 
     fun periodic() {
-
+//        if (controller.gamepad.right_bumper) {
+//            intake.enableBothIntakes().schedule()
+//        } else {
+//            intake.stopBothIntakes().schedule()
+//        }
     }
 
     // Main code body

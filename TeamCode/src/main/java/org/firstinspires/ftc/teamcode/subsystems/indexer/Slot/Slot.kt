@@ -20,7 +20,7 @@ data class SlotConfig(
     val absoluteId: String,
     val rightColorSensorId: String,
     val leftColorSensorId: String,
-    val slotId: String
+    val archiveExtension: String
 )
 
 @Suppress("JoinDeclarationAndAssignment")
@@ -39,12 +39,14 @@ class Slot (val config: SlotConfig, hw: HardwareMap, telemetry: Telemetry) {
         rightColorSensor = ColorSensorEx(hw.get(
             ColorSensor::class.java,
             config.rightColorSensorId),
-            telemetry)
+            telemetry,
+            config.archiveExtension)
 
         leftColorSensor = ColorSensorEx(hw.get(
             ColorSensor::class.java,
             config.leftColorSensorId),
-            telemetry)
+            telemetry,
+            config.archiveExtension)
 
 //        SequentialCommandGroup(
 //            InstantCommand({ home() }),

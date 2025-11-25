@@ -11,8 +11,8 @@ import org.firstinspires.ftc.robotcore.external.Telemetry
 import org.firstinspires.ftc.teamcode.subsystems.indexer.Slot.Slot
 import org.firstinspires.ftc.teamcode.subsystems.indexer.Slot.SlotConfig
 import org.firstinspires.ftc.teamcode.subsystems.indexer.IndexerConstants.Ids
+import org.firstinspires.ftc.teamcode.subsystems.indexer.IndexerConstants.Extensions
 import org.firstinspires.ftc.teamcode.utils.colorSensor.ColorSensorEx.DetectedColor
-import kotlin.collections.contains
 
 enum class MotifPatterns(val pattern: List<DetectedColor>) {
     PURPLE_PURPLE_GREEN(listOf(DetectedColor.PURPLE, DetectedColor.PURPLE, DetectedColor.GREEN)),
@@ -23,27 +23,30 @@ enum class MotifPatterns(val pattern: List<DetectedColor>) {
 @Suppress("JoinDeclarationAndAssignment")
 class Indexer(val hw: HardwareMap, val telemetry: Telemetry) : SubsystemBase() {
     var frontSlot: Slot
-    var leftSlot: Slot
-    var rightSlot: Slot
+    var backSlot: Slot
+    var middleSlot: Slot
     private var slotList: Array<Slot>
 
     init {
         frontSlot = Slot(
-            SlotConfig(Ids.frontServo, Servo.Direction.FORWARD ,Ids.absFront, Ids.frontSlotRightSensor, Ids.frontSlotLeftSensor, "front"),
+            SlotConfig(Ids.frontServo, Servo.Direction.FORWARD ,Ids.absFront, Ids.frontSlotRightSensor, Ids.frontSlotLeftSensor,
+                Extensions.frontSlotExtension),
             hw,
             telemetry)
 
-        rightSlot = Slot(
-            SlotConfig(Ids.rightServo, Servo.Direction.REVERSE ,Ids.absRight, Ids.rightSlotRightSensor, Ids.rightSlotLeftSensor, "right"),
+        middleSlot = Slot(
+            SlotConfig(Ids.rightServo, Servo.Direction.REVERSE ,Ids.absRight, Ids.middleSlotRightSensor, Ids.middleSlotLeftSensor,
+                Extensions.middleSlotExtension),
             hw,
             telemetry)
 
-        leftSlot = Slot(
-            SlotConfig(Ids.leftServo, Servo.Direction.REVERSE ,Ids.absLeft ,Ids.leftSlotRightSensor, Ids.leftSlotLeftSensor, "left"),
+        backSlot = Slot(
+            SlotConfig(Ids.leftServo, Servo.Direction.REVERSE ,Ids.absLeft ,Ids.backSlotRightSensor, Ids.backSlotLeftSensor,
+                Extensions.backSlotExtension),
             hw,
             telemetry)
 
-        slotList = arrayOf(frontSlot, rightSlot, leftSlot)
+        slotList = arrayOf(frontSlot, middleSlot, backSlot)
     }
 
 
@@ -62,7 +65,7 @@ class Indexer(val hw: HardwareMap, val telemetry: Telemetry) : SubsystemBase() {
 //
 //        return greenIndex > 1 || purpleIndex > 2
 //    }
-
+//
 //    fun feedShooter(): SequentialCommandGroup {
 //        var slotOrder = arrayOf("", "", "")
 //        val cmdGroup = SequentialCommandGroup()
@@ -94,8 +97,8 @@ class Indexer(val hw: HardwareMap, val telemetry: Telemetry) : SubsystemBase() {
 //
 //        for ((index, color) in motifPatterns.pattern.withIndex()) {
 //            for (slot in slotList) {
-//                if (slot.getDetectedColor() == color && !slotOrder.contains(slot.config.slotId)) {
-//                    slotOrder.fill(slot.config.slotId, index)
+//                if (slot.getDetectedColor() == color && !slotOrder.contains(slot.config.archiveExtension)) {
+//                    slotOrder.fill(slot.config.archiveExtension, index)
 //                    cmdGroup.addCommands(feedCMD(slotOrder[index]))
 //                    break
 //                }
@@ -107,9 +110,9 @@ class Indexer(val hw: HardwareMap, val telemetry: Telemetry) : SubsystemBase() {
 
     private fun feedCMD(slotId: String): Command {
         val slot: Slot? = when(slotId) {
-            frontSlot.config.slotId -> frontSlot
-            leftSlot.config.slotId -> leftSlot
-            rightSlot.config.slotId -> rightSlot
+            frontSlot.config.archiveExtension -> frontSlot
+            backSlot.config.archiveExtension -> backSlot
+            middleSlot.config.archiveExtension -> middleSlot
             else -> null
         }
 
@@ -134,14 +137,15 @@ class Indexer(val hw: HardwareMap, val telemetry: Telemetry) : SubsystemBase() {
     }
 
     override fun periodic() {
-        telemetry.addData("Slot1", slotList[0].getDetectedColor())
-        telemetry.addData("Slot2", slotList[1].getDetectedColor())
-        telemetry.addData("Slot3", slotList[2].getDetectedColor())
-        telemetry.addData("Slot1", slotList[0].getPosition())
-        telemetry.addData("Slot2", slotList[1].getPosition())
-        telemetry.addData("Slot3", slotList[2].getPosition())
+        telemetry.addData("FrontSlot", slotList[0].getDetectedColor())
+        telemetry.addData("MiddleSlot", slotList[1].getDetectedColor())
+        telemetry.addData("BackSlot", slotList[2].getDetectedColor())
+        telemetry.addData("FrontSlot", slotList[0].getPosition())
+        telemetry.addData("MiddleSlot", slotList[1].getPosition())
+        telemetry.addData("MiddleSlot Nigger", slotList[1].getHSV())
+        telemetry.addData("BackSlot", slotList[2].getPosition())
         telemetry.addData("Front Abs", frontSlot.getAbsoluteReading())
-        telemetry.addData("Right Abs", rightSlot.getAbsoluteReading())
-        telemetry.addData("Left Abs", leftSlot.getAbsoluteReading())
+        telemetry.addData("Right Abs", middleSlot.getAbsoluteReading())
+        telemetry.addData("Left Abs", backSlot.getAbsoluteReading())
     }
 }
