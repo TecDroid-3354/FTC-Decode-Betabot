@@ -11,6 +11,7 @@ import org.firstinspires.ftc.teamcode.commands.JoystickCmd
 import org.firstinspires.ftc.teamcode.subsystems.drivetrain.SolversMecanum
 import org.firstinspires.ftc.teamcode.subsystems.indexer.Indexer
 import org.firstinspires.ftc.teamcode.subsystems.intake.Intake
+import org.firstinspires.ftc.teamcode.subsystems.shooter.Hood
 
 
 // Personally, I chose to run my code using a command-based Op Mode since it works better for me
@@ -32,6 +33,7 @@ class CMDOpMode : CommandOpMode() {
     lateinit var mecanum: SolversMecanum
     lateinit var intake: Intake
     lateinit var indexer: Indexer
+    lateinit var hood: Hood
 
     // Declaring useful components
     lateinit var controller: GamepadEx
@@ -53,6 +55,8 @@ class CMDOpMode : CommandOpMode() {
 
         indexer = Indexer(hardwareMap, telemetry)
 
+        hood = Hood(hardwareMap, telemetry)
+
         // Initializing controller & button bindings
         controller = GamepadEx(gamepad1)
         configureButtonBindings()
@@ -70,6 +74,11 @@ class CMDOpMode : CommandOpMode() {
                 intake.enableBothIntakes()
             ).whenReleased (
                 intake.stopBothIntakes()
+            )
+
+        GamepadButton(controller, GamepadKeys.Button.A)
+            .whenPressed(
+                InstantCommand({ hood.setHoodAngle(Angle.fromDegrees(90.0)) })
             )
     }
 
