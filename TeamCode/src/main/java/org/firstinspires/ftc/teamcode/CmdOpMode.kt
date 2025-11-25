@@ -65,16 +65,6 @@ class CMDOpMode : CommandOpMode() {
                 mecanum.resetOtosYaw()
             }))
 
-        GamepadButton(controller, GamepadKeys.Button.A)
-            .whenPressed(InstantCommand({
-                indexer.middleSlot.feed()
-            }))
-
-        GamepadButton(controller, GamepadKeys.Button.B)
-            .whenPressed(InstantCommand({
-                indexer.middleSlot.home()
-            }))
-
         GamepadButton(controller, GamepadKeys.Button.RIGHT_BUMPER)
             .whenPressed(
                 intake.enableBothIntakes()
@@ -83,13 +73,7 @@ class CMDOpMode : CommandOpMode() {
             )
     }
 
-    fun periodic() {
-//        if (controller.gamepad.right_bumper) {
-//            intake.enableBothIntakes().schedule()
-//        } else {
-//            intake.stopBothIntakes().schedule()
-//        }
-    }
+    fun periodic() {}
 
     // Main code body
     override fun runOpMode() {

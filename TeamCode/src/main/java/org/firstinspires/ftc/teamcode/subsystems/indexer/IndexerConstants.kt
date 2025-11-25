@@ -3,8 +3,8 @@ package org.firstinspires.ftc.teamcode.subsystems.indexer
 class IndexerConstants {
     object Ids {
         const val frontServo: String = "frontServo"
-        const val rightServo: String = "rightServo"
-        const val leftServo: String = "leftServo"
+        const val rightServo: String = "leftServo"
+        const val leftServo: String = "rightServo"
 
         const val absFront: String = "absFront"
         const val absRight: String = "absRight"
@@ -28,10 +28,27 @@ class IndexerConstants {
     }
 
     object Positions {
-        // Front slot servo: feed = 0.49, home = 0.83
-        const val feedPosition: Double = 0.49
-        const val homePosition: Double = 0.83
-        const val awakePosition: Double = 0.01
+
+        object frontPositions {
+
+            const val feedPosition: Double = 0.49
+
+            const val homePosition: Double = 0.83
+        }
+
+        object middlePositions {
+
+            const val feedPosition: Double = 0.28
+
+            const val homePosition: Double = 0.6
+        }
+
+        object backPositions {
+
+            const val feedPosition: Double = 0.88
+
+            const val homePosition: Double = 0.56
+        }
     }
 
     object Extensions {

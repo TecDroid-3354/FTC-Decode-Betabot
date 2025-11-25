@@ -71,14 +71,14 @@ class Intake(
             Motor(hardwareMap, "rightIntakeMotor", 28.0, 6000.0),
             VelocityMotorConfig(
                 direction = DcMotorSimple.Direction.FORWARD,
-                pidfCoefficients = PIDFController(0.2, 0.0, 0.0, 0.0))
+                pidfCoefficients = PIDFController(0.5, 0.0, 0.0, 0.0))
         )
 
         leftMotor = VelocityMotorEx(
             Motor(hardwareMap, "leftIntakeMotor", 28.0, 6000.0),
             VelocityMotorConfig(
                 direction = DcMotorSimple.Direction.REVERSE,
-                pidfCoefficients = PIDFController(0.2, 0.0, 0.0, 0.0))
+                pidfCoefficients = PIDFController(0.5, 0.0, 0.0, 0.0))
         )
     }
 }

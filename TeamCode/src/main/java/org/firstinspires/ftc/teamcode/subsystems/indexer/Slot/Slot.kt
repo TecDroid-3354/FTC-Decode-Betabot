@@ -3,20 +3,18 @@ package org.firstinspires.ftc.teamcode.subsystems.indexer.Slot
 import com.qualcomm.robotcore.hardware.ColorSensor
 import com.qualcomm.robotcore.hardware.HardwareMap
 import com.qualcomm.robotcore.hardware.Servo
-import com.seattlesolvers.solverslib.command.InstantCommand
-import com.seattlesolvers.solverslib.command.SequentialCommandGroup
-import com.seattlesolvers.solverslib.command.WaitCommand
 import com.seattlesolvers.solverslib.hardware.AbsoluteAnalogEncoder
 import com.seattlesolvers.solverslib.hardware.ServoEx
 import org.firstinspires.ftc.robotcore.external.Telemetry
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit
-import org.firstinspires.ftc.teamcode.subsystems.indexer.IndexerConstants
 import org.firstinspires.ftc.teamcode.utils.colorSensor.ColorSensorEx
 import org.firstinspires.ftc.teamcode.utils.colorSensor.ColorSensorEx.DetectedColor
 
 data class SlotConfig(
     val servoName: String,
-    val servoDirection: Servo.Direction,
+    val isInverted: Boolean,
+    val feedPosition: Double,
+    val homePosition: Double,
     val absoluteId: String,
     val rightColorSensorId: String,
     val leftColorSensorId: String,
@@ -33,7 +31,7 @@ class Slot (val config: SlotConfig, hw: HardwareMap, telemetry: Telemetry) {
 
     init {
         servo = ServoEx(hw, config.servoName)
-        servo.servo.direction = config.servoDirection
+        servo.inverted = config.isInverted
         absEncoder = AbsoluteAnalogEncoder(hw, config.absoluteId, 90.0, AngleUnit.RADIANS)
 
         rightColorSensor = ColorSensorEx(hw.get(
@@ -61,17 +59,17 @@ class Slot (val config: SlotConfig, hw: HardwareMap, telemetry: Telemetry) {
         return servo.rawPosition
     }
 
-    fun getDetectedColor(): Pair<DetectedColor, DetectedColor> {
+    fun getDetectedColor(): DetectedColor {
         // Ensure both readings are equal to correctly detect the ball inside the slot
 
-        return Pair(rightColorSensor.colorFromSensor, leftColorSensor.colorFromSensor)
-//        return if (rightColorSensor.colorFromSensor == leftColorSensor.colorFromSensor) {
-//            // Now that we know they are the same, we can grab either the right or left reading
-//            // In this case we grabbed the right one
-//            rightColorSensor.colorFromSensor
-//        } else {
-//            DetectedColor.UNKNOWN
-//        }
+        //return Pair(rightColorSensor.colorFromSensor, leftColorSensor.colorFromSensor)
+        return if (rightColorSensor.colorFromSensor == leftColorSensor.colorFromSensor) {
+            // Now that we know they are the same, we can grab either the right or left reading
+            // In this case we grabbed the right one
+            rightColorSensor.colorFromSensor
+        } else {
+            DetectedColor.UNKNOWN
+        }
     }
 
     fun getHSV() = rightColorSensor.getHSV()
@@ -81,14 +79,14 @@ class Slot (val config: SlotConfig, hw: HardwareMap, telemetry: Telemetry) {
     }
 
     fun feed() {
-        setServoPosition(IndexerConstants.Positions.feedPosition)
+        setServoPosition(config.feedPosition)
     }
 
     fun home() {
-        setServoPosition(IndexerConstants.Positions.homePosition)
+        setServoPosition(config.homePosition)
     }
 
     fun awake() {
-        setServoPosition(IndexerConstants.Positions.awakePosition)
+        setServoPosition(config.homePosition + 0.01)
     }
 }
