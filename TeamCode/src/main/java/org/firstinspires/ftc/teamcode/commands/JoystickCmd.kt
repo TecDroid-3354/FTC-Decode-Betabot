@@ -23,7 +23,6 @@ class JoystickCmd(
     val x: DoubleSupplier,
     val y: DoubleSupplier,
     val heading: DoubleSupplier,
-    val yawInDegrees: DoubleSupplier,
     val mecanum: SolversMecanum
 ) : CommandBase() {
 
@@ -52,7 +51,7 @@ class JoystickCmd(
             headingVel)
 
         // Passing said chassis speeds so that the mecanum is able to use it
-        mecanum.setChassisSpeedsFromFieldOriented(speeds, yawInDegrees.asDouble)
+        mecanum.setChassisSpeedsFromFieldOriented(speeds)
     }
 
 

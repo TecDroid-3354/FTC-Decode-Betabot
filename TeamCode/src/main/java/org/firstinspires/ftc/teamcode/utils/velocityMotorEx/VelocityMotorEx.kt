@@ -29,7 +29,7 @@ class VelocityMotorEx(
     override fun applyConfig() {
         // Setting up the motor & encoder default behavior
         motor.setZeroPowerBehavior(config.zeroPowerBehavior)
-        motor.encoder.setDirection(config.direction)
+        motor.motor.direction = config.direction
 
         // Arranging velocity PIDs
         val coefficients = config.pidfCoefficients

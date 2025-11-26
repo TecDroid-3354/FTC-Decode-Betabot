@@ -1,6 +1,7 @@
 package org.firstinspires.ftc.teamcode.subsystems.indexer
 
 import com.qualcomm.robotcore.hardware.HardwareMap
+import com.qualcomm.robotcore.hardware.Servo
 import com.seattlesolvers.solverslib.command.Command
 import com.seattlesolvers.solverslib.command.InstantCommand
 import com.seattlesolvers.solverslib.command.SequentialCommandGroup
@@ -10,6 +11,8 @@ import org.firstinspires.ftc.robotcore.external.Telemetry
 import org.firstinspires.ftc.teamcode.subsystems.indexer.Slot.Slot
 import org.firstinspires.ftc.teamcode.subsystems.indexer.Slot.SlotConfig
 import org.firstinspires.ftc.teamcode.subsystems.indexer.IndexerConstants.Ids
+import org.firstinspires.ftc.teamcode.subsystems.indexer.IndexerConstants.Positions
+import org.firstinspires.ftc.teamcode.subsystems.indexer.IndexerConstants.Extensions
 import org.firstinspires.ftc.teamcode.utils.colorSensor.ColorSensorEx.DetectedColor
 
 enum class MotifPatterns(val pattern: List<DetectedColor>) {
@@ -18,76 +21,128 @@ enum class MotifPatterns(val pattern: List<DetectedColor>) {
     GREEN_PURPLE_PURPLE(listOf(DetectedColor.GREEN, DetectedColor.PURPLE, DetectedColor.PURPLE))
 }
 
-class Indexer(hw: HardwareMap, telemetry: Telemetry) : SubsystemBase() {
-    private lateinit var frontSlot: Slot
-    private lateinit var leftSlot: Slot
-    private lateinit var rightSlot: Slot
-    private lateinit var slotList: List<Slot>
+@Suppress("JoinDeclarationAndAssignment")
+class Indexer(val hw: HardwareMap, val telemetry: Telemetry) : SubsystemBase() {
+    var frontSlot: Slot
+    var backSlot: Slot
+    var middleSlot: Slot
+    private var slotList: Array<Slot>
 
     init {
         frontSlot = Slot(
-            SlotConfig(Ids.servoFront, Ids.colorSensorFront),
+            SlotConfig(Ids.frontServo, false, Positions.frontPositions.feedPosition,
+                Positions.frontPositions.homePosition, Ids.absFront, Ids.frontSlotRightSensor, Ids.frontSlotLeftSensor,
+                Extensions.frontSlotExtension),
             hw,
             telemetry)
 
-        leftSlot = Slot(
-            SlotConfig(Ids.servoLeft, Ids.colorSensorLeft),
+        middleSlot = Slot(
+            SlotConfig(Ids.rightServo, true, Positions.middlePositions.feedPosition,
+                Positions.middlePositions.homePosition ,Ids.absRight, Ids.middleSlotRightSensor, Ids.middleSlotLeftSensor,
+                Extensions.middleSlotExtension),
             hw,
             telemetry)
 
-        rightSlot = Slot(
-            SlotConfig(Ids.servoRight, Ids.colorSensorRight),
+        backSlot = Slot(
+            SlotConfig(Ids.leftServo, false, Positions.backPositions.feedPosition,
+                Positions.backPositions.homePosition ,Ids.absLeft ,Ids.backSlotRightSensor, Ids.backSlotLeftSensor,
+                Extensions.backSlotExtension),
             hw,
             telemetry)
 
-        slotList = listOf(frontSlot, leftSlot, rightSlot)
+        slotList = arrayOf(frontSlot, middleSlot, backSlot)
+    }
 
+
+
+    fun rejectEvaluation(): Boolean {
+        var greenIndex = 0
+        var purpleIndex = 0
+        for (slot in slotList) {
+            if (slot.getDetectedColor() == DetectedColor.GREEN) {
+                greenIndex++
+            }
+            if (slot.getDetectedColor() == DetectedColor.PURPLE) {
+                purpleIndex++
+            }
+        }
+
+        return greenIndex > 1 || purpleIndex > 2
     }
 
     fun feedShooter(): SequentialCommandGroup {
+        var slotOrder = arrayOf("", "", "")
+        val cmdGroup = SequentialCommandGroup()
+
+        for ((index, slot) in slotList.withIndex()) {
+            if (slot.getDetectedColor() != DetectedColor.UNKNOWN) {
+                slotOrder.fill(slot.config.archiveExtension, index)
+                cmdGroup.addCommands(feedCMD(slotOrder[index]))
+            }
+        }
+
+        return cmdGroup
+    }
+
+    fun feedAllShooter(): SequentialCommandGroup {
         return SequentialCommandGroup(
-            feedCMD(),
-            feedCMD(),
-            feedCMD(),
-        )
+            feedCMD(slotList[0]),
+            feedCMD(slotList[1]),
+            feedCMD(slotList[2]))
     }
 
     fun feedShooter(motifPatterns: MotifPatterns): SequentialCommandGroup {
-        return SequentialCommandGroup(
-            feedCMD(motifPatterns.pattern[0]),
-            feedCMD(motifPatterns.pattern[1]),
-            feedCMD(motifPatterns.pattern[2]),
-        )
-    }
+        var slotOrder = arrayOf("", "", "")
+        val cmdGroup = SequentialCommandGroup()
 
-    private fun feedCMD(color: DetectedColor): Command {
-        for (slot in slotList) {
-            if (slot.getDetectedColor() == color) {
-                return SequentialCommandGroup(
-                    InstantCommand({ slot.feed() }),
-                    WaitCommand(1000),
-                    InstantCommand({ slot.home() }),
-                    WaitCommand(1000)
-                )
+        if (rejectEvaluation()) {
+            return feedShooter()
+        }
+
+        for ((index, color) in motifPatterns.pattern.withIndex()) {
+            for (slot in slotList) {
+                if (slot.getDetectedColor() == color && !slotOrder.contains(slot.config.archiveExtension)) {
+                    slotOrder.fill(slot.config.archiveExtension, index)
+                    cmdGroup.addCommands(feedCMD(slotOrder[index]))
+                    break
+                }
             }
         }
 
-        return InstantCommand()
+        return cmdGroup
     }
 
-    private fun feedCMD(): Command {
-        for (slot in slotList) {
-            if (slot.getDetectedColor() != DetectedColor.UNKNOWN) {
-                return SequentialCommandGroup(
-                    InstantCommand({ slot.feed() }),
-                    WaitCommand(1000),
-                    InstantCommand({ slot.home() }),
-                    WaitCommand(1000)
-                )
-            }
+    private fun feedCMD(slotId: String): Command {
+        val slot: Slot? = when(slotId) {
+            frontSlot.config.archiveExtension -> frontSlot
+            backSlot.config.archiveExtension -> backSlot
+            middleSlot.config.archiveExtension -> middleSlot
+            else -> null
         }
 
-        return InstantCommand()
+        return if (slot != null) {
+            SequentialCommandGroup(
+                InstantCommand({ slot.feed() }),
+                WaitCommand(1000),
+                InstantCommand({ slot.home() }),
+                WaitCommand(1000)
+            )
+        } else {
+            InstantCommand()
+        }
     }
 
+    private fun feedCMD(slot: Slot): Command {
+            return SequentialCommandGroup(
+                InstantCommand({ slot.feed() }),
+                WaitCommand(1000),
+                InstantCommand({ slot.home() }),
+                WaitCommand(1000))
+    }
+
+    override fun periodic() {
+        telemetry.addData("FrontSlot", slotList[0].getDetectedColor())
+        telemetry.addData("MiddleSlot", slotList[1].getDetectedColor())
+        telemetry.addData("BackSlot", slotList[2].getDetectedColor())
+    }
 }

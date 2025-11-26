@@ -1,16 +1,11 @@
 package org.firstinspires.ftc.teamcode
 
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp
+import com.qualcomm.robotcore.hardware.NormalizedColorSensor
 import com.seattlesolvers.solverslib.command.CommandOpMode
 import com.seattlesolvers.solverslib.command.CommandScheduler
-import com.seattlesolvers.solverslib.command.InstantCommand
-import com.seattlesolvers.solverslib.command.button.GamepadButton
 import com.seattlesolvers.solverslib.gamepad.GamepadEx
-import com.seattlesolvers.solverslib.gamepad.GamepadKeys
-import org.firstinspires.ftc.teamcode.commands.JoystickCmd
-import org.firstinspires.ftc.teamcode.subsystems.drivetrain.SolversMecanum
-import org.firstinspires.ftc.teamcode.subsystems.indexer.Indexer
-import org.firstinspires.ftc.teamcode.subsystems.intake.Intake
+import org.firstinspires.ftc.teamcode.subsystems.indexer.IndexerConstants
 
 
 // Personally, I chose to run my code using a command-based Op Mode since it works better for me
@@ -23,35 +18,16 @@ import org.firstinspires.ftc.teamcode.subsystems.intake.Intake
  * To visit the FTC dashboard online (while connected to the Control Hub's internet)
  *    http://192.168.43.1:8080/?page=connection.html&pop=true
  */
-@TeleOp(name = "CMD", group = "Op Mode")
-class CMDOpMode : CommandOpMode() {
-
-    /* ! SET UP CODE ! */
-
-    // Declaring subsystems
-    lateinit var mecanum: SolversMecanum
-    lateinit var intake: Intake
-    lateinit var indexer: Indexer
-
+@TeleOp(name = "TestOpMode", group = "Op Mode")
+class TestOpMode : CommandOpMode() {
     // Declaring useful components
     lateinit var controller: GamepadEx
+    lateinit var colorSensor: NormalizedColorSensor
 
     // Here, declare code to be executed right after pressing the INIT button
     override fun initialize() {
         /* Subsystem initialization */
-
-        // Initializing the mecanum & its default command
-        mecanum = SolversMecanum(hardwareMap, telemetry)
-        mecanum.defaultCommand = JoystickCmd(
-            { controller.leftX },
-            { controller.leftY },
-            { controller.rightX * 0.8 },
-            mecanum
-        )
-
-        intake = Intake(hardwareMap, telemetry)
-
-        indexer = Indexer(hardwareMap, telemetry)
+        colorSensor = hardwareMap.get(NormalizedColorSensor::class.java, IndexerConstants.Ids.frontSlotRightSensor)
 
         // Initializing controller & button bindings
         controller = GamepadEx(gamepad1)
@@ -60,20 +36,13 @@ class CMDOpMode : CommandOpMode() {
 
     // All control bindings that involve command execution are declared here
     fun configureButtonBindings() {
-        GamepadButton(controller, GamepadKeys.Button.START)
-            .whenPressed(InstantCommand({
-                mecanum.resetOtosYaw()
-            }))
 
-        GamepadButton(controller, GamepadKeys.Button.RIGHT_BUMPER)
-            .whenPressed(
-                intake.enableBothIntakes()
-            ).whenReleased (
-                intake.stopBothIntakes()
-            )
     }
 
-    fun periodic() {}
+    fun periodic() {
+        telemetry.addData("Nigger", colorSensor.normalizedColors.red)
+
+    }
 
     // Main code body
     override fun runOpMode() {

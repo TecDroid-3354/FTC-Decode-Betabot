@@ -4,12 +4,13 @@ import Angle
 import AngularVelocity
 import Distance
 import LinearVelocity
+import com.qualcomm.robotcore.hardware.DcMotorSimple
 import com.seattlesolvers.solverslib.controller.PIDFController
 import com.seattlesolvers.solverslib.hardware.motors.Motor
 
 data class VelocityMotorConfig(
     val zeroPowerBehavior: Motor.ZeroPowerBehavior = Motor.ZeroPowerBehavior.FLOAT,
-    val direction: Motor.Direction = Motor.Direction.FORWARD,
+    val direction: DcMotorSimple.Direction = DcMotorSimple.Direction.FORWARD,
     val ticksPerRevolution: Double = 1.0,
     val pidfCoefficients: PIDFController,
     var gearRatio: Double = 1.0,
