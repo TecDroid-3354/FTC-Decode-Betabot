@@ -8,11 +8,10 @@ import com.seattlesolvers.solverslib.command.button.GamepadButton
 import com.seattlesolvers.solverslib.gamepad.GamepadEx
 import com.seattlesolvers.solverslib.gamepad.GamepadKeys
 import org.firstinspires.ftc.teamcode.commands.JoystickCmd
+import org.firstinspires.ftc.teamcode.shooter.Shooter
 import org.firstinspires.ftc.teamcode.subsystems.drivetrain.SolversMecanum
 import org.firstinspires.ftc.teamcode.subsystems.indexer.Indexer
 import org.firstinspires.ftc.teamcode.subsystems.intake.Intake
-import org.firstinspires.ftc.teamcode.subsystems.intake.IntakeDirection
-import org.firstinspires.ftc.teamcode.subsystems.shooter.Hood
 
 
 // Personally, I chose to run my code using a command-based Op Mode since it works better for me
@@ -34,7 +33,7 @@ class CMDOpMode : CommandOpMode() {
     lateinit var mecanum: SolversMecanum
     lateinit var intake: Intake
     lateinit var indexer: Indexer
-    lateinit var hood: Hood
+    lateinit var shooter: Shooter
 
     // Declaring useful components
     lateinit var controller: GamepadEx
@@ -56,6 +55,8 @@ class CMDOpMode : CommandOpMode() {
 
         indexer = Indexer(hardwareMap, telemetry)
 
+        shooter= Shooter(hardwareMap, telemetry)
+
 //        hood = Hood(hardwareMap, telemetry)
 
         // Initializing controller & button bindings
@@ -71,12 +72,19 @@ class CMDOpMode : CommandOpMode() {
             }))
 
         GamepadButton(controller, GamepadKeys.Button.RIGHT_BUMPER)
+            .whenPressed(
+                intake.enableBothIntakes()
+            ).whenReleased (
+                intake.stopBothIntakes()
+            )
+
+        GamepadButton(controller, GamepadKeys.Button.LEFT_BUMPER)
             .whenPressed(InstantCommand({
                 //intake.enableIntake(IntakeDirection.LEFT, 1.0)
-                intake.enableIntake(IntakeDirection.LEFT)
+                shooter.shoot()
             })).whenReleased(InstantCommand({
                 //intake.stopIntake(IntakeDirection.LEFT)
-                intake.stopIntake(IntakeDirection.LEFT)
+                shooter.stop()
             }))
 
         GamepadButton(controller, GamepadKeys.Button.Y)
@@ -113,12 +121,6 @@ class CMDOpMode : CommandOpMode() {
             }))
 
 
-//        GamepadButton(controller, GamepadKeys.Button.RIGHT_BUMPER)
-//            .whenPressed(
-//                intake.enableBothIntakes()
-//            ).whenReleased (
-//                intake.stopBothIntakes()
-//            )
 //
 //        GamepadButton(controller, GamepadKeys.Button.A)
 //            .whenPressed(

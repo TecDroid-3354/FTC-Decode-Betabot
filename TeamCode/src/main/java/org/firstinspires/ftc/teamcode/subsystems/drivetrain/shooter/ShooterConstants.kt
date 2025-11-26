@@ -15,11 +15,6 @@ object ShooterConstants {
     const val shooterMotorId = "shooterMotor"
     // This value needs to be measured physically
     const val ticksPerRevolution = 28.0
-    // If the rotations of the motor are not equal to the subsystem's output, we need to add a reductio
-    // Ask design for new value
-    const val reduction = 27.0 / 18.0
-    // Revolutions per minute
-    const val revPerMin = 6000.0
 
     // These are also constants, but in Kotlin you can only declare as constants variables of primitive types
 
