@@ -7,6 +7,7 @@ import com.seattlesolvers.solverslib.hardware.motors.Motor
 import com.seattlesolvers.solverslib.util.MathUtils
 import org.firstinspires.ftc.robotcore.external.Telemetry
 import org.firstinspires.ftc.teamcode.utils.positionMotorEx.PositionMotorEx
+import org.firstinspires.ftc.teamcode.subsystems.turret.TurretConstants.Limits
 
 /**
  * Intended to control the [Turret] subsystem.
@@ -21,14 +22,25 @@ class Turret(val hardwareMap: HardwareMap, val telemetry: Telemetry): SubsystemB
     // Initialization //
     init {
         // Ensure functional limits
-        require(TurretConstants.Limits.maximumLimit.degrees > TurretConstants.Limits.minimumLimit.degrees)
+        require(Limits.maximumLimit.degrees > Limits.minimumLimit.degrees)
         motorController = PositionMotorEx(
             Motor(hardwareMap, TurretConstants.Identification.turretId), turretMotorConfig)
+
+        motorController.setMode(Motor.RunMode.RawPower)
     }
 
     override fun periodic() {
         // motorController.getPosition() applies the reduction, returning the position of the subsystem.
         telemetry.addData("TurretPositionDegrees", motorController.getPosition().degrees)
+    }
+
+    fun setTurretVoltage(power: Double) {
+        if ((motorController.getPosition().degrees <= Limits.minimumLimit.degrees && power < 0.0) ||
+            (motorController.getPosition().degrees >= Limits.maximumLimit.degrees && power > 0.0)) {
+            motorController.stopMotor()
+        } else {
+            motorController.setPower(power)
+        }
     }
 
     /**
@@ -38,9 +50,12 @@ class Turret(val hardwareMap: HardwareMap, val telemetry: Telemetry): SubsystemB
     fun setTurretAngle(angle: Angle) {
         val coercedAngle = Angle.fromDegrees(
             MathUtils.clamp(angle.degrees,
-            TurretConstants.Limits.minimumLimit.degrees,
-            TurretConstants.Limits.maximumLimit.degrees)
+            Limits.minimumLimit.degrees,
+            Limits.maximumLimit.degrees)
         )
-        motorController.setPosition(coercedAngle)
+
+        val power = motorController.pidfController.calculate(motorController.getPosition().degrees, angle.degrees)
+        setTurretVoltage(power)
+
     }
 }

@@ -7,10 +7,10 @@ import com.seattlesolvers.solverslib.command.InstantCommand
 import com.seattlesolvers.solverslib.command.button.GamepadButton
 import com.seattlesolvers.solverslib.gamepad.GamepadEx
 import com.seattlesolvers.solverslib.gamepad.GamepadKeys
+import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit
 import org.firstinspires.ftc.teamcode.commands.JoystickCmd
 import org.firstinspires.ftc.teamcode.subsystems.drivetrain.SolversMecanum
-import org.firstinspires.ftc.teamcode.subsystems.indexer.Indexer
-import org.firstinspires.ftc.teamcode.subsystems.intake.Intake
+import org.firstinspires.ftc.teamcode.subsystems.turret.Turret
 
 
 // Personally, I chose to run my code using a command-based Op Mode since it works better for me
@@ -30,8 +30,7 @@ class CMDOpMode : CommandOpMode() {
 
     // Declaring subsystems
     lateinit var mecanum: SolversMecanum
-    lateinit var intake: Intake
-    lateinit var indexer: Indexer
+    lateinit var turret: Turret
 
     // Declaring useful components
     lateinit var controller: GamepadEx
@@ -43,15 +42,14 @@ class CMDOpMode : CommandOpMode() {
         // Initializing the mecanum & its default command
         mecanum = SolversMecanum(hardwareMap, telemetry)
         mecanum.defaultCommand = JoystickCmd(
-            { controller.leftX },
+            { -controller.leftX },
             { controller.leftY },
-            { controller.rightX * 0.8 },
+            { -controller.rightX },
+            { mecanum.getRobotYaw(AngleUnit.DEGREES) },
             mecanum
         )
 
-        intake = Intake(hardwareMap, telemetry)
-
-        indexer = Indexer(hardwareMap, telemetry)
+        turret = Turret(hardwareMap, telemetry)
 
         // Initializing controller & button bindings
         controller = GamepadEx(gamepad1)
@@ -62,18 +60,19 @@ class CMDOpMode : CommandOpMode() {
     fun configureButtonBindings() {
         GamepadButton(controller, GamepadKeys.Button.START)
             .whenPressed(InstantCommand({
-                mecanum.resetOtosYaw()
+                mecanum.resetRobotYaw()
             }))
-
-        GamepadButton(controller, GamepadKeys.Button.RIGHT_BUMPER)
-            .whenPressed(
-                intake.enableBothIntakes()
-            ).whenReleased (
-                intake.stopBothIntakes()
-            )
     }
 
-    fun periodic() {}
+    fun periodic() {
+        if (controller.gamepad.right_bumper) {
+            turret.setTurretVoltage(1.0)
+        } else if (controller.gamepad.left_bumper) {
+            turret.setTurretVoltage(-1.0)
+        } else {
+            turret.setTurretVoltage(0.0)
+        }
+    }
 
     // Main code body
     override fun runOpMode() {
