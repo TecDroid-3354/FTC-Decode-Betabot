@@ -7,6 +7,7 @@ import com.seattlesolvers.solverslib.command.InstantCommand
 import com.seattlesolvers.solverslib.command.SubsystemBase
 import com.seattlesolvers.solverslib.controller.PIDFController
 import com.seattlesolvers.solverslib.hardware.motors.Motor
+import com.seattlesolvers.solverslib.hardware.motors.MotorEx
 import org.firstinspires.ftc.robotcore.external.Telemetry
 import org.firstinspires.ftc.teamcode.utils.velocityMotorEx.VelocityMotorConfig
 import org.firstinspires.ftc.teamcode.utils.velocityMotorEx.VelocityMotorEx
@@ -62,23 +63,27 @@ class Intake(
 
     }
 
+    override fun periodic() {
+        telemetry.addData("Rev per min", leftMotor.getVelocity())
+    }
 
     // Setup code //
 
     // Configuring motors with the custom VelocityEx class
     private fun motorConfig() {
         rightMotor = VelocityMotorEx(
-            Motor(hardwareMap, "rightIntakeMotor", 28.0, 6000.0),
+            MotorEx(hardwareMap, "rightIntakeMotor", 28.0, 6000.0),
             VelocityMotorConfig(
                 direction = DcMotorSimple.Direction.FORWARD,
                 pidfCoefficients = PIDFController(0.5, 0.0, 0.0, 0.0))
         )
 
         leftMotor = VelocityMotorEx(
-            Motor(hardwareMap, "leftIntakeMotor", 28.0, 6000.0),
+            MotorEx(hardwareMap, "leftIntakeMotor", 28.0, 6000.0),
             VelocityMotorConfig(
                 direction = DcMotorSimple.Direction.REVERSE,
-                pidfCoefficients = PIDFController(0.5, 0.0, 0.0, 0.0))
+                pidfCoefficients = PIDFController(0.5, 0.0, 0.0, 0.1))
         )
+        leftMotor.setMode(Motor.RunMode.VelocityControl)
     }
 }

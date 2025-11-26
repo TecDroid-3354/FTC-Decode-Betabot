@@ -29,25 +29,25 @@ class IndexerConstants {
 
     object Positions {
 
-        object frontPositions {
+        object FrontPositions {
 
-            const val feedPosition: Double = 0.49
+            const val FEED: Double = 0.3
 
-            const val homePosition: Double = 0.83
+            const val HOME: Double = 0.01
         }
 
-        object middlePositions {
+        object MiddlePositions {
 
-            const val feedPosition: Double = 0.28
+            const val FEED: Double = 0.3
 
-            const val homePosition: Double = 0.6
+            const val HOME: Double = 0.0
         }
 
-        object backPositions {
+        object BackPositions {
 
-            const val feedPosition: Double = 0.88
+            const val FEED: Double = 0.3
 
-            const val homePosition: Double = 0.56
+            const val HOME: Double = 0.015
         }
     }
 

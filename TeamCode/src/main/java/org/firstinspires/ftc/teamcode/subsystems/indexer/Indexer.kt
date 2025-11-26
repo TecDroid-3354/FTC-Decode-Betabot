@@ -1,7 +1,6 @@
 package org.firstinspires.ftc.teamcode.subsystems.indexer
 
 import com.qualcomm.robotcore.hardware.HardwareMap
-import com.qualcomm.robotcore.hardware.Servo
 import com.seattlesolvers.solverslib.command.Command
 import com.seattlesolvers.solverslib.command.InstantCommand
 import com.seattlesolvers.solverslib.command.SequentialCommandGroup
@@ -30,22 +29,22 @@ class Indexer(val hw: HardwareMap, val telemetry: Telemetry) : SubsystemBase() {
 
     init {
         frontSlot = Slot(
-            SlotConfig(Ids.frontServo, false, Positions.frontPositions.feedPosition,
-                Positions.frontPositions.homePosition, Ids.absFront, Ids.frontSlotRightSensor, Ids.frontSlotLeftSensor,
+            SlotConfig(Ids.frontServo, true, Positions.FrontPositions.FEED,
+                Positions.FrontPositions.HOME, Ids.absFront, Ids.frontSlotRightSensor, Ids.frontSlotLeftSensor,
                 Extensions.frontSlotExtension),
             hw,
             telemetry)
 
         middleSlot = Slot(
-            SlotConfig(Ids.rightServo, true, Positions.middlePositions.feedPosition,
-                Positions.middlePositions.homePosition ,Ids.absRight, Ids.middleSlotRightSensor, Ids.middleSlotLeftSensor,
+            SlotConfig(Ids.rightServo, false, Positions.MiddlePositions.FEED,
+                Positions.MiddlePositions.HOME ,Ids.absRight, Ids.middleSlotRightSensor, Ids.middleSlotLeftSensor,
                 Extensions.middleSlotExtension),
             hw,
             telemetry)
 
         backSlot = Slot(
-            SlotConfig(Ids.leftServo, false, Positions.backPositions.feedPosition,
-                Positions.backPositions.homePosition ,Ids.absLeft ,Ids.backSlotRightSensor, Ids.backSlotLeftSensor,
+            SlotConfig(Ids.leftServo, false, Positions.BackPositions.FEED,
+                Positions.BackPositions.HOME ,Ids.absLeft ,Ids.backSlotRightSensor, Ids.backSlotLeftSensor,
                 Extensions.backSlotExtension),
             hw,
             telemetry)
@@ -112,7 +111,7 @@ class Indexer(val hw: HardwareMap, val telemetry: Telemetry) : SubsystemBase() {
         return cmdGroup
     }
 
-    private fun feedCMD(slotId: String): Command {
+    fun feedCMD(slotId: String): Command {
         val slot: Slot? = when(slotId) {
             frontSlot.config.archiveExtension -> frontSlot
             backSlot.config.archiveExtension -> backSlot

@@ -3,6 +3,9 @@ package org.firstinspires.ftc.teamcode.subsystems.indexer.Slot
 import com.qualcomm.robotcore.hardware.ColorSensor
 import com.qualcomm.robotcore.hardware.HardwareMap
 import com.qualcomm.robotcore.hardware.Servo
+import com.seattlesolvers.solverslib.command.InstantCommand
+import com.seattlesolvers.solverslib.command.SequentialCommandGroup
+import com.seattlesolvers.solverslib.command.WaitCommand
 import com.seattlesolvers.solverslib.hardware.AbsoluteAnalogEncoder
 import com.seattlesolvers.solverslib.hardware.ServoEx
 import org.firstinspires.ftc.robotcore.external.Telemetry
@@ -46,11 +49,11 @@ class Slot (val config: SlotConfig, hw: HardwareMap, telemetry: Telemetry) {
             telemetry,
             config.archiveExtension)
 
-//        SequentialCommandGroup(
-//            InstantCommand({ home() }),
-//            WaitCommand(500),
-//            InstantCommand({ awake() })
-//        ).schedule()
+        SequentialCommandGroup(
+            InstantCommand({ home() }),
+            WaitCommand(500),
+            InstantCommand({ awake() })
+        ).schedule()
     }
 
     fun getAbsoluteReading(): Double = absEncoder.currentPosition
@@ -87,6 +90,6 @@ class Slot (val config: SlotConfig, hw: HardwareMap, telemetry: Telemetry) {
     }
 
     fun awake() {
-        setServoPosition(config.homePosition + 0.01)
+        setServoPosition(config.homePosition - 0.001)
     }
 }

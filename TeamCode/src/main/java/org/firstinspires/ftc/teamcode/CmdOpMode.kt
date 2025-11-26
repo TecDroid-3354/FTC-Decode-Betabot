@@ -11,6 +11,7 @@ import org.firstinspires.ftc.teamcode.commands.JoystickCmd
 import org.firstinspires.ftc.teamcode.subsystems.drivetrain.SolversMecanum
 import org.firstinspires.ftc.teamcode.subsystems.indexer.Indexer
 import org.firstinspires.ftc.teamcode.subsystems.intake.Intake
+import org.firstinspires.ftc.teamcode.subsystems.intake.IntakeDirection
 import org.firstinspires.ftc.teamcode.subsystems.shooter.Hood
 
 
@@ -55,7 +56,7 @@ class CMDOpMode : CommandOpMode() {
 
         indexer = Indexer(hardwareMap, telemetry)
 
-        hood = Hood(hardwareMap, telemetry)
+//        hood = Hood(hardwareMap, telemetry)
 
         // Initializing controller & button bindings
         controller = GamepadEx(gamepad1)
@@ -70,16 +71,59 @@ class CMDOpMode : CommandOpMode() {
             }))
 
         GamepadButton(controller, GamepadKeys.Button.RIGHT_BUMPER)
-            .whenPressed(
-                intake.enableBothIntakes()
-            ).whenReleased (
-                intake.stopBothIntakes()
-            )
+            .whenPressed(InstantCommand({
+                //intake.enableIntake(IntakeDirection.LEFT, 1.0)
+                intake.enableIntake(IntakeDirection.LEFT)
+            })).whenReleased(InstantCommand({
+                //intake.stopIntake(IntakeDirection.LEFT)
+                intake.stopIntake(IntakeDirection.LEFT)
+            }))
+
+        GamepadButton(controller, GamepadKeys.Button.Y)
+            .whenPressed(InstantCommand({
+                indexer.frontSlot.home()
+            }))
+
+
+        GamepadButton(controller, GamepadKeys.Button.B)
+            .whenPressed(InstantCommand({
+                indexer.frontSlot.feed()
+            }))
+
 
         GamepadButton(controller, GamepadKeys.Button.A)
-            .whenPressed(
-                InstantCommand({ hood.setHoodAngle(Angle.fromDegrees(90.0)) })
-            )
+            .whenPressed(InstantCommand({
+                indexer.middleSlot.home()
+            }))
+
+
+        GamepadButton(controller, GamepadKeys.Button.X)
+            .whenPressed(InstantCommand({
+                indexer.middleSlot.feed()
+            }))
+
+        GamepadButton(controller, GamepadKeys.Button.DPAD_UP)
+            .whenPressed(InstantCommand({
+                indexer.backSlot.home()
+            }))
+
+        GamepadButton(controller, GamepadKeys.Button.DPAD_DOWN)
+            .whenPressed(InstantCommand({
+                indexer.backSlot.feed()
+            }))
+
+
+//        GamepadButton(controller, GamepadKeys.Button.RIGHT_BUMPER)
+//            .whenPressed(
+//                intake.enableBothIntakes()
+//            ).whenReleased (
+//                intake.stopBothIntakes()
+//            )
+//
+//        GamepadButton(controller, GamepadKeys.Button.A)
+//            .whenPressed(
+//                InstantCommand({ hood.setHoodAngle(Angle.fromDegrees(90.0)) })
+//            )
     }
 
     fun periodic() {}
