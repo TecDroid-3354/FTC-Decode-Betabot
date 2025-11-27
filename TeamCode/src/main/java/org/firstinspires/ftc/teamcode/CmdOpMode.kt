@@ -1,5 +1,6 @@
 package org.firstinspires.ftc.teamcode
 
+import com.qualcomm.hardware.sparkfun.SparkFunOTOS
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp
 import com.seattlesolvers.solverslib.command.CommandOpMode
 import com.seattlesolvers.solverslib.command.CommandScheduler
@@ -10,7 +11,9 @@ import com.seattlesolvers.solverslib.gamepad.GamepadKeys
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit
 import org.firstinspires.ftc.teamcode.commands.JoystickCmd
 import org.firstinspires.ftc.teamcode.subsystems.drivetrain.SolversMecanum
+import org.firstinspires.ftc.teamcode.subsystems.intake.Intake
 import org.firstinspires.ftc.teamcode.subsystems.turret.Turret
+import org.firstinspires.ftc.teamcode.utils.vision.Limelight
 
 
 // Personally, I chose to run my code using a command-based Op Mode since it works better for me
@@ -31,9 +34,12 @@ class CMDOpMode : CommandOpMode() {
     // Declaring subsystems
     lateinit var mecanum: SolversMecanum
     lateinit var turret: Turret
+    lateinit var intake: Intake
+    lateinit var limelight: Limelight
 
     // Declaring useful components
     lateinit var controller: GamepadEx
+    lateinit var otos: SparkFunOTOS
 
     // Here, declare code to be executed right after pressing the INIT button
     override fun initialize() {
@@ -42,14 +48,17 @@ class CMDOpMode : CommandOpMode() {
         // Initializing the mecanum & its default command
         mecanum = SolversMecanum(hardwareMap, telemetry)
         mecanum.defaultCommand = JoystickCmd(
-            { -controller.leftX },
+            { controller.leftX },
             { controller.leftY },
-            { -controller.rightX },
-            { mecanum.getRobotYaw(AngleUnit.DEGREES) },
+            { controller.rightX * 0.8 },
             mecanum
         )
 
+        limelight = Limelight(hardwareMap, telemetry)
+        limelight.start()
+
         turret = Turret(hardwareMap, telemetry)
+        intake = Intake(hardwareMap, telemetry)
 
         // Initializing controller & button bindings
         controller = GamepadEx(gamepad1)
@@ -60,15 +69,20 @@ class CMDOpMode : CommandOpMode() {
     fun configureButtonBindings() {
         GamepadButton(controller, GamepadKeys.Button.START)
             .whenPressed(InstantCommand({
-                mecanum.resetRobotYaw()
+                mecanum.resetOtosYaw()
             }))
+
     }
 
     fun periodic() {
-        if (controller.gamepad.right_bumper) {
-            turret.setTurretVoltage(1.0)
-        } else if (controller.gamepad.left_bumper) {
-            turret.setTurretVoltage(-1.0)
+        if (controller.gamepad.y) {
+            intake.enableBothIntakes().schedule()
+        } else {
+            intake.stopBothIntakes().schedule()
+        }
+
+        if (controller.gamepad.a) {
+            turret.alignToAprilTag(limelight.getTx())
         } else {
             turret.setTurretVoltage(0.0)
         }

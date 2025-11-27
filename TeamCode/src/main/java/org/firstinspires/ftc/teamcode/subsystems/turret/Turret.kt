@@ -30,7 +30,7 @@ class Turret(val hardwareMap: HardwareMap, val telemetry: Telemetry): SubsystemB
     }
 
     override fun periodic() {
-        // motorController.getPosition() applies the reduction, returning the position of the subsystem.
+        //motorController.setPIDFCoefficients(TurretConstants.PIDF.pidfCoefficients)
         telemetry.addData("TurretPositionDegrees", motorController.getPosition().degrees)
     }
 
@@ -54,8 +54,14 @@ class Turret(val hardwareMap: HardwareMap, val telemetry: Telemetry): SubsystemB
             Limits.maximumLimit.degrees)
         )
 
-        val power = motorController.pidfController.calculate(motorController.getPosition().degrees, angle.degrees)
+        val power = motorController.pidfController.calculate(motorController.getPosition().degrees, coercedAngle.degrees)
         setTurretVoltage(power)
+
+    }
+
+    fun alignToAprilTag(tx: Double) {
+        val power = motorController.pidfController.calculate(tx, 0.0)
+        setTurretVoltage(-power)
 
     }
 }
