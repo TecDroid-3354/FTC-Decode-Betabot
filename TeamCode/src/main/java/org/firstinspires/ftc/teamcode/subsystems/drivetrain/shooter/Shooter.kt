@@ -1,6 +1,5 @@
 package org.firstinspires.ftc.teamcode.shooter
 
-import AngularVelocity
 import com.qualcomm.robotcore.hardware.HardwareMap
 import com.seattlesolvers.solverslib.command.SubsystemBase
 import com.seattlesolvers.solverslib.hardware.motors.Motor

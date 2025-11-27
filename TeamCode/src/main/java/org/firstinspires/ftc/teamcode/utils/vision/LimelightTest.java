@@ -4,6 +4,7 @@ import com.qualcomm.hardware.limelightvision.LLResult;
 import com.qualcomm.hardware.limelightvision.Limelight3A;
 import com.qualcomm.hardware.rev.RevHubOrientationOnRobot;
 import com.qualcomm.hardware.sparkfun.SparkFunOTOS;
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.IMU;
@@ -26,7 +27,7 @@ import org.firstinspires.ftc.robotcore.external.navigation.YawPitchRollAngles;
  *      Webcam: https://www.youtube.com/watch?v=OZt33z-lyYo
  * */
 
-
+@Disabled
 @TeleOp(name = "limelightTest", group = "testing")
 public class LimelightTest extends OpMode {
     private Limelight3A limelight;
