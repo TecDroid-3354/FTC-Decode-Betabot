@@ -3,13 +3,16 @@ package org.firstinspires.ftc.teamcode.utils.vision;
 import com.qualcomm.hardware.limelightvision.LLResult;
 import com.qualcomm.hardware.limelightvision.Limelight3A;
 import com.qualcomm.hardware.rev.RevHubOrientationOnRobot;
+import com.qualcomm.hardware.sparkfun.SparkFunOTOS;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.IMU;
+import com.seattlesolvers.solverslib.util.MathUtils;
 
+import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
+import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.Pose3D;
 import org.firstinspires.ftc.robotcore.external.navigation.YawPitchRollAngles;
-
 
 /*
  * USEFUL VIDEO LINKS
@@ -29,21 +32,29 @@ public class LimelightTest extends OpMode {
     private Limelight3A limelight;
     private IMU imu; // Setting the IMU is necessary to get MetaTag2,
     // which allows for better data retrieving using the IMU
+    private SparkFunOTOS otos;
 
-    private double distance; // Allows to accurately measure the target-lens distance
+    private double limelightMountAngleDegrees; // LL mount angle from horizontal
+    private double limelightLensHeightInches; // LL lens Height from ground
+    private double goalHeightInches; // Target height from ground
 
     @Override
     public void init() {
         limelight = hardwareMap.get(Limelight3A.class, "limelight"); // Retrieves pipeline
-        limelight.pipelineSwitch(4); // Gets the limelight pipeline
+        limelight.pipelineSwitch(1); // Gets the limelight pipeline
 
-        // TODO: change to the sparkfun otos
+        // TODO: Get these values
+        limelightMountAngleDegrees = 0.0;
+        limelightLensHeightInches = 0.0;
+        goalHeightInches = 0.0;
+
         imu = hardwareMap.get(IMU.class, "imu");
-        RevHubOrientationOnRobot revHubOrientationOnRobot = new RevHubOrientationOnRobot(
-                RevHubOrientationOnRobot.LogoFacingDirection.RIGHT,
-                RevHubOrientationOnRobot.UsbFacingDirection.FORWARD
-        );
-        imu.initialize(new IMU.Parameters(revHubOrientationOnRobot));
+        imu.resetYaw();
+
+        otos = hardwareMap.get(SparkFunOTOS.class, "otos");
+        otos.setAngularUnit(AngleUnit.DEGREES);
+        otos.setLinearUnit(DistanceUnit.INCH);
+        otos.resetTracking();
     }
 
     @Override
@@ -57,16 +68,29 @@ public class LimelightTest extends OpMode {
     public void loop() {
         // Getting the robot's orientation through the IMU
         YawPitchRollAngles orientation = imu.getRobotYawPitchRollAngles();
-        telemetry.addData("orientation", orientation.getYaw());
+        telemetry.addData("orientationIMU", orientation.getYaw());
+        telemetry.addData("orientationOTOS", otos.getPosition().h);
 
         // Updating limelights' robot orientation with the Yaw
-        limelight.updateRobotOrientation(orientation.getYaw());
+        limelight.updateRobotOrientation(otos.getPosition().h);
 
         // LLResult is like a container full of information about what Limelight sees
         LLResult llResult = limelight.getLatestResult();
 
+        // Math to calculate distance was taken from documentation:
+        // https://docs.limelightvision.io/docs/docs-limelight/tutorials/tutorial-estimating-distance#using-area-to-estimate-distance
         // The condition verifies whether the LimeLight Result is a valid statement
         if (llResult != null && llResult.isValid()) {
+            // Offset to target in degrees (from crosshair)
+            double targetOffsetAngle_Vertical = llResult.getTy();
+            // Needs to be in radians for tan() method
+            double angleToGoalRadians = Math.toRadians(limelightMountAngleDegrees + targetOffsetAngle_Vertical);
+
+            // Calculated distance from limelight lens to goal (in inches)
+            double distanceFromLimelightToGoalInches =
+                    (goalHeightInches - limelightLensHeightInches) / Math.tan(angleToGoalRadians);
+            telemetry.addData("TargetDistanceInches", distanceFromLimelightToGoalInches);
+
             // We will first get a (MetaTag2) Pose3D. From here, we will extract its Tx, Ty & Ta components
             Pose3D botPose = llResult.getBotpose_MT2();
             telemetry.addData("Tx", llResult.getTx()); // Represents how far left/right the target is (in degrees)

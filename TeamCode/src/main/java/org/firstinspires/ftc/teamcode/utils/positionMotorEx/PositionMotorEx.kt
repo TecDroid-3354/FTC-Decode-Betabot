@@ -18,7 +18,7 @@ class PositionMotorEx(
     private var lastPower = 0.0
 
     // Setting up the PID controller that will manage the position-achieving
-    private var pidfController: PIDFController = PIDFController(config.pidfCoefficients)
+    val pidfController: PIDFController = PIDFController(config.pidfCoefficients)
 
 
     /* ! CONFIG METHODS ! */
@@ -32,6 +32,7 @@ class PositionMotorEx(
         // Setting up the motor & encoder default behavior
         motor.setZeroPowerBehavior(config.zeroPowerBehavior)
         motor.encoder.setDirection(config.direction)
+        motor.resetEncoder()
 
         // Arranging PIDs
         setPIDFCoefficients(config.pidfCoefficients)
@@ -78,7 +79,6 @@ class PositionMotorEx(
     // Stops the motor using two instructions
     override fun stopMotor() {
         motor.set(0.0)
-        motor.stopMotor()
     }
 
 
