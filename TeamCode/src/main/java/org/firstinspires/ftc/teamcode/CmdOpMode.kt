@@ -4,14 +4,19 @@ import com.qualcomm.robotcore.eventloop.opmode.TeleOp
 import com.seattlesolvers.solverslib.command.CommandOpMode
 import com.seattlesolvers.solverslib.command.CommandScheduler
 import com.seattlesolvers.solverslib.command.InstantCommand
+import com.seattlesolvers.solverslib.command.RunCommand
 import com.seattlesolvers.solverslib.command.button.GamepadButton
+import com.seattlesolvers.solverslib.command.button.Trigger
 import com.seattlesolvers.solverslib.gamepad.GamepadEx
 import com.seattlesolvers.solverslib.gamepad.GamepadKeys
+import com.seattlesolvers.solverslib.gamepad.TriggerReader
 import org.firstinspires.ftc.teamcode.commands.JoystickCmd
 import org.firstinspires.ftc.teamcode.shooter.Shooter
 import org.firstinspires.ftc.teamcode.subsystems.drivetrain.SolversMecanum
 import org.firstinspires.ftc.teamcode.subsystems.indexer.Indexer
 import org.firstinspires.ftc.teamcode.subsystems.intake.Intake
+import org.firstinspires.ftc.teamcode.subsystems.turret.Turret
+import org.firstinspires.ftc.teamcode.utils.vision.Limelight
 
 
 // Personally, I chose to run my code using a command-based Op Mode since it works better for me
@@ -34,6 +39,8 @@ class CMDOpMode : CommandOpMode() {
     lateinit var intake: Intake
     lateinit var indexer: Indexer
     lateinit var shooter: Shooter
+    lateinit var turret: Turret
+    lateinit var limelight: Limelight
 
     // Declaring useful components
     lateinit var controller: GamepadEx
@@ -55,7 +62,10 @@ class CMDOpMode : CommandOpMode() {
 
         indexer = Indexer(hardwareMap, telemetry)
 
-        shooter= Shooter(hardwareMap, telemetry)
+        shooter = Shooter(hardwareMap, telemetry)
+        turret = Turret(hardwareMap, telemetry)
+        limelight = Limelight(hardwareMap, telemetry)
+        limelight.start()
 
 //        hood = Hood(hardwareMap, telemetry)
 
@@ -80,45 +90,32 @@ class CMDOpMode : CommandOpMode() {
 
         GamepadButton(controller, GamepadKeys.Button.LEFT_BUMPER)
             .whenPressed(InstantCommand({
-                //intake.enableIntake(IntakeDirection.LEFT, 1.0)
                 shooter.shoot()
             })).whenReleased(InstantCommand({
-                //intake.stopIntake(IntakeDirection.LEFT)
                 shooter.stop()
             }))
 
         GamepadButton(controller, GamepadKeys.Button.Y)
             .whenPressed(InstantCommand({
-                indexer.frontSlot.home()
+                indexer.feedCMD("FrontSlot")
             }))
 
 
         GamepadButton(controller, GamepadKeys.Button.B)
             .whenPressed(InstantCommand({
-                indexer.frontSlot.feed()
+                indexer.feedCMD("MiddleSlot")
             }))
-
-
-        GamepadButton(controller, GamepadKeys.Button.A)
-            .whenPressed(InstantCommand({
-                indexer.middleSlot.home()
-            }))
-
 
         GamepadButton(controller, GamepadKeys.Button.X)
             .whenPressed(InstantCommand({
-                indexer.middleSlot.feed()
+                indexer.feedCMD("BackSlot")
             }))
 
-        GamepadButton(controller, GamepadKeys.Button.DPAD_UP)
-            .whenPressed(InstantCommand({
-                indexer.backSlot.home()
-            }))
 
-        GamepadButton(controller, GamepadKeys.Button.DPAD_DOWN)
-            .whenPressed(InstantCommand({
-                indexer.backSlot.feed()
-            }))
+        Trigger({ TriggerReader(controller, GamepadKeys.Trigger.RIGHT_TRIGGER).wasJustPressed() })
+            .whenActive(Runnable { turret.alignToAprilTag(limelight.getTx()) })
+        Trigger({ TriggerReader(controller, GamepadKeys.Trigger.LEFT_TRIGGER).wasJustPressed() })
+            .whenActive(Runnable { turret.setTurretAngle(Angle.fromDegrees(0.0)) })
 
 
 //
