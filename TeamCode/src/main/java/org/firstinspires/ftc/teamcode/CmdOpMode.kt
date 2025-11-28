@@ -65,7 +65,7 @@ class CMDOpMode : CommandOpMode() {
         turret = Turret(hardwareMap, telemetry)
         limelight = Limelight(hardwareMap, telemetry)
         limelight.start()
-        limelight.setLLPollRate(150)
+        limelight.setLLPollRate(250)
 
         hood = Hood(hardwareMap, telemetry)
 
@@ -122,14 +122,13 @@ class CMDOpMode : CommandOpMode() {
 //            .whenActive(InstantCommand({ turret.setTurretAngle(Angle.fromDegrees(0.0)) }))
 
 //
-//        GamepadButton(controller, GamepadKeys.Button.A)
-//            .whenPressed(
-//                InstantCommand({ hood.setHoodAngle(Angle.fromDegrees(90.0)) })
-//            )
+        GamepadButton(controller, GamepadKeys.Button.A)
+            .whenPressed(
+                InstantCommand({ hood.setHoodPosition(0.74) })
+            )
     }
 
     fun periodic() {
-        if (limelight.)
         turret.alignToAprilTag(limelight.getTx())
     }
 

@@ -1,5 +1,8 @@
 package org.firstinspires.ftc.teamcode.shooter
 
+import com.qualcomm.robotcore.hardware.DcMotor
+import com.qualcomm.robotcore.hardware.DcMotorEx
+import com.qualcomm.robotcore.hardware.DcMotorSimple
 import com.qualcomm.robotcore.hardware.HardwareMap
 import com.seattlesolvers.solverslib.command.SubsystemBase
 import com.seattlesolvers.solverslib.hardware.motors.Motor
@@ -27,7 +30,7 @@ class Shooter(hw: HardwareMap, val telemetry: Telemetry): SubsystemBase() {
 
     // This is where the motor intended to control the shooter is declared
     //val motor: VelocityMotorEx
-    val motor:  VelocityMotorEx
+    val motor:  DcMotor
 
     // Initialization //
 
@@ -38,9 +41,9 @@ class Shooter(hw: HardwareMap, val telemetry: Telemetry): SubsystemBase() {
 //        motor.setVeloCoefficients(1.0, 0.0, 0.0)
         // The shooter motor controller is initialized by creating an instance of Motor and passing a velocity motor config
 
-        motor = VelocityMotorEx(MotorEx(hw, ShooterConstants.shooterMotorId, 28.0, 6000.0), shooterMotorConfig)
-        motor.motor.setRunMode(Motor.RunMode.RawPower)
-        motor.setInverted(true)
+        motor = hw.get(DcMotor::class.java, ShooterConstants.shooterMotorId)
+        motor.mode = DcMotor.RunMode.RUN_WITHOUT_ENCODER
+        motor.direction = DcMotorSimple.Direction.REVERSE
     }
 
     // Periodic method //
@@ -56,14 +59,14 @@ class Shooter(hw: HardwareMap, val telemetry: Telemetry): SubsystemBase() {
      */
     fun shoot() {
         //motor.setVelocity(velocity)
-        motor.motor.set(1.0)
+        motor.power = 1.0
     }
 
     /**
      * Calls the super class method for stopping the motor
       */
     fun stop() {
-        motor.motor.set(0.0)
+        motor.power = 0.0
     }
 
     // Getters //

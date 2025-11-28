@@ -20,7 +20,7 @@ class TurretConstants {
     }
 
     object Limits {
-        val minimumLimit = Angle.fromDegrees(-146.0)
+        val minimumLimit = Angle.fromDegrees(-120.0)
         val maximumLimit = Angle.fromDegrees(133.0)
     }
 
@@ -29,7 +29,7 @@ class TurretConstants {
     class PIDF {
         companion object {
             @JvmField
-            var pidfCoefficients = PIDFCoefficients(0.025, 0.0, 0.0, 0.0)
+            var pidfCoefficients = PIDFCoefficients(0.03, 0.0009, 0.00045, 0.0)
         }
     }
 }
