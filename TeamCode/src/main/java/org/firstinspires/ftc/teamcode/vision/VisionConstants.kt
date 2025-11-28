@@ -11,7 +11,7 @@ class VisionConstants {
     object LimelightConfiguration {
         // Rate at which the limelight data is retrieved. Must range from 1 - 250.
         val PollRateHz: Int = 250
-        val PipelineIndex: Int = 0
+        val PipelineIndex: Int = 1
     }
 
     // Get these values from design
@@ -46,6 +46,6 @@ class VisionConstants {
 
     /* Contains any tolerance and setpoint necessary for alignment with vision */
     object AlignmentParameters {
-        val ShootingHorizontalTolerance: Distance = Distance.fromInches(0.0)
+        val ShootingHorizontalTolerance: Distance = Distance.fromInches(1.0)
     }
 }

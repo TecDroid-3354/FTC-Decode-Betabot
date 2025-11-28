@@ -1,5 +1,6 @@
 package org.firstinspires.ftc.teamcode.vision
 
+import Distance
 import com.qualcomm.hardware.limelightvision.Limelight3A
 import com.qualcomm.robotcore.hardware.HardwareMap
 import org.firstinspires.ftc.robotcore.external.navigation.Pose3D
@@ -20,6 +21,17 @@ class LimelightVision(val hw: HardwareMap) {
         limelight.setPollRateHz(LimelightConfiguration.PollRateHz)
         // Sets the pipeline
         limelight.pipelineSwitch(LimelightConfiguration.PipelineIndex)
+    }
+
+    fun getDistance(): Pair<Distance, Distance> {
+        // Gets the camera position relative to the closest detected aprilTag.
+        // It is important to use cameraPoseTargetSpace and NOT robotPoseTargetSpace, as the last
+        // one is useful when the camera is fixed, which in this case is not.
+        val robotPoseRelativeToAprilTag: Pose3D = limelight.latestResult
+            .fiducialResults[0].cameraPoseTargetSpace
+
+        return Pair(Distance.fromMeters(robotPoseRelativeToAprilTag.position.z),
+            Distance.fromMeters(robotPoseRelativeToAprilTag.position.x))
     }
 
     /* Determines if the limelight (and therefore, turret, NOT chassis) is at set point by comparing
