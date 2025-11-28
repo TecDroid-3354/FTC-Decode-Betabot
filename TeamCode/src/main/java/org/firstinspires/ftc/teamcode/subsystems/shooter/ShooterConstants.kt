@@ -21,7 +21,7 @@ object ShooterConstants {
     // The motor's behavior when is not given any output
     val zeroPowerBehavior = Motor.ZeroPowerBehavior.BRAKE
     // The motor's direction
-    val direction = DcMotorSimple.Direction.REVERSE
+    val isInverted =  false
     // The PID controller
     val pidController = PIDController(1.0, 0.0, 0.0)
 

@@ -14,7 +14,7 @@ import org.firstinspires.ftc.teamcode.utils.velocityMotorEx.VelocityMotorEx
  */
 val shooterMotorConfig = VelocityMotorConfig(
     ShooterConstants.zeroPowerBehavior,
-    ShooterConstants.direction,
+    ShooterConstants.isInverted,
     ShooterConstants.ticksPerRevolution,
     ShooterConstants.pidController,
 )
@@ -40,11 +40,12 @@ class Shooter(hw: HardwareMap, val telemetry: Telemetry): SubsystemBase() {
 
         motor = VelocityMotorEx(MotorEx(hw, ShooterConstants.shooterMotorId, 28.0, 6000.0), shooterMotorConfig)
         motor.motor.setRunMode(Motor.RunMode.RawPower)
+        motor.setInverted(true)
     }
 
     // Periodic method //
     override fun periodic() {
-        telemetry.addData("position", motor.motor.rate)
+        //telemetry.addData("position", motor.motor.rate)
     }
 
     // Functional code //

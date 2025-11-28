@@ -40,7 +40,7 @@ class IndexerConstants {
 
             const val FEED: Double = 0.3
 
-            const val HOME: Double = 0.0
+            const val HOME: Double = 0.01
         }
 
         object BackPositions {

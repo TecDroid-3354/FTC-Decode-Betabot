@@ -63,9 +63,7 @@ class Intake(
 
     }
 
-    override fun periodic() {
-        telemetry.addData("Rev per min", leftMotor.getVelocity())
-    }
+    override fun periodic() {}
 
     // Setup code //
 
@@ -74,16 +72,17 @@ class Intake(
         rightMotor = VelocityMotorEx(
             MotorEx(hardwareMap, "rightIntakeMotor", 28.0, 6000.0),
             VelocityMotorConfig(
-                direction = DcMotorSimple.Direction.FORWARD,
-                pidfCoefficients = PIDFController(0.5, 0.0, 0.0, 0.0))
+                zeroPowerBehavior = Motor.ZeroPowerBehavior.FLOAT,
+                false,
+                pidfCoefficients = PIDFController(0.5, 0.0, 0.0, 0.1))
         )
 
         leftMotor = VelocityMotorEx(
             MotorEx(hardwareMap, "leftIntakeMotor", 28.0, 6000.0),
             VelocityMotorConfig(
-                direction = DcMotorSimple.Direction.REVERSE,
+                zeroPowerBehavior = Motor.ZeroPowerBehavior.FLOAT,
+                true,
                 pidfCoefficients = PIDFController(0.5, 0.0, 0.0, 0.1))
         )
-        leftMotor.setMode(Motor.RunMode.VelocityControl)
     }
 }

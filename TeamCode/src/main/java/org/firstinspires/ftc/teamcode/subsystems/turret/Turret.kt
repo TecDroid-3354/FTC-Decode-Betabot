@@ -30,7 +30,7 @@ class Turret(val hardwareMap: HardwareMap, val telemetry: Telemetry): SubsystemB
     }
 
     override fun periodic() {
-        //motorController.setPIDFCoefficients(TurretConstants.PIDF.pidfCoefficients)
+        motorController.setPIDFCoefficients(TurretConstants.PIDF.pidfCoefficients)
         telemetry.addData("TurretPositionDegrees", motorController.getPosition().degrees)
     }
 
@@ -62,6 +62,5 @@ class Turret(val hardwareMap: HardwareMap, val telemetry: Telemetry): SubsystemB
     fun alignToAprilTag(tx: Double) {
         val power = motorController.pidfController.calculate(tx, 0.0)
         setTurretVoltage(-power)
-
     }
 }

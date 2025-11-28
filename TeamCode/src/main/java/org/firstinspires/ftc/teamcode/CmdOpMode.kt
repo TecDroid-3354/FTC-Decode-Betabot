@@ -4,17 +4,15 @@ import com.qualcomm.robotcore.eventloop.opmode.TeleOp
 import com.seattlesolvers.solverslib.command.CommandOpMode
 import com.seattlesolvers.solverslib.command.CommandScheduler
 import com.seattlesolvers.solverslib.command.InstantCommand
-import com.seattlesolvers.solverslib.command.RunCommand
 import com.seattlesolvers.solverslib.command.button.GamepadButton
-import com.seattlesolvers.solverslib.command.button.Trigger
 import com.seattlesolvers.solverslib.gamepad.GamepadEx
 import com.seattlesolvers.solverslib.gamepad.GamepadKeys
-import com.seattlesolvers.solverslib.gamepad.TriggerReader
 import org.firstinspires.ftc.teamcode.commands.JoystickCmd
 import org.firstinspires.ftc.teamcode.shooter.Shooter
 import org.firstinspires.ftc.teamcode.subsystems.drivetrain.SolversMecanum
 import org.firstinspires.ftc.teamcode.subsystems.indexer.Indexer
 import org.firstinspires.ftc.teamcode.subsystems.intake.Intake
+import org.firstinspires.ftc.teamcode.subsystems.shooter.Hood
 import org.firstinspires.ftc.teamcode.subsystems.turret.Turret
 import org.firstinspires.ftc.teamcode.utils.vision.Limelight
 
@@ -41,6 +39,7 @@ class CMDOpMode : CommandOpMode() {
     lateinit var shooter: Shooter
     lateinit var turret: Turret
     lateinit var limelight: Limelight
+    lateinit var hood: Hood
 
     // Declaring useful components
     lateinit var controller: GamepadEx
@@ -66,6 +65,9 @@ class CMDOpMode : CommandOpMode() {
         turret = Turret(hardwareMap, telemetry)
         limelight = Limelight(hardwareMap, telemetry)
         limelight.start()
+        limelight.setLLPollRate(150)
+
+        hood = Hood(hardwareMap, telemetry)
 
 //        hood = Hood(hardwareMap, telemetry)
 
@@ -96,27 +98,28 @@ class CMDOpMode : CommandOpMode() {
             }))
 
         GamepadButton(controller, GamepadKeys.Button.Y)
-            .whenPressed(InstantCommand({
-                indexer.feedCMD("FrontSlot")
-            }))
+            .whenPressed(indexer.feedAllShooter())
 
 
-        GamepadButton(controller, GamepadKeys.Button.B)
-            .whenPressed(InstantCommand({
-                indexer.feedCMD("MiddleSlot")
-            }))
-
-        GamepadButton(controller, GamepadKeys.Button.X)
-            .whenPressed(InstantCommand({
-                indexer.feedCMD("BackSlot")
-            }))
-
-
-        Trigger({ TriggerReader(controller, GamepadKeys.Trigger.RIGHT_TRIGGER).wasJustPressed() })
-            .whenActive(Runnable { turret.alignToAprilTag(limelight.getTx()) })
-        Trigger({ TriggerReader(controller, GamepadKeys.Trigger.LEFT_TRIGGER).wasJustPressed() })
-            .whenActive(Runnable { turret.setTurretAngle(Angle.fromDegrees(0.0)) })
-
+//        GamepadButton(controller, GamepadKeys.Button.Y)
+//            .whenPressed(InstantCommand({
+//                indexer.feedCMD("FrontSlot")
+//            }))
+//
+//        GamepadButton(controller, GamepadKeys.Button.B)
+//            .whenPressed(InstantCommand({
+//                indexer.feedCMD("MiddleSlot")
+//            }))
+//
+//        GamepadButton(controller, GamepadKeys.Button.X)
+//            .whenPressed(InstantCommand({
+//                indexer.feedCMD("BackSlot")
+//            }))
+//
+//        Trigger { controller.getTrigger(GamepadKeys.Trigger.RIGHT_TRIGGER) > 0.1 }
+//            .whenActive(InstantCommand({ turret.alignToAprilTag(limelight.getTx()) }))
+//        Trigger { controller.getTrigger(GamepadKeys.Trigger.LEFT_TRIGGER) > 0.1 }
+//            .whenActive(InstantCommand({ turret.setTurretAngle(Angle.fromDegrees(0.0)) }))
 
 //
 //        GamepadButton(controller, GamepadKeys.Button.A)
@@ -125,7 +128,10 @@ class CMDOpMode : CommandOpMode() {
 //            )
     }
 
-    fun periodic() {}
+    fun periodic() {
+        if (limelight.)
+        turret.alignToAprilTag(limelight.getTx())
+    }
 
     // Main code body
     override fun runOpMode() {
@@ -137,6 +143,7 @@ class CMDOpMode : CommandOpMode() {
 
         // Run the scheduler
         while (!isStopRequested && opModeIsActive()) {
+
             // Command for actually running the scheduler
             CommandScheduler.getInstance().run()
             periodic()

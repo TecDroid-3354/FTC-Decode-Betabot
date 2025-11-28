@@ -20,8 +20,8 @@ class TurretConstants {
     }
 
     object Limits {
-        val minimumLimit = Angle.fromDegrees(-11.0)
-        val maximumLimit = Angle.fromDegrees(225.0)
+        val minimumLimit = Angle.fromDegrees(-146.0)
+        val maximumLimit = Angle.fromDegrees(133.0)
     }
 
 

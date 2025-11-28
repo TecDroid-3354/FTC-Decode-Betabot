@@ -33,9 +33,9 @@ class Limelight(hardwareMap: HardwareMap, val telemetry: Telemetry) : SubsystemB
         limelight!!.pipelineSwitch(1) // Gets the limelight pipeline
 
         // TODO: Get these values
-        limelightMountAngleDegrees = 0.0
-        limelightLensHeightInches = 0.0
-        goalHeightInches = 0.0
+        limelightMountAngleDegrees = 21.0
+        limelightLensHeightInches = 12.5497
+        goalHeightInches = 38.75 // According to FTC Game manual
 
         imu = hardwareMap.get<IMU?>(IMU::class.java, "imu")
         imu!!.resetYaw()
@@ -50,6 +50,10 @@ class Limelight(hardwareMap: HardwareMap, val telemetry: Telemetry) : SubsystemB
         // We start the limelight specifically at this point so that it doesn't take any energy
         // before the start button is pressed in match
         limelight!!.start()
+    }
+
+    fun setLLPollRate(rate: Int) {
+        limelight?.setPollRateHz(rate)
     }
 
     fun getTx(): Double = tx

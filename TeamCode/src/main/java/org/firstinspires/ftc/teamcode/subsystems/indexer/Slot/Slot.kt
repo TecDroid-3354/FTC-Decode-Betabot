@@ -40,14 +40,12 @@ class Slot (val config: SlotConfig, hw: HardwareMap, telemetry: Telemetry) {
         rightColorSensor = ColorSensorEx(hw.get(
             ColorSensor::class.java,
             config.rightColorSensorId),
-            telemetry,
-            config.archiveExtension)
+            telemetry)
 
         leftColorSensor = ColorSensorEx(hw.get(
             ColorSensor::class.java,
             config.leftColorSensorId),
-            telemetry,
-            config.archiveExtension)
+            telemetry)
 
         SequentialCommandGroup(
             InstantCommand({ home() }),
@@ -74,8 +72,6 @@ class Slot (val config: SlotConfig, hw: HardwareMap, telemetry: Telemetry) {
             DetectedColor.UNKNOWN
         }
     }
-
-    fun getHSV() = rightColorSensor.getHSV()
 
     private fun setServoPosition(position: Double) {
         servo.set(position)

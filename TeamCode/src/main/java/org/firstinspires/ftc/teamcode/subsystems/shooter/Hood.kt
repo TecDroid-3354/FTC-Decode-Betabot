@@ -4,6 +4,7 @@ import Angle
 import com.qualcomm.robotcore.hardware.HardwareMap
 import com.seattlesolvers.solverslib.command.SubsystemBase
 import com.seattlesolvers.solverslib.hardware.ServoEx
+import com.seattlesolvers.solverslib.util.MathUtils
 import org.firstinspires.ftc.robotcore.external.Telemetry
 
 /**
@@ -20,8 +21,9 @@ class Hood(val hardwareMap: HardwareMap, val telemetry: Telemetry): SubsystemBas
 
     // Initialization code //
     init {
-        servo = ServoEx(hardwareMap, hardwareMap.get(HoodConstants.Identification.hoodId).deviceName)
+        servo = ServoEx(hardwareMap, HoodConstants.Identification.hoodId)
         servoConfig()
+        setHoodPosition(HoodConstants.Positions.homePosition)
 
         // servo.position returns a value from 0.0 to 1.0, we take it as rotations.
         currentAngle = Angle.fromRotations(servo.servo.position)
@@ -34,9 +36,10 @@ class Hood(val hardwareMap: HardwareMap, val telemetry: Telemetry): SubsystemBas
     }
 
     // Sets the desired angle to the servo (in radians) and updates the currentAngle variable //
-    fun setHoodAngle(angle: Angle) {
-        servo.set(angle.radians) // Per documentation, servo.set() requires radians.
-        currentAngle = angle
+    fun setHoodPosition(position: Double) {
+        val clampedPosition = MathUtils.clamp(position, HoodConstants.Positions.minPosition,
+            HoodConstants.Positions.homePosition)
+        servo.set(clampedPosition) // Per documentation, servo.set() requires radians
     }
 
     // Setup code //

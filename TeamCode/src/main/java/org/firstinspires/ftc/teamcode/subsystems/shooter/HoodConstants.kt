@@ -8,4 +8,9 @@ class HoodConstants {
     object Configuration {
         val hoodServoInverted = false
     }
+
+    object Positions {
+        val homePosition = 0.78
+        val minPosition = 0.0
+    }
 }

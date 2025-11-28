@@ -83,13 +83,6 @@ class Indexer(val hw: HardwareMap, val telemetry: Telemetry) : SubsystemBase() {
         return cmdGroup
     }
 
-    fun feedAllShooter(): SequentialCommandGroup {
-        return SequentialCommandGroup(
-            feedCMD(slotList[0]),
-            feedCMD(slotList[1]),
-            feedCMD(slotList[2]))
-    }
-
     fun feedShooter(motifPatterns: MotifPatterns): SequentialCommandGroup {
         var slotOrder = arrayOf("", "", "")
         val cmdGroup = SequentialCommandGroup()
@@ -131,8 +124,15 @@ class Indexer(val hw: HardwareMap, val telemetry: Telemetry) : SubsystemBase() {
         }
     }
 
+    fun feedAllShooter(): SequentialCommandGroup {
+        return SequentialCommandGroup(
+            feedCMD(slotList[0]),
+            feedCMD(slotList[1]),
+            feedCMD(slotList[2]))
+    }
+
     private fun feedCMD(slot: Slot): Command {
-            return SequentialCommandGroup(
+        return SequentialCommandGroup(
                 InstantCommand({ slot.feed() }),
                 WaitCommand(1000),
                 InstantCommand({ slot.home() }),
