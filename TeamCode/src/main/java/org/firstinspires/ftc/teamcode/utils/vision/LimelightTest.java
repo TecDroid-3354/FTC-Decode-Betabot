@@ -69,8 +69,8 @@ public class LimelightTest extends OpMode {
     public void loop() {
         // Getting the robot's orientation through the IMU
         YawPitchRollAngles orientation = imu.getRobotYawPitchRollAngles();
-        telemetry.addData("orientationIMU", orientation.getYaw());
-        telemetry.addData("orientationOTOS", otos.getPosition().h);
+//        telemetry.addData("orientationIMU", orientation.getYaw());
+//        telemetry.addData("orientationOTOS", otos.getPosition().h);
 
         // Updating limelights' robot orientation with the Yaw
         limelight.updateRobotOrientation(otos.getPosition().h);
@@ -90,17 +90,18 @@ public class LimelightTest extends OpMode {
             // Calculated distance from limelight lens to goal (in inches)
             double distanceFromLimelightToGoalInches =
                     (goalHeightInches - limelightLensHeightInches) / Math.tan(angleToGoalRadians);
+
             telemetry.addData("TargetDistanceInches", distanceFromLimelightToGoalInches);
 
             // We will first get a (MetaTag2) Pose3D. From here, we will extract its Tx, Ty & Ta components
             Pose3D botPose = llResult.getBotpose_MT2();
-            telemetry.addData("Tx", llResult.getTx()); // Represents how far left/right the target is (in degrees)
-            telemetry.addData("Ty", llResult.getTy()); // Represents how far up/down the target is (in degrees)
-            telemetry.addData("Ta", llResult.getTa()); // Represents how big the AprilTag looks
+//            telemetry.addData("Tx", llResult.getTx()); // Represents how far left/right the target is (in degrees)
+//            telemetry.addData("Ty", llResult.getTy()); // Represents how far up/down the target is (in degrees)
+//            telemetry.addData("Ta", llResult.getTa()); // Represents how big the AprilTag looks
             // according to the camera field of view (0-100%)
 
-            telemetry.addData("BotPose", botPose.toString());
-            telemetry.addData("Yaw", botPose.getOrientation().getYaw());
+//            telemetry.addData("BotPose", botPose.toString());
+//            telemetry.addData("Yaw", botPose.getOrientation().getYaw());
 
             /*
              * It is important to notice that the Full3D option should be enabled
