@@ -9,8 +9,9 @@ import com.seattlesolvers.solverslib.command.WaitCommand
 import org.firstinspires.ftc.robotcore.external.Telemetry
 import org.firstinspires.ftc.teamcode.subsystems.indexer.Slot.Slot
 import org.firstinspires.ftc.teamcode.subsystems.indexer.Slot.SlotConfig
-import org.firstinspires.ftc.teamcode.subsystems.indexer.IndexerConstants.Ids
 import org.firstinspires.ftc.teamcode.subsystems.indexer.IndexerConstants.Positions
+import org.firstinspires.ftc.teamcode.subsystems.indexer.IndexerConstants.Identification
+import org.firstinspires.ftc.teamcode.subsystems.indexer.IndexerConstants.Configuration
 import org.firstinspires.ftc.teamcode.subsystems.indexer.IndexerConstants.Extensions
 import org.firstinspires.ftc.teamcode.utils.colorSensor.ColorSensorEx.DetectedColor
 
@@ -21,30 +22,50 @@ enum class MotifPatterns(val pattern: List<DetectedColor>) {
 }
 
 @Suppress("JoinDeclarationAndAssignment")
-class Indexer(val hw: HardwareMap, val telemetry: Telemetry) : SubsystemBase() {
-    var frontSlot: Slot
-    var backSlot: Slot
-    var middleSlot: Slot
+class Indexer(
+    hw: HardwareMap,
+    val telemetry: Telemetry
+): SubsystemBase() {
+
+    // Declaration of our slots //
+    val frontSlot: Slot
+    val backSlot: Slot
+    val middleSlot: Slot
     private var slotList: Array<Slot>
 
+    // Initialization code //
     init {
+
+        // Giving each slot its corresponding servo, absolute, color sensors and positions
         frontSlot = Slot(
-            SlotConfig(Ids.frontServo, true, Positions.FrontPositions.FEED,
-                Positions.FrontPositions.HOME, Ids.absFront, Ids.frontSlotRightSensor, Ids.frontSlotLeftSensor,
+            SlotConfig(Identification.FrontSlot.frontServoId, Configuration.isFrontServoInverted,
+                Positions.FrontPositions.FEED,
+                Positions.FrontPositions.HOME,
+                Identification.FrontSlot.absFront,
+                Identification.FrontSlot.frontSlotRightSensor,
+                Identification.FrontSlot.frontSlotLeftSensor,
                 Extensions.frontSlotExtension),
             hw,
             telemetry)
 
         middleSlot = Slot(
-            SlotConfig(Ids.rightServo, false, Positions.MiddlePositions.FEED,
-                Positions.MiddlePositions.HOME ,Ids.absRight, Ids.middleSlotRightSensor, Ids.middleSlotLeftSensor,
+            SlotConfig(Identification.MiddleSlot.middleServoId, Configuration.isMiddleServoInverted,
+                Positions.MiddlePositions.FEED,
+                Positions.MiddlePositions.HOME,
+                Identification.MiddleSlot.absMiddle,
+                Identification.MiddleSlot.middleSlotRightSensor,
+                Identification.MiddleSlot.middleSlotLeftSensor,
                 Extensions.middleSlotExtension),
             hw,
             telemetry)
 
         backSlot = Slot(
-            SlotConfig(Ids.leftServo, false, Positions.BackPositions.FEED,
-                Positions.BackPositions.HOME ,Ids.absLeft ,Ids.backSlotRightSensor, Ids.backSlotLeftSensor,
+            SlotConfig(Identification.BackSlot.backServoId, Configuration.isBackServoInverted,
+                Positions.BackPositions.FEED,
+                Positions.BackPositions.HOME,
+                Identification.BackSlot.absBack,
+                Identification.BackSlot.backSlotRightSensor,
+                Identification.BackSlot.backSlotLeftSensor,
                 Extensions.backSlotExtension),
             hw,
             telemetry)
@@ -52,8 +73,15 @@ class Indexer(val hw: HardwareMap, val telemetry: Telemetry) : SubsystemBase() {
         slotList = arrayOf(frontSlot, middleSlot, backSlot)
     }
 
+    // This code will execute indefinably during your operation
+    override fun periodic() {}
 
-
+    /**
+     * [rejectEvaluation] tracks if the ball configuration inside our indexer is valid for
+     * launching with a defined order, for that it updates indexes for both colors and if green balls are
+     * more than 1, it will reject the current ball configuration. Same if there are more than 2 purple balls.
+     * @return True if there is more than one green ball or two purple balls
+     */
     fun rejectEvaluation(): Boolean {
         var greenIndex = 0
         var purpleIndex = 0
@@ -69,6 +97,11 @@ class Indexer(val hw: HardwareMap, val telemetry: Telemetry) : SubsystemBase() {
         return greenIndex > 1 || purpleIndex > 2
     }
 
+    /**
+     * [feedShooter] returns a [SequentialCommandGroup] that feeds each slot if the color the color sensors detection
+     * is not [DetectedColor.UNKNOWN]
+     * @return a [SequentialCommandGroup] that feeds every slot that has a ball
+     */
     fun feedShooter(): SequentialCommandGroup {
         var slotOrder = arrayOf("", "", "")
         val cmdGroup = SequentialCommandGroup()
@@ -83,6 +116,13 @@ class Indexer(val hw: HardwareMap, val telemetry: Telemetry) : SubsystemBase() {
         return cmdGroup
     }
 
+    /**
+     * [feedShooter] receeives a [MotifPatterns] and determines if the bal configuration inside the [Indexer]
+     * is valid for completing the [MotifPatterns], and then sets the slot order if the ccolors inside each [Slot]
+     * satisfy the [MotifPatterns]
+     * @param motifPatterns The current Pattern, it must be received from Limelight readings
+     * @return a [SequentialCommandGroup] that executes the feed sequence on each valid slot
+     */
     fun feedShooter(motifPatterns: MotifPatterns): SequentialCommandGroup {
         var slotOrder = arrayOf("", "", "")
         val cmdGroup = SequentialCommandGroup()
@@ -104,7 +144,25 @@ class Indexer(val hw: HardwareMap, val telemetry: Telemetry) : SubsystemBase() {
         return cmdGroup
     }
 
-    fun feedCMD(slotId: String): Command {
+    /**
+     * [feedAllShooter] Returns a [SequentialCommandGroup] that executes a whole feed sequence involving
+     * three slots no matter if they have no ball inside
+     * @return a [SequentialCommandGroup] that executes [feedCMD] for each slot
+     */
+    fun feedAllShooter(): SequentialCommandGroup {
+        return SequentialCommandGroup(
+            feedCMD(slotList[0]),
+            feedCMD(slotList[1]),
+            feedCMD(slotList[2]))
+    }
+
+    /**
+     * [feedCMD] receives a string as an argument and returns a [SequentialCommandGroup] that executes if
+     * the received [Slot] is not null and executes normally the feed sequence.
+     * @param slotId the archive extension of a slot
+     * @return A [SequentialCommandGroup] that executes the feed sequence, if slot is null, it returns nothing
+     */
+    private fun feedCMD(slotId: String): Command {
         val slot: Slot? = when(slotId) {
             frontSlot.config.archiveExtension -> frontSlot
             backSlot.config.archiveExtension -> backSlot
@@ -124,24 +182,17 @@ class Indexer(val hw: HardwareMap, val telemetry: Telemetry) : SubsystemBase() {
         }
     }
 
-    fun feedAllShooter(): SequentialCommandGroup {
-        return SequentialCommandGroup(
-            feedCMD(slotList[0]),
-            feedCMD(slotList[1]),
-            feedCMD(slotList[2]))
-    }
-
+    /**
+     * [feedCMD] receives a [Slot] as an argument and returns a [SequentialCommandGroup] that rises the flicker
+     * and lowers it after the ball was launched.
+     * @param  slot , it must be initialized [Slot]
+     * @return a [SequentialCommandGroup] that executes the feed sequence
+     */
     private fun feedCMD(slot: Slot): Command {
         return SequentialCommandGroup(
-                InstantCommand({ slot.feed() }),
-                WaitCommand(1000),
-                InstantCommand({ slot.home() }),
-                WaitCommand(1000))
-    }
-
-    override fun periodic() {
-        telemetry.addData("FrontSlot", slotList[0].getDetectedColor())
-        telemetry.addData("MiddleSlot", slotList[1].getDetectedColor())
-        telemetry.addData("BackSlot", slotList[2].getDetectedColor())
+            InstantCommand({ slot.feed() }),
+            WaitCommand(1000),
+            InstantCommand({ slot.home() }),
+            WaitCommand(1000))
     }
 }

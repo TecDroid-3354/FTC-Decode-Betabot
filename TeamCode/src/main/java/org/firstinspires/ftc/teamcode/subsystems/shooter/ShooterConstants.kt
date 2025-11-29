@@ -1,29 +1,37 @@
 package org.firstinspires.ftc.teamcode.shooter
 
+import com.bylazar.configurables.annotations.Configurable
+import com.qualcomm.robotcore.hardware.DcMotor
 import com.qualcomm.robotcore.hardware.DcMotorSimple
 import com.seattlesolvers.solverslib.controller.PIDController
-import com.seattlesolvers.solverslib.hardware.motors.Motor
 
-object ShooterConstants {
+class ShooterConstants {
 
-    // Shooter constants //
+    object Identification {
+        // This is the motor's Id, it needs to be called in the Driver Hub's configuration
+        const val shooterMotorId = "shooterMotor"
+    }
 
-    // These are constant values that the shooter subsystem has, these values cannot be changed unless design
-    // says the opposite.
+    object Configuration {
 
-    // This is the identifier you need to specify in the Control Hub's configuration
-    const val shooterMotorId = "shooterMotor"
-    // This value needs to be measured physically
-    const val ticksPerRevolution = 28.0
+        // This value needs to be measured physically, the number of ticks per motor's revolution
+        const val ticksPerRevolution = 28.0
+        // Whether the motor is inverted
+        val direction = DcMotorSimple.Direction.REVERSE
+        // The motor's behavior when is not given any output
+        val zeroPowerBehavior = DcMotor.ZeroPowerBehavior.FLOAT
+        // The motor's run mode, in this case as the shooter does not need any encoder position, is set to
+        // run without encoder
+        val runMode = DcMotor.RunMode.RUN_WITHOUT_ENCODER
+    }
 
-    // These are also constants, but in Kotlin you can only declare as constants variables of primitive types
-
-    // The motor's behavior when is not given any output
-    val zeroPowerBehavior = Motor.ZeroPowerBehavior.BRAKE
-    // The motor's direction
-    val isInverted =  false
-    // The PID controller
-    val pidController = PIDController(1.0, 0.0, 0.0)
-
-    val motorType = Motor.GoBILDA.BARE
+    // It will be used to give the motor the correct velocity to be set to
+    @Configurable
+    class PIDF {
+        companion object {
+            @JvmField
+            // The PID controller used for the subsytem's motor
+            var pidController = PIDController(1.0, 0.0, 0.0)
+        }
+    }
 }

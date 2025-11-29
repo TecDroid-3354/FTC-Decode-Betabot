@@ -16,8 +16,8 @@ class VisionConstants {
 
     // Get these values from design
     object LimelightPhysicalDescription {
-        val LLMountAngleFromHorizontal: Angle = Angle.fromDegrees(0.0)
-        val LLHeightFromGroundToLens: Distance = Distance.fromInches(0.0)
+        val LLMountAngleFromHorizontal: Angle = Angle.fromDegrees(21.0)
+        val LLHeightFromGroundToLens: Distance = Distance.fromInches(12.5497)
     }
 
     // Retrieved from Decode Manual
@@ -37,11 +37,7 @@ class VisionConstants {
 
         // Distance to the top of the rectangle part of the GOAL is 38.75 inches, but we need the
         // center of the aprilTag, which is 9.25 inches below
-        val BlueGoalHeightFromGround: Distance = Distance.fromInches(38.75 - 9.25)
-
-        // Distance to the top of the rectangle part of the GOAL is 38.75 inches, but we need the
-        // center of the aprilTag, which is 9.25 inches below
-        val RedGoalHeightFromGround: Distance = Distance.fromInches(38.75 - 9.25)
+        val GoalHeightFromGround: Distance = Distance.fromInches(38.75 - 9.25)
     }
 
     /* Contains any tolerance and setpoint necessary for alignment with vision */

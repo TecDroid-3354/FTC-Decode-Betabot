@@ -6,7 +6,6 @@ import com.qualcomm.robotcore.hardware.HardwareMap
 import com.seattlesolvers.solverslib.command.SubsystemBase
 import com.seattlesolvers.solverslib.drivebase.MecanumDrive
 import com.seattlesolvers.solverslib.hardware.motors.Motor
-import com.seattlesolvers.solverslib.hardware.motors.Motor.GoBILDA
 import com.seattlesolvers.solverslib.kinematics.wpilibkinematics.ChassisSpeeds
 import org.firstinspires.ftc.robotcore.external.Telemetry
 import org.firstinspires.ftc.teamcode.subsystems.drivetrain.MecanumConstants.Ids
@@ -15,7 +14,8 @@ import org.firstinspires.ftc.teamcode.subsystems.drivetrain.MecanumConstants.Phy
 
 class SolversMecanum(
     val hardwareMap: HardwareMap,
-    val telemetry: Telemetry
+    val telemetry: Telemetry,
+    val otos: SparkFunOTOS
 ) : SubsystemBase() {
 
     // Declaring motors
@@ -27,15 +27,9 @@ class SolversMecanum(
     // Declaring mecanum from solverslib
     var mecanum: MecanumDrive
 
-    // Declaring useful components
-    //lateinit var imu: IMU
-    lateinit var otos: SparkFunOTOS
-    //lateinit var revHubOrientation: RevHubOrientationOnRobot
-
     // Initialization code //
     init {
         motorsConfig()
-        componentConfig()
 
         // Setting up the mecanum using the previously declared motors
         mecanum = MecanumDrive(
@@ -96,20 +90,5 @@ class SolversMecanum(
         frontLeftMotor.setZeroPowerBehavior(Motor.ZeroPowerBehavior.BRAKE)
         backRightMotor.setZeroPowerBehavior(Motor.ZeroPowerBehavior.BRAKE)
         backLeftMotor.setZeroPowerBehavior(Motor.ZeroPowerBehavior.BRAKE)
-
-    }
-
-    private fun componentConfig() {
-        // REV Hub IMU declaration
-        otos = hardwareMap.get(SparkFunOTOS::class.java, "otos")
-        //imu = hardwareMap.get(IMU::class.java, "imu")
-        //imu.resetYaw()
-
-//        revHubOrientation = RevHubOrientationOnRobot(
-//            RevHubOrientationOnRobot.LogoFacingDirection.RIGHT,
-//            RevHubOrientationOnRobot.UsbFacingDirection.FORWARD
-//        )
-
-        //imu.initialize(IMU.Parameters(revHubOrientation))
     }
 }

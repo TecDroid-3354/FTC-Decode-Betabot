@@ -1,25 +1,23 @@
-package org.firstinspires.ftc.teamcode.utils.vision
+package org.firstinspires.ftc.teamcode.vision
 
 import com.qualcomm.hardware.limelightvision.Limelight3A
 import com.qualcomm.hardware.sparkfun.SparkFunOTOS
 import com.qualcomm.robotcore.hardware.HardwareMap
-import com.qualcomm.robotcore.hardware.IMU
 import com.seattlesolvers.solverslib.command.SubsystemBase
 import org.firstinspires.ftc.robotcore.external.Telemetry
+import org.firstinspires.ftc.teamcode.vision.VisionConstants.LimelightPhysicalDescription
+import org.firstinspires.ftc.teamcode.vision.VisionConstants.AprilTagsPhysicalDescription
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit
 import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit
 import kotlin.math.tan
 
-class Limelight(hardwareMap: HardwareMap, val telemetry: Telemetry) : SubsystemBase() {
+class Limelight(
+    hardwareMap: HardwareMap,
+    val telemetry: Telemetry,
+    var otos: SparkFunOTOS
+) : SubsystemBase() {
+
     private var limelight: Limelight3A? = null
-    private var imu: IMU? = null // Setting the IMU is necessary to get MetaTag2,
-
-    // which allows for better data retrieving using the IMU
-    private var otos: SparkFunOTOS? = null
-
-    private var limelightMountAngleDegrees = 0.0 // LL mount angle from horizontal
-    private var limelightLensHeightInches = 0.0 // LL lens Height from ground
-    private var goalHeightInches = 0.0 // Target height from ground
 
     private var ty = 0.0
     private var tx = 0.0
@@ -28,22 +26,15 @@ class Limelight(hardwareMap: HardwareMap, val telemetry: Telemetry) : SubsystemB
     init {
         limelight = hardwareMap.get<Limelight3A?>(
             Limelight3A::class.java,
-            "limelight"
+            VisionConstants.LimelightIdentification.Id
         ) // Retrieves pipeline
-        limelight!!.pipelineSwitch(1) // Gets the limelight pipeline
-
-        // TODO: Get these values
-        limelightMountAngleDegrees = 21.0
-        limelightLensHeightInches = 12.5497
-        goalHeightInches = 38.75 // According to FTC Game manual
-
-        imu = hardwareMap.get<IMU?>(IMU::class.java, "imu")
-        imu!!.resetYaw()
+        limelight!!.pipelineSwitch(VisionConstants.LimelightConfiguration.PipelineIndex) // Gets the limelight pipeline
+        limelight!!.setPollRateHz(VisionConstants.LimelightConfiguration.PollRateHz)
 
         otos = hardwareMap.get<SparkFunOTOS?>(SparkFunOTOS::class.java, "otos")
-        otos!!.setAngularUnit(AngleUnit.DEGREES)
-        otos!!.setLinearUnit(DistanceUnit.INCH)
-        otos!!.resetTracking()
+        otos.setAngularUnit(AngleUnit.DEGREES)
+        otos.setLinearUnit(DistanceUnit.INCH)
+        otos.resetTracking()
     }
 
     fun start() {
@@ -52,22 +43,15 @@ class Limelight(hardwareMap: HardwareMap, val telemetry: Telemetry) : SubsystemB
         limelight!!.start()
     }
 
-    fun setLLPollRate(rate: Int) {
-        limelight?.setPollRateHz(rate)
-    }
-
     fun getTx(): Double = tx
     fun getTy(): Double = ty
     fun getTa(): Double = ta
 
     override fun periodic() {
-        // Getting the robot's orientation through the IMU
-        val orientation = imu!!.getRobotYawPitchRollAngles()
-        telemetry.addData("orientationIMU", orientation.getYaw())
-        telemetry.addData("orientationOTOS", otos!!.getPosition().h)
+        telemetry.addData("orientationOTOS", otos.getPosition().h)
 
         // Updating limelights' robot orientation with the Yaw
-        limelight!!.updateRobotOrientation(otos!!.getPosition().h)
+        limelight!!.updateRobotOrientation(otos.getPosition().h)
 
         // LLResult is like a container full of information about what Limelight sees
         val llResult = limelight!!.getLatestResult()
@@ -77,15 +61,15 @@ class Limelight(hardwareMap: HardwareMap, val telemetry: Telemetry) : SubsystemB
         // The condition verifies whether the LimeLight Result is a valid statement
         if (llResult != null && llResult.isValid()) {
             // Offset to target in degrees (from crosshair)
-            val targetOffsetAngle_Vertical = llResult.getTy()
+            val targetOffsetAngle_Vertical = Angle.fromDegrees(llResult.getTy())
             // Needs to be in radians for tan() method
             val angleToGoalRadians =
-                Math.toRadians(limelightMountAngleDegrees + targetOffsetAngle_Vertical)
+                Math.toRadians(LimelightPhysicalDescription.LLMountAngleFromHorizontal.degrees + targetOffsetAngle_Vertical.degrees)
 
             // Calculated distance from limelight lens to goal (in inches)
             val distanceFromLimelightToGoalInches =
-                (goalHeightInches - limelightLensHeightInches) / tan(angleToGoalRadians)
-            telemetry.addData("TargetDistanceInches", distanceFromLimelightToGoalInches)
+                (AprilTagsPhysicalDescription.GoalHeightFromGround - LimelightPhysicalDescription.LLHeightFromGroundToLens) / tan(angleToGoalRadians)
+            telemetry.addData("TargetDistanceInches", distanceFromLimelightToGoalInches.inches)
 
             // We will first get a (MetaTag2) Pose3D. From here, we will extract its Tx, Ty & Ta components
             tx = llResult.getTx()

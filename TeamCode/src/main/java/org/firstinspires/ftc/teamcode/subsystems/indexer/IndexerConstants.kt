@@ -1,34 +1,67 @@
 package org.firstinspires.ftc.teamcode.subsystems.indexer
 
 class IndexerConstants {
-    object Ids {
-        const val frontServo: String = "frontServo"
-        const val rightServo: String = "leftServo"
-        const val leftServo: String = "rightServo"
 
-        const val absFront: String = "absFront"
-        const val absRight: String = "absRight"
-        const val absLeft: String = "absLeft"
+    object Identification {
 
+        // These are the Ids of each of the component per slot, they must be called in the robot configuraation
+        // inside the Control HUB
 
         // The front of the robot is where the servo hub and the battery are
-        // The names are structured the following:
+        // The names of the color sensors are structured the following:
         // f for front, m for middle, and b for back
         // R for Right, L for Left
         // CS for Color Sensor
         // Therefore fRCS would be front, right Color Sensor
-        const val frontSlotRightSensor: String = "fRCS"
-        const val middleSlotRightSensor: String = "mRCS"
-        const val backSlotRightSensor: String = "bRCS"
 
-        const val frontSlotLeftSensor: String = "fLCS"
-        const val middleSlotLeftSensor: String = "mLCS"
-        const val backSlotLeftSensor: String = "bLCS"
+        object FrontSlot {
 
+            const val frontServoId: String = "frontServo"
+
+            const val absFront: String = "absFront"
+
+            const val frontSlotRightSensor: String = "fRCS"
+
+            const val frontSlotLeftSensor: String = "fLCS"
+        }
+
+        object MiddleSlot {
+
+            const val middleServoId: String = "leftServo"
+
+            const val absMiddle: String = "absRight"
+
+            const val middleSlotRightSensor: String = "mRCS"
+
+            const val middleSlotLeftSensor: String = "mLCS"
+        }
+        object BackSlot {
+
+            const val backServoId: String = "rightServo"
+
+            const val absBack: String = "absLeft"
+
+            const val backSlotRightSensor: String = "bRCS"
+
+            const val backSlotLeftSensor: String = "bLCS"
+        }
+
+    }
+
+    object Configuration {
+
+        // Gives each servo an inverted value
+        const val isFrontServoInverted: Boolean = true
+
+        const val isMiddleServoInverted: Boolean = false
+
+        const val isBackServoInverted: Boolean = false
     }
 
     object Positions {
 
+        // The HOME, and FEED positions for each servo, these are passed through the slot Config and grabbed by
+        // the Slot class
         object FrontPositions {
 
             const val FEED: Double = 0.3
@@ -52,9 +85,12 @@ class IndexerConstants {
     }
 
     object Extensions {
-        // Front slot servo: feed = 0.49, home = 0.83
+
+        // These are useful for configuring each slot color detection and tune them separately
         const val frontSlotExtension: String = "FrontSlot"
+
         const val middleSlotExtension: String = "MiddleSlot"
+
         const val backSlotExtension: String = "BackSlot"
     }
 }

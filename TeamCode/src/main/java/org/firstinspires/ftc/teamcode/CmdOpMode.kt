@@ -1,5 +1,6 @@
 package org.firstinspires.ftc.teamcode
 
+import com.qualcomm.hardware.sparkfun.SparkFunOTOS
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp
 import com.seattlesolvers.solverslib.command.CommandOpMode
 import com.seattlesolvers.solverslib.command.CommandScheduler
@@ -14,7 +15,7 @@ import org.firstinspires.ftc.teamcode.subsystems.indexer.Indexer
 import org.firstinspires.ftc.teamcode.subsystems.intake.Intake
 import org.firstinspires.ftc.teamcode.subsystems.shooter.Hood
 import org.firstinspires.ftc.teamcode.subsystems.turret.Turret
-import org.firstinspires.ftc.teamcode.utils.vision.Limelight
+import org.firstinspires.ftc.teamcode.vision.Limelight
 
 
 // Personally, I chose to run my code using a command-based Op Mode since it works better for me
@@ -40,6 +41,7 @@ class CMDOpMode : CommandOpMode() {
     lateinit var turret: Turret
     lateinit var limelight: Limelight
     lateinit var hood: Hood
+    lateinit var otos: SparkFunOTOS
 
     // Declaring useful components
     lateinit var controller: GamepadEx
@@ -48,8 +50,9 @@ class CMDOpMode : CommandOpMode() {
     override fun initialize() {
         /* Subsystem initialization */
 
+        otos = hardwareMap.get(SparkFunOTOS::class.java, "otos")
         // Initializing the mecanum & its default command
-        mecanum = SolversMecanum(hardwareMap, telemetry)
+        mecanum = SolversMecanum(hardwareMap, telemetry, otos)
         mecanum.defaultCommand = JoystickCmd(
             { controller.leftX },
             { controller.leftY },
@@ -63,13 +66,10 @@ class CMDOpMode : CommandOpMode() {
 
         shooter = Shooter(hardwareMap, telemetry)
         turret = Turret(hardwareMap, telemetry)
-        limelight = Limelight(hardwareMap, telemetry)
+        limelight = Limelight(hardwareMap, telemetry, otos)
         limelight.start()
-        limelight.setLLPollRate(250)
 
         hood = Hood(hardwareMap, telemetry)
-
-//        hood = Hood(hardwareMap, telemetry)
 
         // Initializing controller & button bindings
         controller = GamepadEx(gamepad1)
@@ -80,7 +80,7 @@ class CMDOpMode : CommandOpMode() {
     fun configureButtonBindings() {
         GamepadButton(controller, GamepadKeys.Button.START)
             .whenPressed(InstantCommand({
-                mecanum.resetOtosYaw()
+                otos.resetTracking()
             }))
 
         GamepadButton(controller, GamepadKeys.Button.RIGHT_BUMPER)
@@ -100,31 +100,14 @@ class CMDOpMode : CommandOpMode() {
         GamepadButton(controller, GamepadKeys.Button.Y)
             .whenPressed(indexer.feedAllShooter())
 
-
-//        GamepadButton(controller, GamepadKeys.Button.Y)
-//            .whenPressed(InstantCommand({
-//                indexer.feedCMD("FrontSlot")
-//            }))
-//
-//        GamepadButton(controller, GamepadKeys.Button.B)
-//            .whenPressed(InstantCommand({
-//                indexer.feedCMD("MiddleSlot")
-//            }))
-//
-//        GamepadButton(controller, GamepadKeys.Button.X)
-//            .whenPressed(InstantCommand({
-//                indexer.feedCMD("BackSlot")
-//            }))
-//
-//        Trigger { controller.getTrigger(GamepadKeys.Trigger.RIGHT_TRIGGER) > 0.1 }
-//            .whenActive(InstantCommand({ turret.alignToAprilTag(limelight.getTx()) }))
-//        Trigger { controller.getTrigger(GamepadKeys.Trigger.LEFT_TRIGGER) > 0.1 }
-//            .whenActive(InstantCommand({ turret.setTurretAngle(Angle.fromDegrees(0.0)) }))
-
-//
         GamepadButton(controller, GamepadKeys.Button.A)
             .whenPressed(
-                InstantCommand({ hood.setHoodPosition(0.74) })
+                InstantCommand({ hood.modifyCurrentPositionBy(0.01) })
+            )
+
+        GamepadButton(controller, GamepadKeys.Button.B)
+            .whenPressed(
+                InstantCommand({ hood.modifyCurrentPositionBy(0.01.unaryMinus()) })
             )
     }
 

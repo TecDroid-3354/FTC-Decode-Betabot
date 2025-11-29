@@ -1,32 +1,19 @@
 package org.firstinspires.ftc.teamcode.shooter
 
 import com.qualcomm.robotcore.hardware.DcMotor
-import com.qualcomm.robotcore.hardware.DcMotorEx
-import com.qualcomm.robotcore.hardware.DcMotorSimple
 import com.qualcomm.robotcore.hardware.HardwareMap
 import com.seattlesolvers.solverslib.command.SubsystemBase
-import com.seattlesolvers.solverslib.hardware.motors.Motor
-import com.seattlesolvers.solverslib.hardware.motors.MotorEx
 import org.firstinspires.ftc.robotcore.external.Telemetry
-import org.firstinspires.ftc.teamcode.utils.velocityMotorEx.VelocityMotorConfig
-import org.firstinspires.ftc.teamcode.utils.velocityMotorEx.VelocityMotorEx
 
-/**
- * Creates a [VelocityMotorConfig] in order to store the desired configurations for the
- * shooter's velocity motor
- */
-val shooterMotorConfig = VelocityMotorConfig(
-    ShooterConstants.zeroPowerBehavior,
-    ShooterConstants.isInverted,
-    ShooterConstants.ticksPerRevolution,
-    ShooterConstants.pidController,
-)
 /**
  * This is the code for controlling the shooter wheels on our robot.
  *
  */
 @Suppress("JoinDeclarationAndAssignment")
-class Shooter(hw: HardwareMap, val telemetry: Telemetry): SubsystemBase() {
+class Shooter(
+    hw: HardwareMap,
+    val telemetry: Telemetry
+): SubsystemBase() {
 
     // This is where the motor intended to control the shooter is declared
     //val motor: VelocityMotorEx
@@ -36,14 +23,8 @@ class Shooter(hw: HardwareMap, val telemetry: Telemetry): SubsystemBase() {
 
     // This is the code that will execute when the class is initialized
     init {
-//        motor = MotorEx(hw, ShooterConstants.shooterMotorId, ShooterConstants.motorType)
-//        motor.setRunMode(Motor.RunMode.VelocityControl)
-//        motor.setVeloCoefficients(1.0, 0.0, 0.0)
-        // The shooter motor controller is initialized by creating an instance of Motor and passing a velocity motor config
-
-        motor = hw.get(DcMotor::class.java, ShooterConstants.shooterMotorId)
-        motor.mode = DcMotor.RunMode.RUN_WITHOUT_ENCODER
-        motor.direction = DcMotorSimple.Direction.REVERSE
+        motor = hw.get(DcMotor::class.java, ShooterConstants.Identification.shooterMotorId)
+        motorConfiguration()
     }
 
     // Periodic method //
@@ -75,17 +56,17 @@ class Shooter(hw: HardwareMap, val telemetry: Telemetry): SubsystemBase() {
      * Checks if the shooter motor is active and running, useful for logic control
      * @return true if the motor is running
      */
-//    fun isActive(): Boolean {
-//        return motor.get() > 0.05 || motor.get() < -0.05
-//        //return motor.getVelocity().rotPerSec >= 0.01
-//    }
-//
-//    /**
-//     * Gets the current motor's velocity in degrees / second
-//     * @return the current velocity in deg / sec
-//     */
-//    fun getVelocity(): Double {
-//        //return motor.getVelocity().rpm
-//        return motor.velocity
-//    }
+    fun isActive(): Boolean {
+        return motor.power > 0.1
+    }
+
+    /**
+     * Configures the motor with the given values in the constant sheet
+     */
+    fun motorConfiguration() {
+        // The motor's configuration is grabbed from the constant's file
+        motor.mode = ShooterConstants.Configuration.runMode
+        motor.direction = ShooterConstants.Configuration.direction
+        motor.zeroPowerBehavior = ShooterConstants.Configuration.zeroPowerBehavior
+    }
 }
