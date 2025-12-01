@@ -22,9 +22,11 @@ public class Constants {
     // Follower constants ///
     // Consists of values from the automatic, PID, and centripetal tuners
     public static FollowerConstants followerConstants = new FollowerConstants()
-            .mass(6.0) // Robot's mass. Compensates for the centripetal force
+            .mass(14.0) // Robot's mass in kilograms. Compensates for the centripetal force
             .forwardZeroPowerAcceleration(-45.7432) // Measures how the robot decelerates when moving forward & power is cut
+            // It should be negative. Otherwise, it'll accelerate when getting closer to 0
             .lateralZeroPowerAcceleration(-52.0536) // Measures how the robot decelerates when moving sideways & power is cut
+            // It should be negative. Otherwise, it'll accelerate when getting closer to 0
             .useSecondaryTranslationalPIDF(true)
             .useSecondaryHeadingPIDF(true)
             .useSecondaryDrivePIDF(true)
@@ -55,7 +57,7 @@ public class Constants {
             .linearUnit(DistanceUnit.INCH) // Unit used to measure
             .angleUnit(AngleUnit.RADIANS) // Unit used to measure
             .linearScalar(1.05) // Conversion factor between OTOS reading & actual inches
-            .angularScalar(0.98)
+            .angularScalar(0.98) // Conversion factor between OTOS reading & actual turn
             .offset(new SparkFunOTOS.Pose2D(-4.25,0.0,-110.0 * (Math.PI / 180)));
             // .offset represents the sensor's position relative to the center of the robot
 

@@ -2,6 +2,7 @@ package org.firstinspires.ftc.teamcode.auto;
 
 import com.pedropathing.follower.Follower;
 import com.pedropathing.geometry.BezierCurve;
+import com.pedropathing.geometry.BezierLine;
 import com.pedropathing.paths.PathChain;
 import com.pedropathing.geometry.Pose;
 
@@ -12,18 +13,23 @@ public class Paths {
     // The flow this follows goes:
     // Pose object --> Path object --> PathChain object
 
-    /* Pose objects are declared here
-       A pose object represents a point related to the center of the robot, in the field.
-       From here, we join several Poses together to form a Path object
-       Then, after joining several Paths together, we form the PathChain object
-     */
-    private final Pose startPose = new Pose(15, 112, Math.toRadians(90));
-    private final Pose shootingPose = new Pose(50, 110, Math.toRadians(145));
-
     /* A PathChain object basically represents a transition between points */
     public PathChain testPath1;
 
-    // ! Actual paths !
+
+    /* ! Actual poses + paths ! */
+    // The structure goes as following: we'll declare the key poses individually in another file.
+    // Then, we will import those poses to this file and combine them into PathChains.
+
+    // Red side //
+
+    // Red 9 + 3
+    Red9Plus3Poses red9Plus3Poses; // Imported poses
+    public PathChain red9Plus3ShootPrecharged,
+            red9Plus3PickFirstRow, red9Plus3ShootFirstRow,
+            red9Plus3PickSecondRow, red9Plus3ShootSecondRow,
+            red9Plus3PickThirdRow, red9Plus3End;
+
 
     // In this case, the constructor will only take the Follower, which will allow us to build the paths
     public Paths(Follower follower) {
@@ -68,6 +74,118 @@ public class Paths {
             .build(); // Converts from pathBuilder to pathChain
 
 
-        // ! Actual paths
+        /* ! Actual paths ! */
+
+        // Red side //
+
+        // Red 9 + 3
+        red9Plus3Poses = new Red9Plus3Poses();
+        Red9Plus3Paths(follower);
     }
+
+    // Red 9 + 3
+    private void Red9Plus3Paths(Follower follower) {
+        red9Plus3ShootPrecharged = follower.pathBuilder()
+            .addPath(
+                new BezierLine(
+                    red9Plus3Poses.red9Plus3StartPose,
+                    red9Plus3Poses.red9Plus3ShootingPose
+                )
+            )
+            .setLinearHeadingInterpolation(
+                    red9Plus3Poses.red9Plus3StartPose.getHeading(),
+                    red9Plus3Poses.red9Plus3ShootingPose.getHeading())
+            .build();
+
+        red9Plus3PickFirstRow = follower.pathBuilder()
+            .addPath(
+                new BezierLine(
+                    red9Plus3Poses.red9Plus3ShootingPose,
+                    new Pose(129, 84)
+                )
+            )
+            .setLinearHeadingInterpolation(
+                    red9Plus3Poses.red9Plus3ShootingPose.getHeading(),
+                    Math.toRadians(0)
+            )
+            .build();
+
+        red9Plus3ShootFirstRow = follower.pathBuilder()
+            .addPath(
+                new BezierLine(
+                    new Pose(129, 84),
+                    red9Plus3Poses.red9Plus3ShootingPose
+                )
+            )
+            .setLinearHeadingInterpolation(
+                Math.toRadians(0),
+                red9Plus3Poses.red9Plus3ShootingPose.getHeading()
+            )
+            .build();
+
+        red9Plus3PickSecondRow = follower.pathBuilder()
+            .addPath(
+                new BezierLine(
+                    red9Plus3Poses.red9Plus3ShootingPose,
+                    new Pose(103, 59)
+                )
+            )
+            .setLinearHeadingInterpolation(
+                    red9Plus3Poses.red9Plus3ShootingPose.getHeading(),
+                    Math.toRadians(0)
+            )
+            .addPath(
+                new BezierLine(
+                    new Pose(103, 59),
+                    new Pose(129, 59)
+                )
+            )
+            .build();
+
+        red9Plus3ShootSecondRow = follower.pathBuilder()
+            .addPath(
+                new BezierLine(
+                    new Pose(129, 59),
+                    red9Plus3Poses.red9Plus3ShootingPose
+                )
+            )
+            .setLinearHeadingInterpolation(
+                    Math.toRadians(0),
+                    red9Plus3Poses.red9Plus3ShootingPose.getHeading()
+            )
+            .build();
+
+        red9Plus3PickThirdRow = follower.pathBuilder()
+            .addPath(
+                new BezierLine(
+                    red9Plus3Poses.red9Plus3ShootingPose,
+                    new Pose(103, 35)
+                )
+            )
+            .setLinearHeadingInterpolation(
+                    red9Plus3Poses.red9Plus3ShootingPose.getHeading(),
+                    Math.toRadians(0)
+            )
+            .addPath(
+                new BezierLine(
+                    new Pose(103, 35),
+                    new Pose(129, 35)
+                )
+            )
+            .build();
+
+        red9Plus3End = follower.pathBuilder()
+            .addPath(
+                new BezierLine(
+                    new Pose(129, 35),
+                    red9Plus3Poses.red9Plus3EndPose
+                )
+            )
+            .setLinearHeadingInterpolation(
+                    Math.toRadians(0),
+                    red9Plus3Poses.red9Plus3EndPose.getHeading()
+            )
+            .build();
+    }
+
 }

@@ -8,8 +8,8 @@ import com.seattlesolvers.solverslib.command.CommandScheduler;
 
 import org.firstinspires.ftc.teamcode.pedroPathing.Constants;
 
-@Autonomous(name = "Auto", group = "Auto")
-public class AutoTest extends CommandOpMode {
+@Autonomous(name = "Red 9+3 Close", group = "Red")
+class Red9Plus3 extends CommandOpMode {
 
     /* ! SETUP CODE ! */
 
@@ -31,7 +31,7 @@ public class AutoTest extends CommandOpMode {
     public void initialize() {
         // The follower is initialized & set to the starting pose
         follower = Constants.createFollower(hardwareMap);
-        follower.setStartingPose(null); // TODO: add starting pose
+        follower.setStartingPose(paths.red9Plus3Poses.red9Plus3StartPose);
         // Initializes the class where all paths are created
         paths = new Paths(follower);
         // Initializes the timer that accounts for the timeout before a path is considered done
@@ -74,17 +74,47 @@ public class AutoTest extends CommandOpMode {
     // here. It is the one called continuously during the autonomous
     public void autonomousPathUpdates() {
         switch (pathState) {
+            // The follower is in charge of following a PathChain declared within the Paths object
             case 0:
-                //
-                follower.followPath(paths.testPath1, true);
+                follower.followPath(paths.red9Plus3ShootPrecharged, true);
                 setPathState(1);
                 break;
             case 1:
                 if (!follower.isBusy()) {
-                    follower.followPath(paths.testPath1);
+                    follower.followPath(paths.red9Plus3PickFirstRow);
                     setPathState(2);
-                    break;
                 }
+                break;
+            case 2:
+                if (!follower.isBusy()) {
+                    follower.followPath(paths.red9Plus3ShootFirstRow);
+                    setPathState(3);
+                }
+                break;
+            case 3:
+                if (!follower.isBusy()) {
+                    follower.followPath(paths.red9Plus3PickSecondRow);
+                    setPathState(4);
+                }
+                break;
+            case 4:
+                if (!follower.isBusy()) {
+                    follower.followPath(paths.red9Plus3ShootSecondRow);
+                    setPathState(5);
+                }
+                break;
+            case 5:
+                if (!follower.isBusy()) {
+                    follower.followPath(paths.red9Plus3PickThirdRow);
+                    setPathState(6);
+                }
+                break;
+            case 6:
+                if (!follower.isBusy()) {
+                    follower.followPath(paths.red9Plus3End);
+                    setPathState(7);
+                }
+                break;
         }
     }
 
