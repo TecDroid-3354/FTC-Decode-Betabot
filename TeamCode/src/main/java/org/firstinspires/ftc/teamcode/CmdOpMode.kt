@@ -83,16 +83,17 @@ class CMDOpMode : CommandOpMode() {
                 otos.resetTracking()
             }))
 
-        GamepadButton(controller, GamepadKeys.Button.RIGHT_BUMPER)
+        GamepadButton(controller, GamepadKeys.Button.LEFT_BUMPER)
             .whenPressed(
                 intake.enableBothIntakes()
             ).whenReleased (
                 intake.stopBothIntakes()
             )
 
-        GamepadButton(controller, GamepadKeys.Button.LEFT_BUMPER)
+        GamepadButton(controller, GamepadKeys.Button.RIGHT_BUMPER)
             .whenPressed(InstantCommand({
-                shooter.shoot()
+                //shooter.shoot()
+                shooter.shootTest()
             })).whenReleased(InstantCommand({
                 shooter.stop()
             }))

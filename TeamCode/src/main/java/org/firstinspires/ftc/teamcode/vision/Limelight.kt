@@ -9,6 +9,7 @@ import org.firstinspires.ftc.teamcode.vision.VisionConstants.LimelightPhysicalDe
 import org.firstinspires.ftc.teamcode.vision.VisionConstants.AprilTagsPhysicalDescription
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit
 import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit
+import org.firstinspires.ftc.teamcode.subsystems.indexer.MotifPatterns
 import kotlin.math.tan
 
 class Limelight(
@@ -47,8 +48,36 @@ class Limelight(
     fun getTy(): Double = ty
     fun getTa(): Double = ta
 
+    private fun getMotifPattern(): MotifPatterns {
+
+        val llResult = limelight!!.latestResult
+        var obeliskId = 0
+
+        if (llResult.isValid && llResult != null) {
+            val fiducialResult = llResult.fiducialResults
+
+            for (detectedId in fiducialResult) {
+                for (aprilTagId in VisionConstants.AprilTagsIdentification.ObeliskIds) {
+                    if (detectedId.fiducialId == aprilTagId) {
+                        obeliskId = detectedId.fiducialId
+                    }
+                }
+            }
+        }
+
+        return when (obeliskId) {
+            21 -> MotifPatterns.GREEN_PURPLE_PURPLE
+            22 -> MotifPatterns.PURPLE_GREEN_PURPLE
+            23 -> MotifPatterns.PURPLE_PURPLE_GREEN
+            else -> MotifPatterns.NO_PATTERN_DETECTED
+        }
+    }
+
     override fun periodic() {
         telemetry.addData("orientationOTOS", otos.getPosition().h)
+        telemetry.addData("Motif", getMotifPattern().pattern.toString())
+
+        //telemetry.addData("Id detected", getObeliskId())
 
         // Updating limelights' robot orientation with the Yaw
         limelight!!.updateRobotOrientation(otos.getPosition().h)
@@ -60,6 +89,7 @@ class Limelight(
         // https://docs.limelightvision.io/docs/docs-limelight/tutorials/tutorial-estimating-distance#using-area-to-estimate-distance
         // The condition verifies whether the LimeLight Result is a valid statement
         if (llResult != null && llResult.isValid()) {
+
             // Offset to target in degrees (from crosshair)
             val targetOffsetAngle_Vertical = Angle.fromDegrees(llResult.getTy())
             // Needs to be in radians for tan() method

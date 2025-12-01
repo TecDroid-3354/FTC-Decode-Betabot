@@ -18,7 +18,8 @@ import org.firstinspires.ftc.teamcode.utils.colorSensor.ColorSensorEx.DetectedCo
 enum class MotifPatterns(val pattern: List<DetectedColor>) {
     PURPLE_PURPLE_GREEN(listOf(DetectedColor.PURPLE, DetectedColor.PURPLE, DetectedColor.GREEN)),
     PURPLE_GREEN_PURPLE(listOf(DetectedColor.PURPLE, DetectedColor.GREEN, DetectedColor.PURPLE)),
-    GREEN_PURPLE_PURPLE(listOf(DetectedColor.GREEN, DetectedColor.PURPLE, DetectedColor.PURPLE))
+    GREEN_PURPLE_PURPLE(listOf(DetectedColor.GREEN, DetectedColor.PURPLE, DetectedColor.PURPLE)),
+    NO_PATTERN_DETECTED(listOf(DetectedColor.UNKNOWN, DetectedColor.UNKNOWN, DetectedColor.UNKNOWN))
 }
 
 @Suppress("JoinDeclarationAndAssignment")
@@ -173,9 +174,9 @@ class Indexer(
         return if (slot != null) {
             SequentialCommandGroup(
                 InstantCommand({ slot.feed() }),
-                WaitCommand(1000),
+                WaitCommand(250),
                 InstantCommand({ slot.home() }),
-                WaitCommand(1000)
+                WaitCommand(750)
             )
         } else {
             InstantCommand()
@@ -191,8 +192,8 @@ class Indexer(
     private fun feedCMD(slot: Slot): Command {
         return SequentialCommandGroup(
             InstantCommand({ slot.feed() }),
-            WaitCommand(1000),
+            WaitCommand(250),
             InstantCommand({ slot.home() }),
-            WaitCommand(1000))
+            WaitCommand(750))
     }
 }

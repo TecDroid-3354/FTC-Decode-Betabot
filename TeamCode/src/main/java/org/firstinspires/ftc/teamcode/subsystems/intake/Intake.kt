@@ -76,7 +76,10 @@ class Intake(
     }
 
     // This code executes indefinitely during our robot's program
-    override fun periodic() {}
+    override fun periodic() {
+        rightMotor.setPIDFCoefficients(IntakeConstants.PIDF.pidfController)
+        leftMotor.setPIDFCoefficients(IntakeConstants.PIDF.pidfController)
+    }
 
     // Setup code //
 
