@@ -1,13 +1,21 @@
 package org.firstinspires.ftc.teamcode.subsystems.intake
 
-import LinearVelocity
+import org.firstinspires.ftc.teamcode.CMDOpMode
 import com.qualcomm.robotcore.hardware.HardwareMap
+import com.seattlesolvers.solverslib.command.Command
+import com.seattlesolvers.solverslib.command.InstantCommand
 import com.seattlesolvers.solverslib.command.SubsystemBase
-import com.seattlesolvers.solverslib.controller.PIDFController
-import com.seattlesolvers.solverslib.hardware.motors.Motor
+import com.seattlesolvers.solverslib.hardware.motors.MotorEx
 import org.firstinspires.ftc.robotcore.external.Telemetry
+import org.firstinspires.ftc.teamcode.shooter.IntakeConstants
 import org.firstinspires.ftc.teamcode.utils.velocityMotorEx.VelocityMotorConfig
 import org.firstinspires.ftc.teamcode.utils.velocityMotorEx.VelocityMotorEx
+
+// Intake sides in our robot
+enum class IntakeDirection {
+    RIGHT,
+    LEFT
+}
 
 class Intake(
     val hardwareMap: HardwareMap,
@@ -21,62 +29,78 @@ class Intake(
         motorConfig()
     }
 
-    override fun periodic() {
-        // Telemetry to retrieve useful subsystem data
-    }
-
-
     // Functional code //
 
-    // This is the method called in the OpMode. We basically give it the direction we're intaking
-    // from, and the subsystem moves the motors accordingly
-    fun enableIntake(direction: IntakeDirection) {
+    /**
+     * This is the method called in the [CMDOpMode]. We basically give it the direction we're intaking and
+     * it enables that motor
+     * @param direction the side of the intake it will enable
+     */
+    private fun enableIntake(direction: IntakeDirection, output: Double = 1.0) {
         when (direction) {
-            IntakeDirection.RIGHT -> enableRollers(rightMotor)
-            IntakeDirection.LEFT -> enableRollers(leftMotor)
+            IntakeDirection.RIGHT -> rightMotor.setPower(output)
+            IntakeDirection.LEFT -> leftMotor.setPower(output)
         }
     }
 
-    // The following method moves the rollers, i.e. "intakes", from a given side
-    // It is able to take a custom velocity, or use the default 0.8
-    private fun enableRollers(motor: VelocityMotorEx, velocity: Double = IntakeConstants.General.velocity) {
-        motor.setVelocity(LinearVelocity.fromMps(velocity))
+    /**
+     * This is the method called in the [CMDOpMode]. It calls [enableIntake] twice and turns on both intakes
+     */
+    fun enableBothIntakes(): Command {
+        return InstantCommand({
+            enableIntake(IntakeDirection.RIGHT)
+            enableIntake(IntakeDirection.LEFT)
+        })
     }
 
-    // Quite literally stops the motors
-    fun stopIntake(direction: IntakeDirection) {
+    /**
+     * Quite literally stops the motor
+     * @param direction The [Intake] side you want to stop
+     */
+    private fun stopIntake(direction: IntakeDirection) {
         when (direction) {
-            IntakeDirection.RIGHT -> rightMotor.stopMotor()
-            IntakeDirection.LEFT -> leftMotor.stopMotor()
+            IntakeDirection.RIGHT -> rightMotor.setPower(0.0) // Check
+            IntakeDirection.LEFT -> leftMotor.setPower(0.0) // Check
         }
     }
 
+    /**
+     * Quite literally stops both motors
+     */
+    fun stopBothIntakes(): Command {
+        return InstantCommand({
+            stopIntake(IntakeDirection.RIGHT)
+            stopIntake(IntakeDirection.LEFT)
+        })
+
+    }
+
+    // This code executes indefinitely during our robot's program
+    override fun periodic() {
+        rightMotor.setPIDFCoefficients(IntakeConstants.PIDF.pidfController)
+        leftMotor.setPIDFCoefficients(IntakeConstants.PIDF.pidfController)
+    }
 
     // Setup code //
 
     // Configuring motors with the custom VelocityEx class
     private fun motorConfig() {
         rightMotor = VelocityMotorEx(
-            Motor(hardwareMap, "rightIntakeMotor", 28.0, 6000.0),
+            MotorEx(hardwareMap, IntakeConstants.Identification.rightIntakeMotorId,
+                IntakeConstants.Configuration.ticksPerRevolution, IntakeConstants.Configuration.rpm),
             VelocityMotorConfig(
-                direction = Motor.Direction.REVERSE,
-                pidfCoefficients = PIDFController(
-                    IntakeConstants.Motor.p,
-                    IntakeConstants.Motor.i,
-                    IntakeConstants.Motor.d,
-                    IntakeConstants.Motor.f))
+                IntakeConstants.Configuration.zeroPowerBehavior,
+                IntakeConstants.Configuration.rightIsInverted,
+                pidfCoefficients = IntakeConstants.PIDF.pidfController)
         )
 
-
         leftMotor = VelocityMotorEx(
-            Motor(hardwareMap, "leftIntakeMotor", 28.0, 6000.0),
+            MotorEx(hardwareMap, IntakeConstants.Identification.leftIntakeMotorId,
+                IntakeConstants.Configuration.ticksPerRevolution, IntakeConstants.Configuration.rpm),
             VelocityMotorConfig(
-                direction = Motor.Direction.REVERSE,
-                pidfCoefficients = PIDFController(
-                    IntakeConstants.Motor.p,
-                    IntakeConstants.Motor.i,
-                    IntakeConstants.Motor.d,
-                    IntakeConstants.Motor.f))
+                IntakeConstants.Configuration.zeroPowerBehavior,
+                IntakeConstants.Configuration.leftIsInverted,
+                pidfCoefficients = IntakeConstants.PIDF.pidfController)
         )
     }
 }

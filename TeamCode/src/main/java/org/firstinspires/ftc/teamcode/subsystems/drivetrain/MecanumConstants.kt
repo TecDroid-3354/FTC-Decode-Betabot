@@ -1,25 +1,17 @@
 package org.firstinspires.ftc.teamcode.subsystems.drivetrain
 
-import AngularVelocity
-import LinearVelocity
-import kotlin.math.PI
-
 class MecanumConstants {
+
     object Ids {
-        const val frontRightId: String = "frontRightMotor" // port 1 expansion
-        const val frontLeftId: String = "frontLeftMotor" // port 1 control
-        const val backRightId: String = "backRightMotor" // port 0 expansion
-        const val backLeftId: String = "backLeftMotor" // port 3 control
+        // The chassis motor's Ids, they must be called inside the robot's configuration in the Control Hub
+        const val frontRightId: String = "frontRight" // port 1 expansion
+        const val frontLeftId: String = "frontLeft" // port 4 control
+        const val backRightId: String = "backRight" // port 0 expansion
+        const val backLeftId: String = "backLeft" // port 3 control
     }
 
     object Physics {
-        const val ticksPerRevolution: Double = 2150.4
-        val circumference = Distance.fromCm(7.5 * PI)
-    }
-
-    object Velocities {
-        val maxVelocityY: LinearVelocity = LinearVelocity.fromMps(1.5)
-        val maxVelocityX: LinearVelocity = LinearVelocity.fromMps(1.5)
-        val maxRotationVelocity: AngularVelocity = AngularVelocity.fromDegPerSec(30.0)
+        const val countPerRevolution: Double = 28.0 // ticks per revolution
+        const val maxRPM: Double = 6000.0 // max revolutions per minute
     }
 }

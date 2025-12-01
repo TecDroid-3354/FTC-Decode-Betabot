@@ -1,5 +1,6 @@
 package org.firstinspires.ftc.teamcode
 
+import com.qualcomm.hardware.sparkfun.SparkFunOTOS
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp
 import com.seattlesolvers.solverslib.command.CommandOpMode
 import com.seattlesolvers.solverslib.command.CommandScheduler
@@ -7,11 +8,14 @@ import com.seattlesolvers.solverslib.command.InstantCommand
 import com.seattlesolvers.solverslib.command.button.GamepadButton
 import com.seattlesolvers.solverslib.gamepad.GamepadEx
 import com.seattlesolvers.solverslib.gamepad.GamepadKeys
-import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit
 import org.firstinspires.ftc.teamcode.commands.JoystickCmd
+import org.firstinspires.ftc.teamcode.shooter.Shooter
 import org.firstinspires.ftc.teamcode.subsystems.drivetrain.SolversMecanum
+import org.firstinspires.ftc.teamcode.subsystems.indexer.Indexer
 import org.firstinspires.ftc.teamcode.subsystems.intake.Intake
-import org.firstinspires.ftc.teamcode.subsystems.intake.IntakeDirection
+import org.firstinspires.ftc.teamcode.subsystems.shooter.Hood
+import org.firstinspires.ftc.teamcode.subsystems.turret.Turret
+import org.firstinspires.ftc.teamcode.vision.Limelight
 
 
 // Personally, I chose to run my code using a command-based Op Mode since it works better for me
@@ -32,6 +36,12 @@ class CMDOpMode : CommandOpMode() {
     // Declaring subsystems
     lateinit var mecanum: SolversMecanum
     lateinit var intake: Intake
+    lateinit var indexer: Indexer
+    lateinit var shooter: Shooter
+    lateinit var turret: Turret
+    lateinit var limelight: Limelight
+    lateinit var hood: Hood
+    lateinit var otos: SparkFunOTOS
 
     // Declaring useful components
     lateinit var controller: GamepadEx
@@ -40,17 +50,26 @@ class CMDOpMode : CommandOpMode() {
     override fun initialize() {
         /* Subsystem initialization */
 
+        otos = hardwareMap.get(SparkFunOTOS::class.java, "otos")
         // Initializing the mecanum & its default command
-        mecanum = SolversMecanum(hardwareMap, telemetry)
+        mecanum = SolversMecanum(hardwareMap, telemetry, otos)
         mecanum.defaultCommand = JoystickCmd(
-            { -controller.leftX },
+            { controller.leftX },
             { controller.leftY },
-            { -controller.rightX },
-            { mecanum.getRobotYaw(AngleUnit.DEGREES) },
+            { controller.rightX * 0.8 },
             mecanum
         )
 
         intake = Intake(hardwareMap, telemetry)
+
+        indexer = Indexer(hardwareMap, telemetry)
+
+        shooter = Shooter(hardwareMap, telemetry)
+        turret = Turret(hardwareMap, telemetry)
+        limelight = Limelight(hardwareMap, telemetry, otos)
+        limelight.start()
+
+        hood = Hood(hardwareMap, telemetry)
 
         // Initializing controller & button bindings
         controller = GamepadEx(gamepad1)
@@ -61,26 +80,40 @@ class CMDOpMode : CommandOpMode() {
     fun configureButtonBindings() {
         GamepadButton(controller, GamepadKeys.Button.START)
             .whenPressed(InstantCommand({
-                mecanum.resetRobotYaw()
-            }))
-
-        GamepadButton(controller, GamepadKeys.Button.RIGHT_BUMPER)
-            .whenPressed(InstantCommand({
-                intake.enableIntake(IntakeDirection.RIGHT)
-            })).whenReleased(InstantCommand({
-                intake.stopIntake(IntakeDirection.RIGHT)
+                otos.resetTracking()
             }))
 
         GamepadButton(controller, GamepadKeys.Button.LEFT_BUMPER)
+            .whenPressed(
+                intake.enableBothIntakes()
+            ).whenReleased (
+                intake.stopBothIntakes()
+            )
+
+        GamepadButton(controller, GamepadKeys.Button.RIGHT_BUMPER)
             .whenPressed(InstantCommand({
-                intake.enableIntake(IntakeDirection.LEFT)
+                //shooter.shoot()
+                shooter.shootTest()
             })).whenReleased(InstantCommand({
-                intake.stopIntake(IntakeDirection.LEFT)
+                shooter.stop()
             }))
+
+        GamepadButton(controller, GamepadKeys.Button.Y)
+            .whenPressed(indexer.feedAllShooter())
+
+        GamepadButton(controller, GamepadKeys.Button.A)
+            .whenPressed(
+                InstantCommand({ hood.modifyCurrentPositionBy(0.01) })
+            )
+
+        GamepadButton(controller, GamepadKeys.Button.B)
+            .whenPressed(
+                InstantCommand({ hood.modifyCurrentPositionBy(0.01.unaryMinus()) })
+            )
     }
 
     fun periodic() {
-
+        turret.alignToAprilTag(limelight.getTx())
     }
 
     // Main code body
@@ -93,6 +126,7 @@ class CMDOpMode : CommandOpMode() {
 
         // Run the scheduler
         while (!isStopRequested && opModeIsActive()) {
+
             // Command for actually running the scheduler
             CommandScheduler.getInstance().run()
             periodic()

@@ -6,11 +6,12 @@ import Distance
 import LinearVelocity
 import com.seattlesolvers.solverslib.controller.PIDFController
 import com.seattlesolvers.solverslib.hardware.motors.Motor
+import com.seattlesolvers.solverslib.hardware.motors.MotorEx
 import kotlin.math.abs
 
 // Custom class to declare custom PID motors that take velocities
 class VelocityMotorEx(
-    private val motor: Motor,
+    val motor: MotorEx,
     override var config: VelocityMotorConfig
 ) : IVelocityMotorEx {
 
@@ -23,13 +24,14 @@ class VelocityMotorEx(
 
     init {
         applyConfig()
+
     }
 
     // The following functions, applyConfig()
     override fun applyConfig() {
         // Setting up the motor & encoder default behavior
         motor.setZeroPowerBehavior(config.zeroPowerBehavior)
-        motor.encoder.setDirection(config.direction)
+        motor.inverted = config.isInverted
 
         // Arranging velocity PIDs
         val coefficients = config.pidfCoefficients
@@ -104,6 +106,9 @@ class VelocityMotorEx(
 
     // Sets the run mode
     override fun setMode(mode: Motor.RunMode) = motor.setRunMode(mode)
+    override fun setInverted(isInverted: Boolean) {
+        motor.inverted = isInverted
+    }
 
 
     /* ! GETTER METHODS ! */
@@ -113,13 +118,13 @@ class VelocityMotorEx(
         Angle.fromRotations(motor.currentPosition / config.ticksPerRevolution * config.gearRatio)
 
     // Returns the current velocity
-    override fun getVelocity(): AngularVelocity = AngularVelocity.fromRps(motor.get() / config.ticksPerRevolution * config.gearRatio)
+    override fun getVelocity(): AngularVelocity = AngularVelocity.fromRps(motor.velocity / config.ticksPerRevolution * config.gearRatio)
 
     override fun getLinearVelocity(): LinearVelocity =
-        LinearVelocity.fromMps(wheelCircumference.meters * (motor.get() / config.ticksPerRevolution * config.gearRatio))
+        LinearVelocity.fromMps(wheelCircumference.meters * (motor.velocity / config.ticksPerRevolution * config.gearRatio))
 
     override fun getLinearVelocity(circumference: Distance): LinearVelocity =
-        LinearVelocity.fromMps(circumference.meters * (motor.get() / config.ticksPerRevolution * config.gearRatio))
+        LinearVelocity.fromMps(circumference.meters * (motor.velocity / config.ticksPerRevolution * config.gearRatio))
 
 
 }

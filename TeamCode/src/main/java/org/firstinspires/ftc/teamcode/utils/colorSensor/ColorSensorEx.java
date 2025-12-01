@@ -29,7 +29,7 @@ public class ColorSensorEx {
         RED,
         BLUE,
         YELLOW,
-        ORANGE,
+        GREEN,
         PURPLE,
         WHITE,
         BLACK,
