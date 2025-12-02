@@ -1,47 +1,59 @@
-package org.firstinspires.ftc.teamcode.utils.colorSensor;
+package org.firstinspires.ftc.teamcode.utils.colorSensor.Calibration;
 
-import com.qualcomm.robotcore.eventloop.opmode.Disabled;
+import static java.lang.Thread.sleep;
+
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.ColorSensor;
+import com.qualcomm.robotcore.hardware.Gamepad;
+import com.qualcomm.robotcore.hardware.HardwareMap;
 
+import org.firstinspires.ftc.robotcore.external.Telemetry;
+import org.firstinspires.ftc.teamcode.subsystems.indexer.IndexerConstants;
 import org.firstinspires.ftc.teamcode.utils.ReadFile;
 import org.json.JSONObject;
 import java.io.File;
 import java.io.FileWriter;
 import org.firstinspires.ftc.teamcode.utils.colorSensor.ColorSensorEx.DetectedColor;
+public class ColorCalibrationJSON {
 
-@TeleOp(name = "ColorSensor-calibration", group = "Op Mode")
-@Disabled
-public class ColorCalibrationJSON extends LinearOpMode {
+    private String sensorId;
+    private String archiveExtension;
+    private Telemetry telemetry;
+    private HardwareMap hardwareMap;
+    private Gamepad gamepad1;
+
+    public ColorCalibrationJSON(String sensorId, String archiveExtension, Telemetry telemetry, HardwareMap hardwareMap, Gamepad gamepad1) {
+        this.sensorId = sensorId;
+        this.archiveExtension = archiveExtension;
+        this.telemetry = telemetry;
+        this.hardwareMap = hardwareMap;
+        this.gamepad1 = gamepad1;
+        colorSensor = hardwareMap.get(ColorSensor.class, sensorId);
+
+    }
 
     ColorSensor colorSensor;
 
-    @Override
-    public void runOpMode() {
-        colorSensor = hardwareMap.get(ColorSensor.class, "colorSensor");
+    public void runOpMode() throws InterruptedException {
 
         telemetry.addLine("Coloca el sensor frente al color y presiona:");
         telemetry.addLine("A=RED | B=BLUE | X=YELLOW | Y=WHITE");
-        telemetry.addLine("Izq=ORANGE | Der=PURPLE | Arriba=UNKNOWN | Abajo=BLACK");
+        telemetry.addLine("Izq=GREEN | Der=PURPLE | Arriba=UNKNOWN | Abajo=BLACK");
         telemetry.update();
 
-        waitForStart();
+        if (gamepad1.a) guardarColor(DetectedColor.RED);
+        if (gamepad1.b) guardarColor(DetectedColor.BLUE);
+        if (gamepad1.x) guardarColor(DetectedColor.YELLOW);
+        if (gamepad1.y) guardarColor(DetectedColor.WHITE);
 
-        while (opModeIsActive()) {
-            if (gamepad1.a) guardarColor(DetectedColor.RED);
-            if (gamepad1.b) guardarColor(DetectedColor.BLUE);
-            if (gamepad1.x) guardarColor(DetectedColor.YELLOW);
-            if (gamepad1.y) guardarColor(DetectedColor.WHITE);
-
-            if (gamepad1.dpad_left) guardarColor(DetectedColor.GREEN);
-            if (gamepad1.dpad_right) guardarColor(DetectedColor.PURPLE);
-            if (gamepad1.dpad_up) guardarColor(DetectedColor.UNKNOWN);
-            if (gamepad1.dpad_down) guardarColor(DetectedColor.BLACK);
-        }
+        if (gamepad1.dpad_left) guardarColor(DetectedColor.GREEN);
+        if (gamepad1.dpad_right) guardarColor(DetectedColor.PURPLE);
+        if (gamepad1.dpad_up) guardarColor(DetectedColor.UNKNOWN);
+        if (gamepad1.dpad_down) guardarColor(DetectedColor.BLACK);
     }
 
-    private void guardarColor(DetectedColor target) {
+    private void guardarColor(DetectedColor target) throws InterruptedException {
         // Promediamos varias lecturas
         float hueSum = 0, satSum = 0, valSum = 0;
         int samples = 20;
@@ -67,7 +79,7 @@ public class ColorCalibrationJSON extends LinearOpMode {
 
         // Guardamos en archivo JSON
         try {
-            File file = new File("/sdcard/FIRST/colorCalibration.json"); // ruta en RC
+            File file = new File("/sdcard/FIRST/colorCalibration" + archiveExtension + ".json"); // ruta en RC
             JSONObject json;
 
             if (file.exists()) {
