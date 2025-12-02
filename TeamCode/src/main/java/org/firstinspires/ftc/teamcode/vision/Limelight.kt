@@ -1,5 +1,7 @@
 package org.firstinspires.ftc.teamcode.vision
 
+import com.qualcomm.hardware.limelightvision.LLResult
+import com.qualcomm.hardware.limelightvision.LLResultTypes
 import com.qualcomm.hardware.limelightvision.Limelight3A
 import com.qualcomm.hardware.sparkfun.SparkFunOTOS
 import com.qualcomm.robotcore.hardware.HardwareMap
@@ -19,6 +21,7 @@ class Limelight(
 ) : SubsystemBase() {
 
     private var limelight: Limelight3A? = null
+    private var llResult: LLResult? = null
 
     private var ty = 0.0
     private var tx = 0.0
@@ -50,16 +53,20 @@ class Limelight(
 
     private fun getMotifPattern(): MotifPatterns {
 
-        val llResult = limelight!!.latestResult
+        var fiducialResult: List<LLResultTypes.FiducialResult>? = null
         var obeliskId = 0
 
-        if (llResult.isValid && llResult != null) {
-            val fiducialResult = llResult.fiducialResults
+        while (obeliskId == 0) {
+            if (llResult!!.isValid && llResult != null) {
 
-            for (detectedId in fiducialResult) {
-                for (aprilTagId in VisionConstants.AprilTagsIdentification.ObeliskIds) {
-                    if (detectedId.fiducialId == aprilTagId) {
-                        obeliskId = detectedId.fiducialId
+                fiducialResult = llResult!!.fiducialResults
+
+                for (detectedId in fiducialResult) {
+                    for (aprilTagId in VisionConstants.AprilTagsIdentification.ObeliskIds) {
+                        if (detectedId.fiducialId == aprilTagId) {
+                            obeliskId = detectedId.fiducialId
+                            break
+                        }
                     }
                 }
             }
@@ -75,7 +82,7 @@ class Limelight(
 
     override fun periodic() {
         telemetry.addData("orientationOTOS", otos.getPosition().h)
-        telemetry.addData("Motif", getMotifPattern().pattern.toString())
+        //telemetry.addData("Motif", getMotifPattern().pattern.toString())
 
         //telemetry.addData("Id detected", getObeliskId())
 
@@ -83,15 +90,15 @@ class Limelight(
         limelight!!.updateRobotOrientation(otos.getPosition().h)
 
         // LLResult is like a container full of information about what Limelight sees
-        val llResult = limelight!!.getLatestResult()
+        llResult = limelight!!.getLatestResult()
 
         // Math to calculate distance was taken from documentation:
         // https://docs.limelightvision.io/docs/docs-limelight/tutorials/tutorial-estimating-distance#using-area-to-estimate-distance
         // The condition verifies whether the LimeLight Result is a valid statement
-        if (llResult != null && llResult.isValid()) {
+        if (llResult != null && llResult!!.isValid()) {
 
             // Offset to target in degrees (from crosshair)
-            val targetOffsetAngle_Vertical = Angle.fromDegrees(llResult.getTy())
+            val targetOffsetAngle_Vertical = Angle.fromDegrees(llResult!!.getTy())
             // Needs to be in radians for tan() method
             val angleToGoalRadians =
                 Math.toRadians(LimelightPhysicalDescription.LLMountAngleFromHorizontal.degrees + targetOffsetAngle_Vertical.degrees)
@@ -102,11 +109,11 @@ class Limelight(
             telemetry.addData("TargetDistanceInches", distanceFromLimelightToGoalInches.inches)
 
             // We will first get a (MetaTag2) Pose3D. From here, we will extract its Tx, Ty & Ta components
-            tx = llResult.getTx()
-            ty = llResult.getTy()
-            ta = llResult.getTa()
+            tx = llResult!!.getTx()
+            ty = llResult!!.getTy()
+            ta = llResult!!.getTa()
 
-            val botPose = llResult.getBotpose_MT2()
+            val botPose = llResult!!.getBotpose_MT2()
             telemetry.addData(
                 "Tx",
                 tx

@@ -83,6 +83,11 @@ class CMDOpMode : CommandOpMode() {
                 otos.resetTracking()
             }))
 
+//        GamepadButton(controller, GamepadKeys.Button.DPAD_DOWN)
+//            .whenPressed(InstantCommand({
+//                telemetry.addData("Pattern detected", limelight.getMotifPattern())
+//            }))
+
         GamepadButton(controller, GamepadKeys.Button.LEFT_BUMPER)
             .whenPressed(
                 intake.enableBothIntakes()
@@ -98,8 +103,18 @@ class CMDOpMode : CommandOpMode() {
                 shooter.stop()
             }))
 
-        GamepadButton(controller, GamepadKeys.Button.Y)
+        GamepadButton(controller, GamepadKeys.Button.DPAD_UP)
             .whenPressed(indexer.feedAllShooter())
+
+        GamepadButton(controller, GamepadKeys.Button.A)
+            .whenPressed(
+                InstantCommand({ hood.modifyCurrentPositionBy(0.01) })
+            )
+
+        GamepadButton(controller, GamepadKeys.Button.B)
+            .whenPressed(
+                InstantCommand({ hood.modifyCurrentPositionBy(0.01.unaryMinus()) })
+            )
 
         GamepadButton(controller, GamepadKeys.Button.A)
             .whenPressed(
@@ -123,6 +138,8 @@ class CMDOpMode : CommandOpMode() {
 
         // Pauses OpMode until the START button is pressed on the Driver Hub
         waitForStart()
+
+        //limelight.getMotifPattern()
 
         // Run the scheduler
         while (!isStopRequested && opModeIsActive()) {
