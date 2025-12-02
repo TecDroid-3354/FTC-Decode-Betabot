@@ -57,11 +57,13 @@ public class Constants {
             .hardwareMapName("otos") // Name of the OTOS in the hardware map
             .linearUnit(DistanceUnit.INCH) // Unit used to measure
             .angleUnit(AngleUnit.RADIANS) // Unit used to measure
-            .offset(new SparkFunOTOS.Pose2D(0.0,0.0,-Math.PI / 2.0))
+            // .offset(x, y, h) represents the sensor's position relative to the center of the robot
+            // The sensor is aligned along a normal cartesian plane's x axis. It is horizontally
+            // translated 1/4 in to the left, which would be a translation in the y axis since OTOS
+            // axes are flipped.
+            .offset(new SparkFunOTOS.Pose2D(0.0,-0.25,-Math.PI / 2.0))
             .linearScalar(1.0)
             .angularScalar(0.995);
-
-            // .offset represents the sensor's position relative to the center of the robot
 
 
     // Path constraints //

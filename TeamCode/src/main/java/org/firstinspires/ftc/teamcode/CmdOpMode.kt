@@ -1,14 +1,18 @@
 package org.firstinspires.ftc.teamcode
 
+import com.pedropathing.follower.Follower
+import com.pedropathing.paths.PathChain
 import com.qualcomm.hardware.sparkfun.SparkFunOTOS
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp
 import com.seattlesolvers.solverslib.command.CommandOpMode
 import com.seattlesolvers.solverslib.command.CommandScheduler
 import com.seattlesolvers.solverslib.command.InstantCommand
+import com.seattlesolvers.solverslib.command.RunCommand
 import com.seattlesolvers.solverslib.command.button.GamepadButton
 import com.seattlesolvers.solverslib.gamepad.GamepadEx
 import com.seattlesolvers.solverslib.gamepad.GamepadKeys
 import org.firstinspires.ftc.teamcode.commands.JoystickCmd
+import org.firstinspires.ftc.teamcode.pedroPathing.Constants
 import org.firstinspires.ftc.teamcode.shooter.Shooter
 import org.firstinspires.ftc.teamcode.subsystems.drivetrain.SolversMecanum
 import org.firstinspires.ftc.teamcode.subsystems.indexer.Indexer
@@ -46,6 +50,11 @@ class CMDOpMode : CommandOpMode() {
     // Declaring useful components
     lateinit var controller: GamepadEx
 
+    // PedroPathing Endgame
+    lateinit var endGamePath: PathChain
+    lateinit var follower: Follower
+    var automatedDrive: Boolean = false;
+
     // Here, declare code to be executed right after pressing the INIT button
     override fun initialize() {
         /* Subsystem initialization */
@@ -70,6 +79,11 @@ class CMDOpMode : CommandOpMode() {
         limelight.start()
 
         hood = Hood(hardwareMap, telemetry)
+
+        // PedroPathing Endgame
+        endGamePath = PathChain()
+        follower = Constants.createFollower(hardwareMap)
+        follower.update()
 
         // Initializing controller & button bindings
         controller = GamepadEx(gamepad1)
@@ -110,6 +124,11 @@ class CMDOpMode : CommandOpMode() {
             .whenPressed(
                 InstantCommand({ hood.modifyCurrentPositionBy(0.01.unaryMinus()) })
             )
+
+        GamepadButton(controller, GamepadKeys.Button.DPAD_DOWN)
+            .whenPressed(
+                InstantCommand({ automatedDrive = true })
+            )
     }
 
     fun periodic() {
@@ -132,6 +151,13 @@ class CMDOpMode : CommandOpMode() {
             periodic()
 
             telemetry.update()
+
+            if (automatedDrive) {
+                RunCommand({
+                    follower.followPath(endGamePath)
+                    follower.update()
+                }, mecanum)
+            }
         }
 
         // Cancels all previous commands
