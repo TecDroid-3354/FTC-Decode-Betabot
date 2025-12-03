@@ -45,6 +45,7 @@ class CMDOpMode : CommandOpMode() {
 
     // Declaring useful components
     lateinit var controller: GamepadEx
+    lateinit var limelightIdFilter: IntArray
 
     // Here, declare code to be executed right after pressing the INIT button
     override fun initialize() {
@@ -113,13 +114,40 @@ class CMDOpMode : CommandOpMode() {
     }
 
     fun periodic() {
-        turret.alignToAprilTag(limelight.getTx())
+        turret.alignToAprilTag(limelight.getClasifierTx(limelightIdFilter))
     }
 
     // Main code body
     override fun runOpMode() {
         // Code executed at the very beginning, right after hitting the INIT Button
         initialize()
+
+        // select side
+        val options = listOf("BlueAlliance", "RedAlliance", "Test")
+        var index = 0
+
+        while (!isStarted && !isStopRequested) {
+            if (gamepad1.dpad_left) index = (index - 1 + options.size) % options.size
+            if (gamepad1.dpad_right) index = (index + 1) % options.size
+
+            telemetry.addLine("Select the Alliance:")
+            for (i in options.indices) {
+                if (i == index)
+                    telemetry.addLine(" ➤ ${options[i]}")  // seleccionado
+                else
+                    telemetry.addLine("   ${options[i]}")
+            }
+            telemetry.update()
+
+            sleep(200) // evita múltiples cambios por una sola pulsación
+        }
+
+        limelightIdFilter = when (options[index]) {
+            "BlueAlliance" -> intArrayOf(20)
+            "RedAlliance" -> intArrayOf(24)
+            "Test" -> intArrayOf(20, 24)
+            else -> intArrayOf(20, 24)
+        }
 
         // Pauses OpMode until the START button is pressed on the Driver Hub
         waitForStart()

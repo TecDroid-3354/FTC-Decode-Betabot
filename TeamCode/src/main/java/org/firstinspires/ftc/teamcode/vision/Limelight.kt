@@ -48,6 +48,24 @@ class Limelight(
     fun getTy(): Double = ty
     fun getTa(): Double = ta
 
+    fun getClasifierTx(filterArray: IntArray): Double {
+        val llResult = limelight!!.latestResult
+
+        if (llResult.isValid && llResult != null) {
+            val fiducialResult = llResult.fiducialResults
+
+            for (detectedId in fiducialResult) {
+                for (id in filterArray) {
+                    if (detectedId.fiducialId == id) {
+                        return llResult.tx
+                    }
+                }
+            }
+        }
+
+        return 0.0
+    }
+
     private fun getMotifPattern(): MotifPatterns {
 
         val llResult = limelight!!.latestResult

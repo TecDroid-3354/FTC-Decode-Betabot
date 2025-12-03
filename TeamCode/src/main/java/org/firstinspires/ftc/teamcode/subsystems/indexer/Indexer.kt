@@ -75,7 +75,16 @@ class Indexer(
     }
 
     // This code will execute indefinably during your operation
-    override fun periodic() {}
+    override fun periodic() {
+        telemetry.addData("frontSlotLeftColor", frontSlot.leftColorSensor.colorFromSensor)
+        telemetry.addData("frontSlotRightColor", frontSlot.rightColorSensor.colorFromSensor)
+
+        telemetry.addData("middleSlotLeftColor", middleSlot.leftColorSensor.colorFromSensor)
+        telemetry.addData("middleSlotRightColor", middleSlot.rightColorSensor.colorFromSensor)
+
+        telemetry.addData("backSlotLeftColor", backSlot.leftColorSensor.colorFromSensor)
+        telemetry.addData("backSlotRightColor", backSlot.rightColorSensor.colorFromSensor)
+    }
 
     /**
      * [rejectEvaluation] tracks if the ball configuration inside our indexer is valid for

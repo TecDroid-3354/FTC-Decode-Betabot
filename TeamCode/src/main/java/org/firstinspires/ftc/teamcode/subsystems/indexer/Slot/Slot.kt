@@ -29,8 +29,8 @@ class Slot (val config: SlotConfig, hw: HardwareMap, telemetry: Telemetry) {
     // Declare the slot components
     private var servo: ServoEx
     private var absEncoder: AbsoluteAnalogEncoder
-    private var rightColorSensor: ColorSensorEx
-    private var leftColorSensor: ColorSensorEx
+    var rightColorSensor: ColorSensorEx
+    var leftColorSensor: ColorSensorEx
 
     // Initialization code //
     init {
