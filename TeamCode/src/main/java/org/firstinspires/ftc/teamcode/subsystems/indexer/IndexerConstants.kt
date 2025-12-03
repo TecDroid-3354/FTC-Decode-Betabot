@@ -80,7 +80,7 @@ class IndexerConstants {
 
             const val FEED: Double = 0.3
 
-            const val HOME: Double = 0.015
+            const val HOME: Double = 0.0
         }
     }
 

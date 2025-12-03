@@ -18,6 +18,6 @@ class HoodConstants {
         // The position were there is no clear movement of the servo
         val homePosition = 0.78
         // This is the position were the hood is lifted the most
-        val minPosition = 0.0
+        val minPosition = 0.53
     }
 }
