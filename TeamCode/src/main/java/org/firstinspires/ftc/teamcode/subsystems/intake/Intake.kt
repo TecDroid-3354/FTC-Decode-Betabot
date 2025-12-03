@@ -46,10 +46,10 @@ class Intake(
     /**
      * This is the method called in the [CMDOpMode]. It calls [enableIntake] twice and turns on both intakes
      */
-    fun enableBothIntakes(): Command {
+    fun enableBothIntakes(output: Double = 1.0): Command {
         return InstantCommand({
-            enableIntake(IntakeDirection.RIGHT)
-            enableIntake(IntakeDirection.LEFT)
+            enableIntake(IntakeDirection.RIGHT, output)
+            enableIntake(IntakeDirection.LEFT, output)
         })
     }
 

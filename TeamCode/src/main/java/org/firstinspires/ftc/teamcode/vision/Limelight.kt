@@ -22,6 +22,7 @@ class Limelight(
 
     private var limelight: Limelight3A? = null
     private var llResult: LLResult? = null
+    private var obeliskId = 0
 
     private var ty = 0.0
     private var tx = 0.0
@@ -51,27 +52,24 @@ class Limelight(
     fun getTy(): Double = ty
     fun getTa(): Double = ta
 
-    private fun getMotifPattern(): MotifPatterns {
-
+    fun getObeliskId() {
         var fiducialResult: List<LLResultTypes.FiducialResult>? = null
-        var obeliskId = 0
 
-        while (obeliskId == 0) {
-            if (llResult!!.isValid && llResult != null) {
-
-                fiducialResult = llResult!!.fiducialResults
-
-                for (detectedId in fiducialResult) {
-                    for (aprilTagId in VisionConstants.AprilTagsIdentification.ObeliskIds) {
-                        if (detectedId.fiducialId == aprilTagId) {
-                            obeliskId = detectedId.fiducialId
-                            break
-                        }
+        if (llResult!!.isValid && llResult != null) {
+            fiducialResult = llResult!!.fiducialResults
+            outerLoop@ for (detectedId in fiducialResult) {
+                for (aprilTagId in VisionConstants.AprilTagsIdentification.ObeliskIds) {
+                    if (detectedId.fiducialId == aprilTagId) {
+                        obeliskId = detectedId.fiducialId
+                        break@outerLoop
+                        break
                     }
                 }
             }
         }
+    }
 
+    fun getMotifPattern(): MotifPatterns {
         return when (obeliskId) {
             21 -> MotifPatterns.GREEN_PURPLE_PURPLE
             22 -> MotifPatterns.PURPLE_GREEN_PURPLE

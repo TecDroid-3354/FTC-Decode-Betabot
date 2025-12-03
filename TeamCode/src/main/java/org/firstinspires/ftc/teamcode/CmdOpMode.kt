@@ -8,6 +8,7 @@ import com.seattlesolvers.solverslib.command.InstantCommand
 import com.seattlesolvers.solverslib.command.button.GamepadButton
 import com.seattlesolvers.solverslib.gamepad.GamepadEx
 import com.seattlesolvers.solverslib.gamepad.GamepadKeys
+import com.seattlesolvers.solverslib.gamepad.TriggerReader
 import org.firstinspires.ftc.teamcode.commands.JoystickCmd
 import org.firstinspires.ftc.teamcode.shooter.Shooter
 import org.firstinspires.ftc.teamcode.subsystems.drivetrain.SolversMecanum
@@ -83,52 +84,45 @@ class CMDOpMode : CommandOpMode() {
                 otos.resetTracking()
             }))
 
-//        GamepadButton(controller, GamepadKeys.Button.DPAD_DOWN)
-//            .whenPressed(InstantCommand({
-//                telemetry.addData("Pattern detected", limelight.getMotifPattern())
-//            }))
-
-        GamepadButton(controller, GamepadKeys.Button.LEFT_BUMPER)
+        GamepadButton(controller, GamepadKeys.Button.RIGHT_BUMPER)
             .whenPressed(
                 intake.enableBothIntakes()
             ).whenReleased (
                 intake.stopBothIntakes()
             )
 
-        GamepadButton(controller, GamepadKeys.Button.RIGHT_BUMPER)
+        GamepadButton(controller, GamepadKeys.Button.LEFT_BUMPER)
+            .whenPressed(
+                intake.enableBothIntakes(-1.0)
+            ).whenReleased(
+                intake.stopBothIntakes()
+            )
+
+        GamepadButton(controller, GamepadKeys.Button.Y)
             .whenPressed(InstantCommand({
-                //shooter.shoot()
                 shooter.shootTest()
             })).whenReleased(InstantCommand({
                 shooter.stop()
             }))
 
+        GamepadButton(controller, GamepadKeys.Button.A)
+            .whenPressed(
+                InstantCommand({ hood.modifyCurrentPositionBy(0.01) })
+            )
+
+        GamepadButton(controller, GamepadKeys.Button.B)
+            .whenPressed(
+                InstantCommand({ hood.modifyCurrentPositionBy(0.01.unaryMinus()) })
+            )
+
         GamepadButton(controller, GamepadKeys.Button.DPAD_UP)
             .whenPressed(indexer.feedAllShooter())
-
-        GamepadButton(controller, GamepadKeys.Button.A)
-            .whenPressed(
-                InstantCommand({ hood.modifyCurrentPositionBy(0.01) })
-            )
-
-        GamepadButton(controller, GamepadKeys.Button.B)
-            .whenPressed(
-                InstantCommand({ hood.modifyCurrentPositionBy(0.01.unaryMinus()) })
-            )
-
-        GamepadButton(controller, GamepadKeys.Button.A)
-            .whenPressed(
-                InstantCommand({ hood.modifyCurrentPositionBy(0.01) })
-            )
-
-        GamepadButton(controller, GamepadKeys.Button.B)
-            .whenPressed(
-                InstantCommand({ hood.modifyCurrentPositionBy(0.01.unaryMinus()) })
-            )
     }
 
     fun periodic() {
         turret.alignToAprilTag(limelight.getTx())
+        limelight.getObeliskId()
+        controller.readButtons()
     }
 
     // Main code body
@@ -139,8 +133,6 @@ class CMDOpMode : CommandOpMode() {
         // Pauses OpMode until the START button is pressed on the Driver Hub
         waitForStart()
 
-        //limelight.getMotifPattern()
-
         // Run the scheduler
         while (!isStopRequested && opModeIsActive()) {
 
@@ -148,6 +140,7 @@ class CMDOpMode : CommandOpMode() {
             CommandScheduler.getInstance().run()
             periodic()
 
+            telemetry.addData("Motif pattern", limelight.getMotifPattern())
             telemetry.update()
         }
 
