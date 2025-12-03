@@ -8,7 +8,6 @@ import com.seattlesolvers.solverslib.command.InstantCommand
 import com.seattlesolvers.solverslib.command.button.GamepadButton
 import com.seattlesolvers.solverslib.gamepad.GamepadEx
 import com.seattlesolvers.solverslib.gamepad.GamepadKeys
-import com.seattlesolvers.solverslib.gamepad.TriggerReader
 import org.firstinspires.ftc.teamcode.commands.JoystickCmd
 import org.firstinspires.ftc.teamcode.shooter.Shooter
 import org.firstinspires.ftc.teamcode.subsystems.drivetrain.SolversMecanum
@@ -46,6 +45,7 @@ class CMDOpMode : CommandOpMode() {
 
     // Declaring useful components
     lateinit var controller: GamepadEx
+    lateinit var limelightIdFilter: IntArray
 
     // Here, declare code to be executed right after pressing the INIT button
     override fun initialize() {
@@ -84,6 +84,18 @@ class CMDOpMode : CommandOpMode() {
                 otos.resetTracking()
             }))
 
+//        GamepadButton(controller, GamepadKeys.Button.DPAD_DOWN)
+//            .whenPressed(InstantCommand({
+//                telemetry.addData("Pattern detected", limelight.getMotifPattern())
+//            }))
+
+        GamepadButton(controller, GamepadKeys.Button.LEFT_BUMPER)
+            .whenPressed(
+                intake.enableBothIntakes(-1.0)
+            ).whenReleased (
+                intake.stopBothIntakes()
+            )
+
         GamepadButton(controller, GamepadKeys.Button.RIGHT_BUMPER)
             .whenPressed(
                 intake.enableBothIntakes()
@@ -91,19 +103,16 @@ class CMDOpMode : CommandOpMode() {
                 intake.stopBothIntakes()
             )
 
-        GamepadButton(controller, GamepadKeys.Button.LEFT_BUMPER)
-            .whenPressed(
-                intake.enableBothIntakes(-1.0)
-            ).whenReleased(
-                intake.stopBothIntakes()
-            )
-
         GamepadButton(controller, GamepadKeys.Button.Y)
             .whenPressed(InstantCommand({
+                //shooter.shoot()
                 shooter.shootTest()
             })).whenReleased(InstantCommand({
                 shooter.stop()
             }))
+
+        GamepadButton(controller, GamepadKeys.Button.DPAD_UP)
+            .whenPressed(indexer.feedAllShooter())
 
         GamepadButton(controller, GamepadKeys.Button.A)
             .whenPressed(
@@ -114,15 +123,11 @@ class CMDOpMode : CommandOpMode() {
             .whenPressed(
                 InstantCommand({ hood.modifyCurrentPositionBy(0.01.unaryMinus()) })
             )
-
-        GamepadButton(controller, GamepadKeys.Button.DPAD_UP)
-            .whenPressed(indexer.feedAllShooter())
     }
 
     fun periodic() {
         turret.alignToAprilTag(limelight.getTx())
         limelight.getObeliskId()
-        controller.readButtons()
     }
 
     // Main code body
@@ -130,8 +135,37 @@ class CMDOpMode : CommandOpMode() {
         // Code executed at the very beginning, right after hitting the INIT Button
         initialize()
 
+        // select side
+        val options = listOf("BlueAlliance", "RedAlliance", "Test")
+        var index = 0
+
+        while (!isStarted && !isStopRequested) {
+            if (gamepad1.dpad_left) index = (index - 1 + options.size) % options.size
+            if (gamepad1.dpad_right) index = (index + 1) % options.size
+
+            telemetry.addLine("Select the Alliance:")
+            for (i in options.indices) {
+                if (i == index)
+                    telemetry.addLine(" ➤ ${options[i]}")  // seleccionado
+                else
+                    telemetry.addLine("   ${options[i]}")
+            }
+            telemetry.update()
+
+            sleep(200) // evita múltiples cambios por una sola pulsación
+        }
+
+        limelightIdFilter = when (options[index]) {
+            "BlueAlliance" -> intArrayOf(20)
+            "RedAlliance" -> intArrayOf(24)
+            "Test" -> intArrayOf(20, 24)
+            else -> intArrayOf(20, 24)
+        }
+
         // Pauses OpMode until the START button is pressed on the Driver Hub
         waitForStart()
+
+        //limelight.getMotifPattern()
 
         // Run the scheduler
         while (!isStopRequested && opModeIsActive()) {
@@ -140,7 +174,6 @@ class CMDOpMode : CommandOpMode() {
             CommandScheduler.getInstance().run()
             periodic()
 
-            telemetry.addData("Motif pattern", limelight.getMotifPattern())
             telemetry.update()
         }
 
