@@ -1,6 +1,8 @@
 package org.firstinspires.ftc.teamcode
 
 import com.pedropathing.follower.Follower
+import com.pedropathing.geometry.BezierLine
+import com.pedropathing.geometry.Pose
 import com.pedropathing.paths.PathChain
 import com.qualcomm.hardware.sparkfun.SparkFunOTOS
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp
@@ -20,6 +22,7 @@ import org.firstinspires.ftc.teamcode.subsystems.intake.Intake
 import org.firstinspires.ftc.teamcode.subsystems.shooter.Hood
 import org.firstinspires.ftc.teamcode.subsystems.turret.Turret
 import org.firstinspires.ftc.teamcode.vision.Limelight
+import java.util.function.Supplier
 
 
 // Personally, I chose to run my code using a command-based Op Mode since it works better for me
@@ -81,9 +84,25 @@ class CMDOpMode : CommandOpMode() {
         hood = Hood(hardwareMap, telemetry)
 
         // PedroPathing Endgame
-        endGamePath = PathChain()
-        follower = Constants.createFollower(hardwareMap)
-        follower.update()
+//        follower = Constants.createFollower(hardwareMap)
+//        endGamePath = follower.pathBuilder()
+//            .addPath(
+//                BezierLine(
+//                    /* TODO: prueba 1 (otos)
+//                    Pose(
+//                        mecanum.otos.position.x,
+//                        mecanum.otos.position.y
+//                    ),*/
+//                    Pose(follower.pose.x, follower.pose.y), // todo: prueba 2, follower
+//                    Pose(105.0, 33.0)
+//                )
+//            )
+//            .setLinearHeadingInterpolation(
+//                mecanum.getRobotYaw(), //TODO: PENDING, GET THE CURRENT HEADING
+//                Math.toRadians(90.0)
+//            )
+//            .build()
+//        follower.update()
 
         // Initializing controller & button bindings
         controller = GamepadEx(gamepad1)
@@ -97,14 +116,14 @@ class CMDOpMode : CommandOpMode() {
                 otos.resetTracking()
             }))
 
-        GamepadButton(controller, GamepadKeys.Button.LEFT_BUMPER)
+        GamepadButton(controller, GamepadKeys.Button.RIGHT_BUMPER)
             .whenPressed(
                 intake.enableBothIntakes()
             ).whenReleased (
                 intake.stopBothIntakes()
             )
 
-        GamepadButton(controller, GamepadKeys.Button.RIGHT_BUMPER)
+        GamepadButton(controller, GamepadKeys.Button.LEFT_BUMPER)
             .whenPressed(InstantCommand({
                 //shooter.shoot()
                 shooter.shootTest()
@@ -125,10 +144,10 @@ class CMDOpMode : CommandOpMode() {
                 InstantCommand({ hood.modifyCurrentPositionBy(0.01.unaryMinus()) })
             )
 
-        GamepadButton(controller, GamepadKeys.Button.DPAD_DOWN)
-            .whenPressed(
-                InstantCommand({ automatedDrive = true })
-            )
+//        GamepadButton(controller, GamepadKeys.Button.DPAD_DOWN)
+//            .whenPressed(
+//                InstantCommand({ automatedDrive = true })
+//            )
     }
 
     fun periodic() {
@@ -152,12 +171,13 @@ class CMDOpMode : CommandOpMode() {
 
             telemetry.update()
 
-            if (automatedDrive) {
-                RunCommand({
-                    follower.followPath(endGamePath)
-                    follower.update()
-                }, mecanum)
-            }
+//            if (automatedDrive) {
+//                // mecanum.defaultCommand.end(true)
+//                RunCommand({
+//                    follower.followPath(endGamePath)
+//                    follower.update()
+//                }, mecanum)
+//            }
         }
 
         // Cancels all previous commands

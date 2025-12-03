@@ -31,9 +31,9 @@ public class Red9Plus3 extends CommandOpMode {
     public void initialize() {
         // The follower is initialized & set to the starting pose
         follower = Constants.createFollower(hardwareMap);
-        follower.setStartingPose(paths.red9Plus3Poses.red9Plus3StartPose);
         // Initializes the class where all paths are created
         paths = new Paths(follower);
+        follower.setStartingPose(paths.red9Plus3Poses.red9Plus3StartPose);
         // Initializes the timer that accounts for the timeout before a path is considered done
         pathTimer = new Timer();
     }
@@ -54,13 +54,13 @@ public class Red9Plus3 extends CommandOpMode {
         setPathState(0);
 
         // Run the scheduler
-        while (isStopRequested() && opModeIsActive()) {
+        while (!isStopRequested() && opModeIsActive()) {
             // Command for actually running the scheduler
             CommandScheduler.getInstance().run();
 
             // Actual path following
-            autonomousPathUpdates();
             follower.update();
+            autonomousPathUpdates();
 
             // Updating the telemetry
             telemetry.update();
@@ -76,7 +76,7 @@ public class Red9Plus3 extends CommandOpMode {
         switch (pathState) {
             // The follower is in charge of following a PathChain declared within the Paths object
             case 0:
-                follower.followPath(paths.red9Plus3ShootPrecharged, true);
+                follower.followPath(paths.red9Plus3ShootPrecharged);
                 setPathState(1);
                 break;
             case 1:

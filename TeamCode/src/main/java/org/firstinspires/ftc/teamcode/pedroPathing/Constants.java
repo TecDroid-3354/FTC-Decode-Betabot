@@ -22,16 +22,16 @@ public class Constants {
     // Follower constants ///
     // Consists of values from the automatic, PID, and centripetal tuners
     public static FollowerConstants followerConstants = new FollowerConstants()
-            .mass(11.0) // Robot's mass. Compensates for the centripetal force
-            .forwardZeroPowerAcceleration(-16.0) // Measures how the robot decelerates when moving forward & power is cut
+            .mass(13.55) // Robot's mass. Compensates for the centripetal force
+            .forwardZeroPowerAcceleration(-27.7404) // 👍 Measures how the robot decelerates when moving forward & power is cut
             // It should be negative. Otherwise, it'll accelerate when getting closer to 0
-            .lateralZeroPowerAcceleration(-35.0) // Measures how the robot decelerates when moving sideways & power is cut
+            .lateralZeroPowerAcceleration(-72.9878) //👍 Measures how the robot decelerates when moving sideways & power is cut
             // It should be negative. Otherwise, it'll accelerate when getting closer to 0
             .useSecondaryTranslationalPIDF(true)
             .useSecondaryHeadingPIDF(true)
             .useSecondaryDrivePIDF(true)
-            .translationalPIDFCoefficients(new PIDFCoefficients(0.05, 0.0, 0.0, 0.0))
-            .secondaryTranslationalPIDFCoefficients(new PIDFCoefficients(0.35,0.0,0.01,0.015))
+            .translationalPIDFCoefficients(new PIDFCoefficients(0.04, 0.0, 0.0, 0.0)) //👍
+            .secondaryTranslationalPIDFCoefficients(new PIDFCoefficients(0.37,0.0,0.01,0.015)) //👍
             .centripetalScaling(0.0002);
 
 
@@ -47,8 +47,8 @@ public class Constants {
             .leftRearMotorDirection(DcMotorSimple.Direction.FORWARD)
             .rightFrontMotorDirection(DcMotorSimple.Direction.REVERSE)
             .rightRearMotorDirection(DcMotorSimple.Direction.REVERSE)
-            .xVelocity(70.0) // The final velocity achieved by the robot after forward/backward testing
-            .yVelocity(56.0); // The final velocity achieved by the robot after lateral testing
+            .xVelocity(75.0414) // 👍 The final velocity achieved by the robot after forward/backward testing
+            .yVelocity(53.0291); // 👍 The final velocity achieved by the robot after lateral testing
 
 
     // Localizer constants //
@@ -62,8 +62,8 @@ public class Constants {
             // translated 1/4 in to the left, which would be a translation in the y axis since OTOS
             // axes are flipped.
             .offset(new SparkFunOTOS.Pose2D(0.0,-0.25,-Math.PI / 2.0))
-            .linearScalar(1.0)
-            .angularScalar(0.995);
+            .linearScalar(0.9484) // Done 👍
+            .angularScalar(0.9939); // Done 👍
 
 
     // Path constraints //

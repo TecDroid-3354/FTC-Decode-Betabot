@@ -10,6 +10,7 @@ import com.seattlesolvers.solverslib.kinematics.wpilibkinematics.ChassisSpeeds
 import org.firstinspires.ftc.robotcore.external.Telemetry
 import org.firstinspires.ftc.teamcode.subsystems.drivetrain.MecanumConstants.Ids
 import org.firstinspires.ftc.teamcode.subsystems.drivetrain.MecanumConstants.Physics
+import java.util.function.DoubleSupplier
 
 
 class SolversMecanum(
@@ -67,6 +68,10 @@ class SolversMecanum(
             chassisSpeeds.omegaRadiansPerSecond,
             getRobotYaw())
     }
+
+    /*fun getRobotPosition(): DoubleSupplier {
+
+    }*/
 
     fun getRobotYaw(): Double = otos.position.h
     fun resetOtosYaw(): Unit = otos.resetTracking()
