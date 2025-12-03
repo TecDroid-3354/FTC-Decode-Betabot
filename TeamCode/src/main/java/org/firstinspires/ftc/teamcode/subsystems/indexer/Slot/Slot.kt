@@ -105,7 +105,7 @@ class Slot (val config: SlotConfig, hw: HardwareMap, telemetry: Telemetry) {
         SequentialCommandGroup(
             InstantCommand({ home() }),
             WaitCommand(500),
-            InstantCommand({ setServoPosition(config.homePosition - 0.001)})
+            InstantCommand({ setServoPosition(config.homePosition + 0.0001)})
         ).schedule()
     }
 }
