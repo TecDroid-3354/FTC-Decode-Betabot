@@ -126,8 +126,7 @@ class CMDOpMode : CommandOpMode() {
     }
 
     fun periodic() {
-        turret.alignToAprilTag(limelight.getTx())
-        limelight.getObeliskId()
+        turret.alignToAprilTag(limelight.getClassifierTx(limelightIdFilter))
     }
 
     // Main code body
@@ -140,8 +139,8 @@ class CMDOpMode : CommandOpMode() {
         var index = 0
 
         while (!isStarted && !isStopRequested) {
-            if (gamepad1.dpad_left) index = (index - 1 + options.size) % options.size
-            if (gamepad1.dpad_right) index = (index + 1) % options.size
+            if (gamepad1.dpad_down) index = (index - 1 + options.size) % options.size
+            if (gamepad1.dpad_up) index = (index + 1) % options.size
 
             telemetry.addLine("Select the Alliance:")
             for (i in options.indices) {

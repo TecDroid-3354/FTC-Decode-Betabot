@@ -52,11 +52,28 @@ class Limelight(
     fun getTy(): Double = ty
     fun getTa(): Double = ta
 
-    fun getObeliskId() {
-        var fiducialResult: List<LLResultTypes.FiducialResult>? = null
+    fun getClassifierTx(filterArray: IntArray): Double {
 
         if (llResult!!.isValid && llResult != null) {
-            fiducialResult = llResult!!.fiducialResults
+            val fiducialResult = llResult!!.fiducialResults
+
+            for (detectedId in fiducialResult) {
+                for (id in filterArray) {
+                    if (detectedId.fiducialId == id) {
+                        return llResult!!.tx
+                    }
+                }
+            }
+        }
+
+        return 0.0
+    }
+
+    private fun getObeliskId() {
+
+        if (llResult!!.isValid && llResult != null) {
+            val fiducialResult = llResult!!.fiducialResults
+
             outerLoop@ for (detectedId in fiducialResult) {
                 for (aprilTagId in VisionConstants.AprilTagsIdentification.ObeliskIds) {
                     if (detectedId.fiducialId == aprilTagId) {
@@ -90,6 +107,7 @@ class Limelight(
         // LLResult is like a container full of information about what Limelight sees
         llResult = limelight!!.getLatestResult()
 
+        getObeliskId()
         // Math to calculate distance was taken from documentation:
         // https://docs.limelightvision.io/docs/docs-limelight/tutorials/tutorial-estimating-distance#using-area-to-estimate-distance
         // The condition verifies whether the LimeLight Result is a valid statement
