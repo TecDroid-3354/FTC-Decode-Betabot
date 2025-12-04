@@ -21,6 +21,7 @@ import java.util.Map;
 public class ColorSensorEx {
     private final ColorSensor colorSensor;
     private final Telemetry telemetry;
+    private final String archiveExtension;
 
     // JSON values
     Map<DetectedColor, float[]> colorCalibrations = new HashMap<>();
@@ -36,9 +37,10 @@ public class ColorSensorEx {
         UNKNOWN
     }
 
-    public ColorSensorEx(ColorSensor colorSensor, Telemetry telemetry) {
+    public ColorSensorEx(ColorSensor colorSensor, String archiveExtension, Telemetry telemetry) {
         this.colorSensor = colorSensor;
         this.telemetry = telemetry;
+        this.archiveExtension = archiveExtension;
 
         loadCalibration();
     }
@@ -79,7 +81,7 @@ public class ColorSensorEx {
 
     private void loadCalibration() {
         try {
-            File file = new File("/sdcard/FIRST/colorCalibration.json");
+            File file = new File("/sdcard/FIRST/colorCalibration" + archiveExtension + ".json");
             JSONObject json = new JSONObject(ReadFile.readFile(file));
 
             for (DetectedColor c : DetectedColor.values()) {

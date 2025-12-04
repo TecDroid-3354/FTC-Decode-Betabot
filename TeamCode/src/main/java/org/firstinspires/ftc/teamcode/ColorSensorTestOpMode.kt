@@ -1,6 +1,7 @@
 package org.firstinspires.ftc.teamcode
 
 import android.graphics.Color
+import com.qualcomm.robotcore.eventloop.opmode.Disabled
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp
 import com.qualcomm.robotcore.hardware.ColorSensor
 import com.seattlesolvers.solverslib.command.CommandOpMode
@@ -22,6 +23,7 @@ import kotlin.math.sqrt
  * To visit the FTC dashboard online (while connected to the Control Hub's internet)
  *    http://192.168.43.1:8080/?page=connection.html&pop=true
  */
+@Disabled
 @TeleOp(name = "ColorSensorTest", group = "Op Mode")
 class ColorSensorTestOpMode : CommandOpMode() {
     private lateinit var colorSensor: ColorSensor

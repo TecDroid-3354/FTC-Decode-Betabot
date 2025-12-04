@@ -15,6 +15,7 @@ import org.firstinspires.ftc.teamcode.subsystems.indexer.Indexer
 import org.firstinspires.ftc.teamcode.subsystems.intake.Intake
 import org.firstinspires.ftc.teamcode.subsystems.shooter.Hood
 import org.firstinspires.ftc.teamcode.subsystems.turret.Turret
+import org.firstinspires.ftc.teamcode.systems.ShooterSystem
 import org.firstinspires.ftc.teamcode.vision.Limelight
 
 
@@ -41,6 +42,7 @@ class CMDOpMode : CommandOpMode() {
     lateinit var turret: Turret
     lateinit var limelight: Limelight
     lateinit var hood: Hood
+    lateinit var shooterSystem: ShooterSystem
     lateinit var otos: SparkFunOTOS
 
     // Declaring useful components
@@ -67,10 +69,11 @@ class CMDOpMode : CommandOpMode() {
 
         shooter = Shooter(hardwareMap, telemetry)
         turret = Turret(hardwareMap, telemetry)
+        hood = Hood(hardwareMap, telemetry)
         limelight = Limelight(hardwareMap, telemetry, otos)
         limelight.start()
 
-        hood = Hood(hardwareMap, telemetry)
+        shooterSystem = ShooterSystem(shooter, hood, indexer, { limelight.getClassifierDistance( limelightIdFilter ) })
 
         // Initializing controller & button bindings
         controller = GamepadEx(gamepad1)
@@ -104,10 +107,8 @@ class CMDOpMode : CommandOpMode() {
             )
 
         GamepadButton(controller, GamepadKeys.Button.Y)
-            .whenPressed(InstantCommand({
-                //shooter.shoot()
-                shooter.shootTest()
-            })).whenReleased(InstantCommand({
+            .whenPressed(shooter.shootCMD())
+            .whenReleased(InstantCommand({
                 shooter.stop()
             }))
 

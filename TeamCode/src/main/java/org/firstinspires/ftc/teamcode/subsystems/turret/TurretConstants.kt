@@ -30,8 +30,8 @@ class TurretConstants {
     object Limits {
         // It is quite important to remark that these limits will only be useful if the robot is turned on
         // with the turret facing towards the battery and the Expansion Hub
-        val minimumLimit = Angle.fromDegrees(-120.0)
-        val maximumLimit = Angle.fromDegrees(133.0)
+        val minimumLimit = Angle.fromDegrees(-100.0)
+        val maximumLimit = Angle.fromDegrees(125.0)
     }
 
     // The subsystem's PIDF controller, it must be @Configurable so it can be changed in real-time using Panels

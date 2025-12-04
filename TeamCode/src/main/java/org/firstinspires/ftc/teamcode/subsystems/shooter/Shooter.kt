@@ -5,9 +5,12 @@ import com.qualcomm.robotcore.hardware.DcMotor
 import com.qualcomm.robotcore.hardware.DcMotorEx
 import com.qualcomm.robotcore.hardware.HardwareMap
 import com.qualcomm.robotcore.hardware.PIDFCoefficients
+import com.seattlesolvers.solverslib.command.Command
+import com.seattlesolvers.solverslib.command.InstantCommand
 import com.seattlesolvers.solverslib.command.SubsystemBase
 import org.firstinspires.ftc.robotcore.external.Telemetry
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit
+import kotlin.time.Instant
 
 /**
  * This is the code for controlling the shooter wheels on our robot.
@@ -43,14 +46,16 @@ class Shooter(
     /**
      * Sets the motor's velocity to a desired angular velocity
      */
-    fun shoot() {
-        //motor.setVelocity(velocity)
-        motor.power = 1.0
-    }
 
-    fun shootTest() {
+    private fun shoot() {
         motor.mode = DcMotor.RunMode.RUN_USING_ENCODERS
         motor.setVelocity(20000.0, AngleUnit.DEGREES)
+    }
+
+    fun shootCMD() : Command {
+        return InstantCommand({
+            shoot()
+        })
     }
 
     /**

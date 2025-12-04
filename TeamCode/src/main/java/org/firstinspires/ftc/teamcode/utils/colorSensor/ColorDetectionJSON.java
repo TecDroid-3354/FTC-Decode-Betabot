@@ -12,7 +12,6 @@ import java.io.File;
 import java.util.HashMap;
 import java.util.Map;
 import org.firstinspires.ftc.teamcode.utils.colorSensor.ColorSensorEx.DetectedColor;
-@Disabled
 @TeleOp(name = "ColorSensor-Test", group = "Op Mode")
 
 public class ColorDetectionJSON extends LinearOpMode {
@@ -24,7 +23,7 @@ public class ColorDetectionJSON extends LinearOpMode {
 
     @Override
     public void runOpMode() {
-        colorSensor = hardwareMap.get(ColorSensor.class, "colorSensor");
+        colorSensor = hardwareMap.get(ColorSensor.class, "fRCS");
 
         // Cargar calibraciones desde archivo
         loadCalibration();

@@ -138,7 +138,8 @@ class Indexer(
         val cmdGroup = SequentialCommandGroup()
 
         if (rejectEvaluation()) {
-            return feedShooter()
+            //return feedShooter()
+            return feedAllShooter()
         }
 
         for ((index, color) in motifPatterns.pattern.withIndex()) {

@@ -1,5 +1,6 @@
 package org.firstinspires.ftc.teamcode.vision
 
+import Distance
 import com.qualcomm.hardware.limelightvision.LLResult
 import com.qualcomm.hardware.limelightvision.LLResultTypes
 import com.qualcomm.hardware.limelightvision.Limelight3A
@@ -27,6 +28,8 @@ class Limelight(
     private var ty = 0.0
     private var tx = 0.0
     private var ta = 0.0
+
+    private var distanceFromLimelightToGoalInches = Distance.fromInches(0.0)
 
     init {
         limelight = hardwareMap.get<Limelight3A?>(
@@ -60,13 +63,30 @@ class Limelight(
             for (detectedId in fiducialResult) {
                 for (id in filterArray) {
                     if (detectedId.fiducialId == id) {
-                        return llResult!!.tx
+                        return tx
                     }
                 }
             }
         }
 
         return 0.0
+    }
+
+    fun getClassifierDistance(filterArray: IntArray): Distance {
+
+        if (llResult!!.isValid && llResult != null) {
+            val fiducialResult = llResult!!.fiducialResults
+
+            for (detectedId in fiducialResult) {
+                for (id in filterArray) {
+                    if (detectedId.fiducialId == id) {
+                        return distanceFromLimelightToGoalInches
+                    }
+                }
+            }
+        }
+
+        return Distance.fromInches(0.0)
     }
 
     private fun getObeliskId() {
@@ -120,9 +140,9 @@ class Limelight(
                 Math.toRadians(LimelightPhysicalDescription.LLMountAngleFromHorizontal.degrees + targetOffsetAngle_Vertical.degrees)
 
             // Calculated distance from limelight lens to goal (in inches)
-            val distanceFromLimelightToGoalInches =
+            distanceFromLimelightToGoalInches =
                 (AprilTagsPhysicalDescription.GoalHeightFromGround - LimelightPhysicalDescription.LLHeightFromGroundToLens) / tan(angleToGoalRadians)
-            telemetry.addData("TargetDistanceInches", distanceFromLimelightToGoalInches.inches)
+            //telemetry.addData("TargetDistanceInches", distanceFromLimelightToGoalInches.inches)
 
             // We will first get a (MetaTag2) Pose3D. From here, we will extract its Tx, Ty & Ta components
             tx = llResult!!.getTx()
@@ -130,19 +150,19 @@ class Limelight(
             ta = llResult!!.getTa()
 
             val botPose = llResult!!.getBotpose_MT2()
-            telemetry.addData(
-                "Tx",
-                tx
-            ) // Represents how far left/right the target is (in degrees)
-            telemetry.addData(
-                "Ty",
-                ty
-            ) // Represents how far up/down the target is (in degrees)
-            telemetry.addData("Ta", ta) // Represents how big the AprilTag looks
-
-            // according to the camera field of view (0-100%)
-            telemetry.addData("BotPose", botPose.toString())
-            telemetry.addData("Yaw", botPose.getOrientation().getYaw())
+//            telemetry.addData(
+//                "Tx",
+//                tx
+//            ) // Represents how far left/right the target is (in degrees)
+//            telemetry.addData(
+//                "Ty",
+//                ty
+//            ) // Represents how far up/down the target is (in degrees)
+//            telemetry.addData("Ta", ta) // Represents how big the AprilTag looks
+//
+//            // according to the camera field of view (0-100%)
+//            telemetry.addData("BotPose", botPose.toString())
+//            telemetry.addData("Yaw", botPose.getOrientation().getYaw())
 
             /*
              * It is important to notice that the Full3D option should be enabled
