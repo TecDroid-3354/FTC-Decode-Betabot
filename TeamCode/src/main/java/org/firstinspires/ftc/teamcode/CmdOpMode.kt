@@ -37,11 +37,11 @@ class CMDOpMode : CommandOpMode() {
     // Declaring subsystems
     lateinit var mecanum: SolversMecanum
     lateinit var intake: Intake
-    lateinit var indexer: Indexer
+
     lateinit var shooter: Shooter
     lateinit var turret: Turret
     lateinit var limelight: Limelight
-    lateinit var hood: Hood
+
     lateinit var shooterSystem: ShooterSystem
     lateinit var otos: SparkFunOTOS
 
@@ -65,15 +65,17 @@ class CMDOpMode : CommandOpMode() {
 
         intake = Intake(hardwareMap, telemetry)
 
-        indexer = Indexer(hardwareMap, telemetry)
 
-        shooter = Shooter(hardwareMap, telemetry)
         turret = Turret(hardwareMap, telemetry)
-        hood = Hood(hardwareMap, telemetry)
+
         limelight = Limelight(hardwareMap, telemetry, otos)
         limelight.start()
 
-        shooterSystem = ShooterSystem(shooter, hood, indexer, { limelight.getClassifierDistance( limelightIdFilter ) })
+        shooterSystem = ShooterSystem(hardwareMap, telemetry) {
+            limelight.getClassifierDistance(
+                limelightIdFilter
+            )
+        }
 
         // Initializing controller & button bindings
         controller = GamepadEx(gamepad1)
@@ -106,23 +108,23 @@ class CMDOpMode : CommandOpMode() {
                 intake.stopBothIntakes()
             )
 
+        GamepadButton(controller, GamepadKeys.Button.DPAD_UP)
+            .whenPressed(shooterSystem.indexer.feedAllShooter())
+
         GamepadButton(controller, GamepadKeys.Button.Y)
             .whenPressed(shooter.shootCMD())
             .whenReleased(InstantCommand({
                 shooter.stop()
             }))
 
-        GamepadButton(controller, GamepadKeys.Button.DPAD_UP)
-            .whenPressed(indexer.feedAllShooter())
-
         GamepadButton(controller, GamepadKeys.Button.A)
             .whenPressed(
-                InstantCommand({ hood.modifyCurrentPositionBy(0.01) })
+                InstantCommand({ shooterSystem.hood.modifyCurrentPositionBy(0.01) })
             )
 
         GamepadButton(controller, GamepadKeys.Button.B)
             .whenPressed(
-                InstantCommand({ hood.modifyCurrentPositionBy(0.01.unaryMinus()) })
+                InstantCommand({ shooterSystem.hood.modifyCurrentPositionBy(0.01.unaryMinus()) })
             )
     }
 

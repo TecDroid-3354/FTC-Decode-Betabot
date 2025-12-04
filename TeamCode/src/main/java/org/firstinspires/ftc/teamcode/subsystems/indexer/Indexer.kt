@@ -104,7 +104,7 @@ class Indexer(
             }
         }
 
-        return greenIndex > 1 || purpleIndex > 2
+        return greenIndex != 1 || purpleIndex != 2
     }
 
     /**
@@ -186,7 +186,7 @@ class Indexer(
                 InstantCommand({ slot.feed() }),
                 WaitCommand(250),
                 InstantCommand({ slot.home() }),
-                WaitCommand(750)
+                WaitCommand(500)
             )
         } else {
             InstantCommand()
@@ -204,6 +204,6 @@ class Indexer(
             InstantCommand({ slot.feed() }),
             WaitCommand(250),
             InstantCommand({ slot.home() }),
-            WaitCommand(750))
+            WaitCommand(500))
     }
 }
