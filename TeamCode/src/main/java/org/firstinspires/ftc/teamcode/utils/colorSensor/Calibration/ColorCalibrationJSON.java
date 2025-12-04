@@ -55,26 +55,26 @@ public class ColorCalibrationJSON {
 
     private void guardarColor(DetectedColor target) throws InterruptedException {
         // Promediamos varias lecturas
-        double redSum = 0, greenSum = 0, blueSum = 0;
+        float hueSum = 0, satSum = 0, valSum = 0;
         int samples = 20;
 
         for (int i = 0; i < samples; i++) {
-            Double[] rgb = getRGB();
-            redSum += rgb[0];
-            greenSum += rgb[1];
-            blueSum += rgb[2];
+            float[] hsv = getHSV();
+            hueSum += hsv[0];
+            satSum += hsv[1];
+            valSum += hsv[2];
             sleep(50);
         }
 
-        double red = redSum / samples;
-        double green = greenSum / samples;
-        double blue = blueSum / samples;
+        float hue = hueSum / samples;
+        float sat = satSum / samples;
+        float val = valSum / samples;
 
         telemetry.addLine("Guardando en JSON...");
         telemetry.addData("Color", target);
-        telemetry.addData("Red", red);
-        telemetry.addData("Green", green);
-        telemetry.addData("Blue", blue);
+        telemetry.addData("Hue", hue);
+        telemetry.addData("Sat", sat);
+        telemetry.addData("Val", val);
         telemetry.update();
 
         // Guardamos en archivo JSON
@@ -91,9 +91,9 @@ public class ColorCalibrationJSON {
 
             // Guardamos valores calibrados
             JSONObject colorData = new JSONObject();
-            colorData.put("red", red);
-            colorData.put("green", green);
-            colorData.put("blue", blue);
+            colorData.put("hue", hue);
+            colorData.put("saturation", sat);
+            colorData.put("value", val);
 
             json.put(target.name(), colorData);
 
@@ -115,11 +115,20 @@ public class ColorCalibrationJSON {
         sleep(1000);
     }
 
-    private Double[] getRGB() {
-        double r = (double) colorSensor.red() / colorSensor.alpha();
-        double g = (double) colorSensor.green() / colorSensor.alpha();
-        double b = (double) colorSensor.blue() / colorSensor.alpha();
+    private float[] getHSV() {
+        float r = colorSensor.red();
+        float g = colorSensor.green();
+        float b = colorSensor.blue();
 
-        return new Double[]{r, g, b};
+        float max = Math.max(r, Math.max(g, b));
+        if (max == 0) max = 1;
+        float rn = r / max;
+        float gn = g / max;
+        float bn = b / max;
+
+        float[] hsv = new float[3];
+        android.graphics.Color.RGBToHSV((int)(rn * 255), (int)(gn * 255), (int)(bn * 255), hsv);
+
+        return hsv;
     }
 }

@@ -19,7 +19,7 @@ import java.util.Map;
  */
 
 public class ColorSensorEx {
-    private final ColorSensor colorSensor;
+    public final ColorSensor colorSensor;
     private final Telemetry telemetry;
     private final String archiveExtension;
 
@@ -37,7 +37,7 @@ public class ColorSensorEx {
         UNKNOWN
     }
 
-    public ColorSensorEx(ColorSensor colorSensor, String archiveExtension, Telemetry telemetry) {
+    public ColorSensorEx(ColorSensor colorSensor, Telemetry telemetry, String archiveExtension) {
         this.colorSensor = colorSensor;
         this.telemetry = telemetry;
         this.archiveExtension = archiveExtension;
@@ -46,7 +46,7 @@ public class ColorSensorEx {
     }
 
     public DetectedColor getColorFromSensor() {
-        Double[] rgb = getRGB();
+        float[] hsv = getHSV();
 
         DetectedColor closestColor = DetectedColor.UNKNOWN;
         double minDistance = Double.MAX_VALUE;
@@ -57,9 +57,9 @@ public class ColorSensorEx {
 
             // Distancia Euclidiana en espacio HSV
             double dist = Math.sqrt(
-                    Math.pow(rgb[0] - ref[0], 2) +
-                            Math.pow(rgb[1] - ref[1], 2) +
-                            Math.pow(rgb[2] - ref[2], 2)
+                    Math.pow(hsv[0] - ref[0], 2) +
+                            Math.pow(hsv[1] - ref[1], 2) +
+                            Math.pow(hsv[2] - ref[2], 2)
             );
 
             if (dist < minDistance) {
@@ -71,12 +71,26 @@ public class ColorSensorEx {
         return closestColor;
     }
 
-    private Double[] getRGB() {
-        double r = (double) colorSensor.red() / colorSensor.alpha();
-        double g = (double) colorSensor.green() / colorSensor.alpha();
-        double b = (double) colorSensor.blue() / colorSensor.alpha();
+    public float[] getHSV() {
+        float r = colorSensor.red();
+        float g = colorSensor.green();
+        float b = colorSensor.blue();
 
-        return new Double[]{r, g, b};
+        float max = Math.max(r, Math.max(g, b));
+        if (max == 0) max = 1;
+        float rn = r / max;
+        float gn = g / max;
+        float bn = b / max;
+
+        float[] hsv = new float[3];
+        android.graphics.Color.RGBToHSV(
+                (int)(rn * 255),
+                (int)(gn * 255),
+                (int)(bn * 255),
+                hsv
+        );
+
+        return hsv; // [hue, sat, val]
     }
 
     private void loadCalibration() {
@@ -87,11 +101,11 @@ public class ColorSensorEx {
             for (DetectedColor c : DetectedColor.values()) {
                 if (json.has(c.name())) {
                     JSONObject data = json.getJSONObject(c.name());
-                    float red = (float) data.getDouble("red");
-                    float green = (float) data.getDouble("green");
-                    float blue = (float) data.getDouble("blue");
+                    float hue = (float) data.getDouble("hue");
+                    float sat = (float) data.getDouble("saturation");
+                    float val = (float) data.getDouble("value");
 
-                    colorCalibrations.put(c, new float[]{red, green, blue});
+                    colorCalibrations.put(c, new float[]{hue, sat, val});
                 }
             }
 

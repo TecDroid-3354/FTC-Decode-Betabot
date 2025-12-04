@@ -44,14 +44,14 @@ class Slot (val config: SlotConfig, hw: HardwareMap, telemetry: Telemetry) {
         rightColorSensor = ColorSensorEx(hw.get(
             ColorSensor::class.java,
             config.rightColorSensorId),
-            config.archiveExtension,
-            telemetry)
+            telemetry,
+            config.archiveExtension)
 
         leftColorSensor = ColorSensorEx(hw.get(
             ColorSensor::class.java,
             config.leftColorSensorId),
-            config.archiveExtension,
-            telemetry)
+            telemetry,
+            config.archiveExtension)
 
         awakeServo()
     }

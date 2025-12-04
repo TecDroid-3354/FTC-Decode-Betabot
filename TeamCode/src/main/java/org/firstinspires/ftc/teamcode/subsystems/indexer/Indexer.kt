@@ -56,7 +56,7 @@ class Indexer(
                 Identification.MiddleSlot.absMiddle,
                 Identification.MiddleSlot.middleSlotRightSensor,
                 Identification.MiddleSlot.middleSlotLeftSensor,
-                Extensions.middleSlotExtension),
+                Extensions.frontSlotExtension),
             hw,
             telemetry)
 

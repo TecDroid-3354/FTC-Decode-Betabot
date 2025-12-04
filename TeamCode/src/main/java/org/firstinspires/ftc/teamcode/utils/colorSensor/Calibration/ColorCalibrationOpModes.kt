@@ -2,7 +2,7 @@ package org.firstinspires.ftc.teamcode.utils.colorSensor.Calibration
 
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp
-import org.firstinspires.ftc.teamcode.subsystems.indexer.IndexerConstants.Identification
+import org.firstinspires.ftc.teamcode.subsystems.indexer.IndexerConstants
 import org.firstinspires.ftc.teamcode.subsystems.indexer.IndexerConstants.Extensions
 
 @TeleOp(name = "ColorCalibrationOpModes")
@@ -14,9 +14,9 @@ class ColorCalibrationOpModes : LinearOpMode() {
     private lateinit var BackSlot: ColorCalibrationJSON
 
     override fun runOpMode() {
-        FrontSlot = ColorCalibrationJSON(Identification.FrontSlot.frontSlotLeftSensor, Extensions.frontSlotExtension, telemetry, hardwareMap, gamepad1)
-        MiddleSlot = ColorCalibrationJSON(Identification.MiddleSlot.middleSlotLeftSensor, Extensions.middleSlotExtension, telemetry, hardwareMap, gamepad1)
-        BackSlot = ColorCalibrationJSON(Identification.BackSlot.backSlotLeftSensor, Extensions.backSlotExtension, telemetry, hardwareMap, gamepad1)
+        FrontSlot = ColorCalibrationJSON(IndexerConstants.Identification.FrontSlot.frontSlotLeftSensor, Extensions.frontSlotExtension, telemetry, hardwareMap, gamepad1)
+        MiddleSlot = ColorCalibrationJSON(IndexerConstants.Identification.MiddleSlot.middleSlotLeftSensor, Extensions.middleSlotExtension, telemetry, hardwareMap, gamepad1)
+        BackSlot = ColorCalibrationJSON(IndexerConstants.Identification.BackSlot.backSlotLeftSensor, Extensions.backSlotExtension, telemetry, hardwareMap, gamepad1)
 
         val opciones = listOf("FrontSlot", "MiddleSlot", "BackSlot")
         var indice = 0
@@ -60,3 +60,4 @@ class ColorCalibrationOpModes : LinearOpMode() {
         BackSlot.runOpMode()
     }
 }
+
