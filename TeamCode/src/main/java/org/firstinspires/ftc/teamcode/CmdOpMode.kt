@@ -1,6 +1,5 @@
 package org.firstinspires.ftc.teamcode
 
-import androidx.core.math.MathUtils
 import com.qualcomm.hardware.sparkfun.SparkFunOTOS
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp
 import com.seattlesolvers.solverslib.command.CommandOpMode
@@ -12,7 +11,9 @@ import com.seattlesolvers.solverslib.gamepad.GamepadKeys
 import org.firstinspires.ftc.teamcode.commands.JoystickCmd
 import org.firstinspires.ftc.teamcode.shooter.Shooter
 import org.firstinspires.ftc.teamcode.subsystems.drivetrain.SolversMecanum
+import org.firstinspires.ftc.teamcode.subsystems.indexer.Indexer
 import org.firstinspires.ftc.teamcode.subsystems.intake.Intake
+import org.firstinspires.ftc.teamcode.subsystems.shooter.Hood
 import org.firstinspires.ftc.teamcode.subsystems.turret.Turret
 import org.firstinspires.ftc.teamcode.systems.ShooterSystem
 import org.firstinspires.ftc.teamcode.vision.Limelight
@@ -36,7 +37,6 @@ class CMDOpMode : CommandOpMode() {
     // Declaring subsystems
     lateinit var mecanum: SolversMecanum
     lateinit var intake: Intake
-
     lateinit var turret: Turret
     lateinit var limelight: Limelight
 
@@ -48,7 +48,6 @@ class CMDOpMode : CommandOpMode() {
 
     // Here, declare code to be executed right after pressing the INIT button
     override fun initialize() {
-
         /* Subsystem initialization */
 
         otos = hardwareMap.get(SparkFunOTOS::class.java, "otos")
@@ -62,8 +61,8 @@ class CMDOpMode : CommandOpMode() {
         )
 
         intake = Intake(hardwareMap, telemetry)
-        turret = Turret(hardwareMap, telemetry)
 
+        turret = Turret(hardwareMap, telemetry)
         limelight = Limelight(hardwareMap, telemetry, otos)
 
         shooterSystem = ShooterSystem(hardwareMap, telemetry) {
@@ -85,11 +84,6 @@ class CMDOpMode : CommandOpMode() {
                 otos.resetTracking()
             }))
 
-//        GamepadButton(controller, GamepadKeys.Button.DPAD_DOWN)
-//            .whenPressed(InstantCommand({
-//                telemetry.addData("Pattern detected", limelight.getMotifPattern())
-//            }))
-
         GamepadButton(controller, GamepadKeys.Button.LEFT_BUMPER)
             .whenPressed(
                 intake.enableBothIntakes(-1.0)
@@ -103,9 +97,6 @@ class CMDOpMode : CommandOpMode() {
             ).whenReleased (
                 intake.stopBothIntakes()
             )
-
-        GamepadButton(controller, GamepadKeys.Button.DPAD_UP)
-            .whenPressed(shooterSystem.indexer.feedAllShooter())
 
         GamepadButton(controller, GamepadKeys.Button.DPAD_RIGHT)
             .whenPressed(
