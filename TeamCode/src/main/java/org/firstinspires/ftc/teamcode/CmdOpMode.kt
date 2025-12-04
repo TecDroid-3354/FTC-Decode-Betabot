@@ -1,5 +1,6 @@
 package org.firstinspires.ftc.teamcode
 
+import androidx.core.math.MathUtils
 import com.qualcomm.hardware.sparkfun.SparkFunOTOS
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp
 import com.seattlesolvers.solverslib.command.CommandOpMode
@@ -11,9 +12,7 @@ import com.seattlesolvers.solverslib.gamepad.GamepadKeys
 import org.firstinspires.ftc.teamcode.commands.JoystickCmd
 import org.firstinspires.ftc.teamcode.shooter.Shooter
 import org.firstinspires.ftc.teamcode.subsystems.drivetrain.SolversMecanum
-import org.firstinspires.ftc.teamcode.subsystems.indexer.Indexer
 import org.firstinspires.ftc.teamcode.subsystems.intake.Intake
-import org.firstinspires.ftc.teamcode.subsystems.shooter.Hood
 import org.firstinspires.ftc.teamcode.subsystems.turret.Turret
 import org.firstinspires.ftc.teamcode.systems.ShooterSystem
 import org.firstinspires.ftc.teamcode.vision.Limelight
@@ -38,19 +37,18 @@ class CMDOpMode : CommandOpMode() {
     lateinit var mecanum: SolversMecanum
     lateinit var intake: Intake
 
-    lateinit var shooter: Shooter
     lateinit var turret: Turret
     lateinit var limelight: Limelight
 
     lateinit var shooterSystem: ShooterSystem
-    lateinit var otos: SparkFunOTOS
-
     // Declaring useful components
     lateinit var controller: GamepadEx
+    lateinit var otos: SparkFunOTOS
     lateinit var limelightIdFilter: IntArray
 
     // Here, declare code to be executed right after pressing the INIT button
     override fun initialize() {
+
         /* Subsystem initialization */
 
         otos = hardwareMap.get(SparkFunOTOS::class.java, "otos")
@@ -64,18 +62,16 @@ class CMDOpMode : CommandOpMode() {
         )
 
         intake = Intake(hardwareMap, telemetry)
-
-
         turret = Turret(hardwareMap, telemetry)
 
         limelight = Limelight(hardwareMap, telemetry, otos)
-        limelight.start()
 
         shooterSystem = ShooterSystem(hardwareMap, telemetry) {
-            limelight.getClassifierDistance(
+            limelight.getDistanceToGoal(
                 limelightIdFilter
             )
         }
+
 
         // Initializing controller & button bindings
         controller = GamepadEx(gamepad1)
@@ -111,11 +107,10 @@ class CMDOpMode : CommandOpMode() {
         GamepadButton(controller, GamepadKeys.Button.DPAD_UP)
             .whenPressed(shooterSystem.indexer.feedAllShooter())
 
-        GamepadButton(controller, GamepadKeys.Button.Y)
-            .whenPressed(shooter.shootCMD())
-            .whenReleased(InstantCommand({
-                shooter.stop()
-            }))
+        GamepadButton(controller, GamepadKeys.Button.DPAD_RIGHT)
+            .whenPressed(
+                shooterSystem.shoot(limelight.getMotifPattern())
+            )
 
         GamepadButton(controller, GamepadKeys.Button.A)
             .whenPressed(
@@ -129,7 +124,7 @@ class CMDOpMode : CommandOpMode() {
     }
 
     fun periodic() {
-        turret.alignToAprilTag(limelight.getClassifierTx(limelightIdFilter))
+        turret.alignToAprilTag(limelight.getAngleToGoal(limelightIdFilter))
     }
 
     // Main code body
@@ -176,6 +171,7 @@ class CMDOpMode : CommandOpMode() {
             CommandScheduler.getInstance().run()
             periodic()
 
+            telemetry.addData("Set point hood", shooterSystem.getObtainedSetPointForHood())
             telemetry.update()
         }
 
