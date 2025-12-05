@@ -87,7 +87,6 @@ class Limelight(
      *  @return the distance from the filtered id to the limelight lenses
      */
     fun getDistanceToGoal(filterArray: IntArray): Distance {
-
         if (llResult!!.isValid && llResult != null) {
             val fiducialResult = llResult!!.fiducialResults
 
@@ -101,6 +100,10 @@ class Limelight(
         }
 
         return Distance.fromInches(0.0)
+    }
+
+    fun getDistanceToGoalAsDouble(filterArray: IntArray): Double {
+        return getDistanceToGoal(filterArray).inches
     }
 
     /**
@@ -159,8 +162,13 @@ class Limelight(
 
             // Calculated distance from limelight lens to goal (in inches)
             distanceFromLimelightToGoalInches =
-                (AprilTagsPhysicalDescription.GoalHeightFromGround - LimelightPhysicalDescription.LLHeightFromGroundToLens) / tan(angleToGoalRadians)
-            telemetry.addData("TargetDistanceInches", distanceFromLimelightToGoalInches.inches)
+                (AprilTagsPhysicalDescription.GoalHeightFromGround - LimelightPhysicalDescription.LLHeightFromGroundToLens) / tan(
+                    angleToGoalRadians
+                )
+            telemetry.addData(
+                "Limelight TargetDistanceInches",
+                distanceFromLimelightToGoalInches.inches
+            )
 
             // We will first get a (MetaTag2) Pose3D. From here, we will extract its Tx, Ty & Ta components
             tx = llResult!!.getTx()
@@ -197,6 +205,5 @@ class Limelight(
      *   2. Get the how big the AprilTag looks from the camera field of view, i.e. the Ta param
      *   3. Get a curve / regression out of all values
      *   4. Work backwards and from the curve, get the distance to the current point
-     *
-     * */
+     */
 }

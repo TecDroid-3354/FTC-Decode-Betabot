@@ -68,7 +68,7 @@ class CMDOpMode : CommandOpMode() {
         limelight = Limelight(hardwareMap, telemetry, otos)
 
         shooterSystem = ShooterSystem(hardwareMap, telemetry,
-            { limelight.getDistanceToGoal(limelightIdFilter) },
+            { limelight.getDistanceToGoal(limelightIdFilter).inches },
             { limelight.llResult != null && limelight.llResult!!.isValid }
         )
 
@@ -99,6 +99,7 @@ class CMDOpMode : CommandOpMode() {
                 intake.stopBothIntakes()
             )
 
+        // todo: make it so that the right TRIGGER is the one that shoots
         GamepadButton(controller, GamepadKeys.Button.DPAD_RIGHT)
             .whenPressed(
                 shooterSystem.shoot(limelight.getMotifPattern())

@@ -32,7 +32,7 @@ class Indexer(
     val frontSlot: Slot
     val backSlot: Slot
     val middleSlot: Slot
-    private var slotList: Array<Slot>
+    var slotList: Array<Slot>
 
     // Initialization code //
     init {
@@ -107,6 +107,15 @@ class Indexer(
         return greenIndex != 1 || purpleIndex != 2
     }
 
+    fun isFull(): Boolean {
+        for (slot in slotList) {
+            if (slot.getDetectedColor() == DetectedColor.UNKNOWN) {
+                return false
+            }
+        }
+        return true
+    }
+
     /**
      * [feedShooter] returns a [SequentialCommandGroup] that feeds each slot if the color the color sensors detection
      * is not [DetectedColor.UNKNOWN]
@@ -160,6 +169,22 @@ class Indexer(
      * three slots no matter if they have no ball inside
      * @return a [SequentialCommandGroup] that executes [feedCMD] for each slot
      */
+
+    // TODO: AUTO
+    fun feedAllShooterAuto() {
+        feedAuto(slotList[0])
+        feedAuto(slotList[1])
+        feedAuto(slotList[2])
+    }
+
+    fun feedAuto(slot: Slot) {
+        slot.feed()
+        WaitCommand(150)
+        slot.home()
+        WaitCommand(400)
+    }
+    // TODO: AUTO
+
     fun feedAllShooter(): SequentialCommandGroup {
         return SequentialCommandGroup(
             feedCMD(slotList[0]),
@@ -184,9 +209,9 @@ class Indexer(
         return if (slot != null) {
             SequentialCommandGroup(
                 InstantCommand({ slot.feed() }),
-                WaitCommand(250),
+                WaitCommand(150),
                 InstantCommand({ slot.home() }),
-                WaitCommand(500)
+                WaitCommand(400)
             )
         } else {
             InstantCommand()
@@ -202,8 +227,8 @@ class Indexer(
     private fun feedCMD(slot: Slot): Command {
         return SequentialCommandGroup(
             InstantCommand({ slot.feed() }),
-            WaitCommand(250),
+            WaitCommand(150),
             InstantCommand({ slot.home() }),
-            WaitCommand(500))
+            WaitCommand(400))
     }
 }

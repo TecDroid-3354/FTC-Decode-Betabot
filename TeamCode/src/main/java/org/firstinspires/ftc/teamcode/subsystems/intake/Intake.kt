@@ -36,7 +36,7 @@ class Intake(
      * it enables that motor
      * @param direction the side of the intake it will enable
      */
-    private fun enableIntake(direction: IntakeDirection, output: Double = 1.0) {
+    fun enableIntake(direction: IntakeDirection, output: Double = 1.0) {
         when (direction) {
             IntakeDirection.RIGHT -> rightMotor.setPower(output)
             IntakeDirection.LEFT -> leftMotor.setPower(output)

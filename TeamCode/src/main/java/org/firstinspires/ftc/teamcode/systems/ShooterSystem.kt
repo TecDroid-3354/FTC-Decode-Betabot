@@ -14,7 +14,6 @@ import org.firstinspires.ftc.teamcode.subsystems.indexer.Indexer
 import org.firstinspires.ftc.teamcode.subsystems.indexer.MotifPatterns
 import org.firstinspires.ftc.teamcode.subsystems.shooter.Hood
 import org.firstinspires.ftc.teamcode.subsystems.shooter.HoodConstants
-import org.firstinspires.ftc.teamcode.systems.Point
 
 
 /**
@@ -32,11 +31,12 @@ val lInterpolationConfig = LInterpolationConfig(
 )
 
 @Suppress("JoinDeclarationAndAssignment")
-class ShooterSystem(hw: HardwareMap, val telemetry: Telemetry, distanceToAprilTag: Supplier<Distance>, val isLLResultValid: Supplier<Boolean>) {
+class ShooterSystem(hw: HardwareMap, val telemetry: Telemetry, distanceToAprilTagInches: Supplier<Double>, val isLLResultValid: Supplier<Boolean>) {
 
     val shooter: Shooter
     val indexer: Indexer
     val hood: Hood
+    val distanceToAprilTag = {Distance.fromInches(distanceToAprilTagInches.get())}
 
     val interpolation = LinearInterpolationConstructor(lInterpolationConfig, distanceToAprilTag)
 
