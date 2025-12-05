@@ -47,7 +47,7 @@ class Shooter(
      * Sets the motor's velocity to a desired angular velocity
      */
 
-    fun shoot() {
+    private fun shoot() {
         motor.mode = DcMotor.RunMode.RUN_USING_ENCODERS
         motor.setVelocity(20000.0, AngleUnit.DEGREES)
     }

@@ -28,7 +28,7 @@ public class Paths {
     public PathChain red9Plus3ShootPrecharged,
             red9Plus3PickFirstRow, red9Plus3ShootFirstRow,
             red9Plus3PickSecondRow, red9Plus3ShootSecondRow,
-            red9Plus3PickThirdRow, red9Plus3End;
+            red9Plus3PickThirdRow, red9Plus3ShootThirdRow;
 
 
 
@@ -39,7 +39,7 @@ public class Paths {
     public PathChain blue9Plus3ShootPrecharged,
             blue9Plus3PickFirstRow, blue9Plus3ShootFirstRow,
             blue9Plus3PickSecondRow, blue9Plus3ShootSecondRow,
-            blue9Plus3PickThirdRow, blue9Plus3End;
+            blue9Plus3PickThirdRow, blue9Plus3ShootThirdRow;
 
 
     // In this case, the constructor will only take the Follower, which will allow us to build the paths
@@ -192,16 +192,16 @@ public class Paths {
             )
             .build();
 
-        red9Plus3End = follower.pathBuilder()
+        red9Plus3ShootThirdRow = follower.pathBuilder()
             .addPath(
                 new BezierLine(
                     new Pose(129, 35),
-                    red9Plus3Poses.red9Plus3EndPose
+                    red9Plus3Poses.red9Plus3ShootingPose
                 )
             )
             .setLinearHeadingInterpolation(
                     Math.toRadians(0),
-                    red9Plus3Poses.red9Plus3EndPose.getHeading()
+                    red9Plus3Poses.red9Plus3ShootingPose.getHeading()
             )
             .build();
     }
@@ -297,16 +297,16 @@ public class Paths {
             )
             .build();
 
-        blue9Plus3End = follower.pathBuilder()
+        blue9Plus3ShootThirdRow = follower.pathBuilder()
             .addPath(
                 new BezierLine(
                     new Pose(15, 35),
-                    blue9Plus3Poses.blue9Plus3EndPose
+                    blue9Plus3Poses.blue9Plus3ShootingPose
                 )
             )
             .setLinearHeadingInterpolation(
                     Math.toRadians(180),
-                    blue9Plus3Poses.blue9Plus3EndPose.getHeading()
+                    blue9Plus3Poses.blue9Plus3ShootingPose.getHeading()
             )
             .build();
     }

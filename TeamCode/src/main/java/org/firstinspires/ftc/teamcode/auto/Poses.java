@@ -12,11 +12,9 @@ import com.pedropathing.geometry.Pose;
 class Red9Plus3Poses {
     final Pose red9Plus3StartPose = new Pose(129, 112, Math.toRadians(90));
     final Pose red9Plus3ShootingPose = new Pose(84, 84, Math.toRadians(50));
-    final Pose red9Plus3EndPose = new Pose(72, 23, Math.toRadians(90));
 }
 
 class Blue9Plus3Poses {
     final Pose blue9Plus3StartPose = new Pose(15, 112, Math.toRadians(90));
     final Pose blue9Plus3ShootingPose = new Pose(60, 84, Math.toRadians(130));
-    final Pose blue9Plus3EndPose = new Pose(72, 23, Math.toRadians(90));
 }
