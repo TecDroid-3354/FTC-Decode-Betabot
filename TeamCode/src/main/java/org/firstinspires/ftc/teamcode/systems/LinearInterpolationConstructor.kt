@@ -1,24 +1,25 @@
 package org.firstinspires.ftc.teamcode.systems
 
+import Angle
 import Distance
 import androidx.core.util.Supplier
 
 data class Point(
-    val x: Double,
-    val y: Double
+    val xDistanceToGoal: Distance,
+    val yHoodAngle: Angle
 )
 
 data class LInterpolationConfig (
     val firstCoordinate: Point,
-    val secondCoordinate : Point
+    val secondCoordinate: Point
 )
 
 class LinearInterpolationConstructor(val config: LInterpolationConfig, var distanceToGoal: Supplier<Distance>) {
 
     fun getDesiredPoint(): Double {
-        val y = config.firstCoordinate.y  + ((distanceToGoal.get() as Double - config.firstCoordinate.x).times(
-                (config.secondCoordinate.y - config.firstCoordinate.y))).div(
-                (config.secondCoordinate.x - config.firstCoordinate.x))
+        val y = config.firstCoordinate.yHoodAngle.rotations  + ((distanceToGoal.get().meters - config.firstCoordinate.xDistanceToGoal.meters).times(
+                (config.secondCoordinate.yHoodAngle.rotations - config.firstCoordinate.yHoodAngle.rotations))).div(
+                (config.secondCoordinate.xDistanceToGoal.meters - config.firstCoordinate.xDistanceToGoal.meters))
 
         return y
     }

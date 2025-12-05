@@ -13,21 +13,26 @@ import org.firstinspires.ftc.teamcode.shooter.Shooter
 import org.firstinspires.ftc.teamcode.subsystems.indexer.Indexer
 import org.firstinspires.ftc.teamcode.subsystems.indexer.MotifPatterns
 import org.firstinspires.ftc.teamcode.subsystems.shooter.Hood
+import org.firstinspires.ftc.teamcode.subsystems.shooter.HoodConstants
 import org.firstinspires.ftc.teamcode.systems.Point
 
+
+/**
+ * These values need to be measured physically
+ */
 val lInterpolationConfig = LInterpolationConfig(
-    Point(22.18, 255.2),
-    Point(60.0, 280.0)
+    firstCoordinate = Point(Distance.fromInches(22.18), Angle.fromDegrees(0.0)),
+    secondCoordinate = Point(Distance.fromInches(0.0), Angle.fromDegrees(0.0))
 )
 
 @Suppress("JoinDeclarationAndAssignment")
-class ShooterSystem(hw: HardwareMap, val telemetry: Telemetry, var aprilTagDistance: Supplier<Distance>) {
+class ShooterSystem(hw: HardwareMap, val telemetry: Telemetry, distanceToAprilTag: Supplier<Distance>, val isLLResultValid: Supplier<Boolean>) {
 
     val shooter: Shooter
     val indexer: Indexer
     val hood: Hood
 
-    val interpolation = LinearInterpolationConstructor(lInterpolationConfig, aprilTagDistance)
+    val interpolation = LinearInterpolationConstructor(lInterpolationConfig, distanceToAprilTag)
 
     init {
         shooter = Shooter(hw, telemetry)
@@ -35,19 +40,19 @@ class ShooterSystem(hw: HardwareMap, val telemetry: Telemetry, var aprilTagDista
         hood = Hood(hw, telemetry)
     }
 
-//    private fun adjustHood() {
-//
-//    }
-
     fun getObtainedSetPointForHood(): Angle {
-        return Angle.fromDegrees(interpolation.getDesiredPoint())
+        return if (isLLResultValid.get()) {
+            Angle.fromDegrees(interpolation.getDesiredPoint())
+        } else {
+            return Angle.fromDegrees(HoodConstants.Positions.homePosition.degrees)
+        }
     }
 
     fun shoot(motifPatterns: MotifPatterns) : Command {
         return SequentialCommandGroup(
             shooter.shootCMD(),
-            //InstantCommand({ adjustHood() }),
-            WaitCommand(850),
+            InstantCommand({ hood.setHoodPosition(getObtainedSetPointForHood()) }),
+            WaitCommand(1000),
             indexer.feedShooter(motifPatterns),
             InstantCommand({ shooter.stop() })
         )

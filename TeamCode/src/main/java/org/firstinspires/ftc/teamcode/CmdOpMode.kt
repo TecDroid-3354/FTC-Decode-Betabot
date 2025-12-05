@@ -9,6 +9,7 @@ import com.seattlesolvers.solverslib.command.button.GamepadButton
 import com.seattlesolvers.solverslib.gamepad.GamepadEx
 import com.seattlesolvers.solverslib.gamepad.GamepadKeys
 import org.firstinspires.ftc.teamcode.commands.JoystickCmd
+import org.firstinspires.ftc.teamcode.pedroPathing.Tuning
 import org.firstinspires.ftc.teamcode.shooter.Shooter
 import org.firstinspires.ftc.teamcode.subsystems.drivetrain.SolversMecanum
 import org.firstinspires.ftc.teamcode.subsystems.indexer.Indexer
@@ -17,6 +18,7 @@ import org.firstinspires.ftc.teamcode.subsystems.shooter.Hood
 import org.firstinspires.ftc.teamcode.subsystems.turret.Turret
 import org.firstinspires.ftc.teamcode.systems.ShooterSystem
 import org.firstinspires.ftc.teamcode.vision.Limelight
+import java.time.Instant
 
 
 // Personally, I chose to run my code using a command-based Op Mode since it works better for me
@@ -65,11 +67,10 @@ class CMDOpMode : CommandOpMode() {
         turret = Turret(hardwareMap, telemetry)
         limelight = Limelight(hardwareMap, telemetry, otos)
 
-        shooterSystem = ShooterSystem(hardwareMap, telemetry) {
-            limelight.getDistanceToGoal(
-                limelightIdFilter
-            )
-        }
+        shooterSystem = ShooterSystem(hardwareMap, telemetry,
+            { limelight.getDistanceToGoal(limelightIdFilter) },
+            { limelight.llResult != null && limelight.llResult!!.isValid }
+        )
 
 
         // Initializing controller & button bindings
@@ -105,12 +106,12 @@ class CMDOpMode : CommandOpMode() {
 
         GamepadButton(controller, GamepadKeys.Button.A)
             .whenPressed(
-                InstantCommand({ shooterSystem.hood.modifyCurrentPositionBy(0.01) })
+                InstantCommand({ shooterSystem.hood.modifyCurrentPositionBy(Angle.fromRotations(0.01)) })
             )
 
         GamepadButton(controller, GamepadKeys.Button.B)
             .whenPressed(
-                InstantCommand({ shooterSystem.hood.modifyCurrentPositionBy(0.01.unaryMinus()) })
+                InstantCommand({ shooterSystem.hood.modifyCurrentPositionBy(Angle.fromRotations(-0.01)) })
             )
     }
 
@@ -140,7 +141,7 @@ class CMDOpMode : CommandOpMode() {
             }
             telemetry.update()
 
-            sleep(200) // evita múltiples cambios por una sola pulsación
+            sleep(400) // evita múltiples cambios por una sola pulsación
         }
 
         limelightIdFilter = when (options[index]) {

@@ -21,8 +21,8 @@ class Limelight(
 ) : SubsystemBase() {
 
     private var limelight: Limelight3A? = null
-    private var llResult: LLResult? = null
     private var obeliskId = 0
+    var llResult: LLResult? = null
 
     private var ty = 0.0
     private var tx = 0.0

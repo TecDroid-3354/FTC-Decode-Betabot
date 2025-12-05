@@ -30,6 +30,10 @@ class TurretConstants {
     object Limits {
         // It is quite important to remark that these limits will only be useful if the robot is turned on
         // with the turret facing towards the battery and the Expansion Hub
+        /*
+        * The turret starts at -90° when taking the Front Intake as the robots front. From here, it can
+        * physically move towards the following limits:
+        * */
         val minimumLimit = Angle.fromDegrees(-100.0)
         val maximumLimit = Angle.fromDegrees(125.0)
     }
