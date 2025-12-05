@@ -7,7 +7,9 @@ import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.seattlesolvers.solverslib.command.CommandOpMode;
 import com.seattlesolvers.solverslib.command.CommandScheduler;
 import com.seattlesolvers.solverslib.command.InstantCommand;
+import com.seattlesolvers.solverslib.command.ParallelCommandGroup;
 import com.seattlesolvers.solverslib.command.SequentialCommandGroup;
+import com.seattlesolvers.solverslib.command.WaitCommand;
 
 import org.firstinspires.ftc.teamcode.pedroPathing.Constants;
 import org.firstinspires.ftc.teamcode.subsystems.intake.Intake;
@@ -58,7 +60,10 @@ public class Red9Plus3 extends CommandOpMode {
         limelight = new Limelight(hardwareMap, telemetry, otos);
 
         // Initializing subsystems
-
+        intake = new Intake(hardwareMap, telemetry);
+        turret = new Turret(hardwareMap, telemetry);
+        /*shooter = new ShooterSystem(hardwareMap, telemetry,
+                () -> limelight.getDistanceToGoal(limelight.getMotifPattern()));*/
     }
 
 
@@ -99,49 +104,74 @@ public class Red9Plus3 extends CommandOpMode {
         switch (pathState) {
             // The follower is in charge of following a PathChain declared within the Paths object
             case 0:
-                follower.followPath(paths.red9Plus3ShootPrecharged);
-                /*SequentialCommandGroup(
-                        InstantCommand ({ follower.followPath(paths.red9Plus3ShootPrecharged) }),
-                        InstantCommand ({ shooter.shoot(limelight.getMotifPattern()) })
-                )
+                // Shoot precharged artifacts
+                // follower.followPath(paths.red9Plus3ShootPrecharged);
                 new SequentialCommandGroup(
-                    new InstantCommand({ follower.followPath(paths.red9Plus3ShootPrecharged) }),
-                    new InstantCommand ({ shooter.shoot(limelight.getMotifPattern()) })
-                );*/
+                    new InstantCommand(() -> follower.followPath(paths.red9Plus3ShootPrecharged) ),
+                    new InstantCommand (() -> shooter.shoot(limelight.getMotifPattern()) )
+                );
                 setPathState(1);
                 break;
             case 1:
                 if (!follower.isBusy()) {
-                    follower.followPath(paths.red9Plus3PickFirstRow);
-                    setPathState(2);
+                    // Align itself & pick up the first row of Artifacts
+                    new SequentialCommandGroup(
+                        new ParallelCommandGroup(
+                            new InstantCommand(() -> follower.followPath(paths.red9Plus3PickFirstRow) ),
+                            new InstantCommand (() -> intake.enableBothIntakes(1.0) )
+                        ),
+                        new WaitCommand(2000),
+                        new InstantCommand(() -> setPathState(2))
+                    );
                 }
                 break;
             case 2:
                 if (!follower.isBusy()) {
+                    // Shoot that first row of artifacts
+                   new SequentialCommandGroup(
+                        new InstantCommand(() -> intake.stopBothIntakes() ),
+                        new InstantCommand(() -> follower.followPath(paths.red9Plus3ShootFirstRow) ),
+                        new InstantCommand (() -> shooter.shoot(limelight.getMotifPattern()) )
+                    );
                     follower.followPath(paths.red9Plus3ShootFirstRow);
                     setPathState(3);
                 }
                 break;
             case 3:
                 if (!follower.isBusy()) {
-                    follower.followPath(paths.red9Plus3PickSecondRow);
+                    // Align itself and pick the second row of Artifacts
+                    new ParallelCommandGroup(
+                        new InstantCommand(() -> follower.followPath(paths.red9Plus3PickSecondRow) ),
+                        new InstantCommand (() -> intake.enableBothIntakes(1.0) )
+                    );
                     setPathState(4);
                 }
                 break;
             case 4:
                 if (!follower.isBusy()) {
-                    follower.followPath(paths.red9Plus3ShootSecondRow);
+                    // Shoot that second row of Artifacts
+                    new SequentialCommandGroup(
+                        new InstantCommand(() -> intake.stopBothIntakes() ),
+                        new InstantCommand(() -> follower.followPath(paths.red9Plus3ShootSecondRow) ),
+                        new InstantCommand (() -> shooter.shoot(limelight.getMotifPattern()) )
+                    );
                     setPathState(5);
                 }
                 break;
             case 5:
                 if (!follower.isBusy()) {
-                    follower.followPath(paths.red9Plus3PickThirdRow);
+                    // Align itself and pick up the third row of Artifacts
+                    new ParallelCommandGroup(
+                        new InstantCommand(() -> follower.followPath(paths.red9Plus3PickThirdRow) ),
+                        new InstantCommand (() -> intake.enableBothIntakes(1.0) )
+                    );
                     setPathState(6);
                 }
                 break;
             case 6:
                 if (!follower.isBusy()) {
+                    // Go to its end position
+                    intake.stopBothIntakes();
                     follower.followPath(paths.red9Plus3End);
                     setPathState(7);
                 }

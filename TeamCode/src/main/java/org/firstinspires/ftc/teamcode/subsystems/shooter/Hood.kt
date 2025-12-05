@@ -17,7 +17,7 @@ class Hood(val hardwareMap: HardwareMap, val telemetry: Telemetry): SubsystemBas
     // Servo controlling the hood. Is a SWYFT servo, check config with SWYFT servo programmer.
     private val servo: ServoEx
     // As SWYFT servos do not store their position, we store the commanded angle (Telemetry purposes)
-    private var currentAngle: Angle
+    var currentAngle: Angle
 
     // Initialization code //
     init {
@@ -32,7 +32,9 @@ class Hood(val hardwareMap: HardwareMap, val telemetry: Telemetry): SubsystemBas
     // Code called every robot loop //
     override fun periodic() {
         // Telemetry to retrieve useful data
-        telemetry.addData("HoodPositionDegrees", currentAngle.degrees)
+        /*telemetry.addData("HoodPositionDegrees", currentAngle.degrees)
+        telemetry.addData("HoodPositionRotations", currentAngle.rotations)*/
+        currentAngle = Angle.fromRotations(servo.servo.position)
     }
 
     // Sets the desired angle to the servo (in radians) and updates the currentAngle variable //

@@ -21,8 +21,14 @@ import org.firstinspires.ftc.teamcode.systems.Point
  * These values need to be measured physically
  */
 val lInterpolationConfig = LInterpolationConfig(
-    firstCoordinate = Point(Distance.fromInches(22.18), Angle.fromDegrees(0.0)),
-    secondCoordinate = Point(Distance.fromInches(0.0), Angle.fromDegrees(0.0))
+    // The angle asked for is the hood's angle at that position, NOT RELATED TO THE APRILTAG
+
+    // TODO: TUNE IN FIELD CALIBRATION; WORKS PERFECTLY WITH OUR MANCRAFT GOAL, BUT CAN'T ASSURE
+    // TODO: IT DOES WITH THE ACTUAL GOAL
+    // angle at 19.18in was 0.69 rotations
+    // angle at 58.31in was 0.54 rotations
+    firstCoordinate = Point(Distance.fromInches(58.31), Angle.fromRotations(0.54)),
+    secondCoordinate = Point(Distance.fromInches(19.18), Angle.fromRotations(0.68))
 )
 
 @Suppress("JoinDeclarationAndAssignment")
@@ -42,7 +48,7 @@ class ShooterSystem(hw: HardwareMap, val telemetry: Telemetry, distanceToAprilTa
 
     fun getObtainedSetPointForHood(): Angle {
         return if (isLLResultValid.get()) {
-            Angle.fromDegrees(interpolation.getDesiredPoint())
+            Angle.fromRotations(interpolation.getDesiredPoint())
         } else {
             return Angle.fromDegrees(HoodConstants.Positions.homePosition.degrees)
         }
@@ -52,7 +58,7 @@ class ShooterSystem(hw: HardwareMap, val telemetry: Telemetry, distanceToAprilTa
         return SequentialCommandGroup(
             shooter.shootCMD(),
             InstantCommand({ hood.setHoodPosition(getObtainedSetPointForHood()) }),
-            WaitCommand(1000),
+            WaitCommand(1200),
             indexer.feedShooter(motifPatterns),
             InstantCommand({ shooter.stop() })
         )

@@ -113,6 +113,16 @@ class CMDOpMode : CommandOpMode() {
             .whenPressed(
                 InstantCommand({ shooterSystem.hood.modifyCurrentPositionBy(Angle.fromRotations(-0.01)) })
             )
+
+        GamepadButton(controller, GamepadKeys.Button.X)
+            .whenPressed(
+                InstantCommand({ shooterSystem.hood.setHoodPosition(Angle.fromRotations(0.69)) })
+            )
+
+        GamepadButton(controller, GamepadKeys.Button.Y)
+            .whenPressed(
+                InstantCommand({ shooterSystem.hood.setHoodPosition(Angle.fromRotations(0.54)) })
+            )
     }
 
     fun periodic() {
@@ -164,6 +174,8 @@ class CMDOpMode : CommandOpMode() {
             periodic()
 
             telemetry.addData("Set point hood", shooterSystem.getObtainedSetPointForHood())
+            telemetry.addData("HoodPositionDegrees CMD", shooterSystem.hood.currentAngle.degrees)
+            telemetry.addData("HoodPositionRotations CMD", shooterSystem.hood.currentAngle.rotations)
             telemetry.update()
         }
 

@@ -17,9 +17,11 @@ data class LInterpolationConfig (
 class LinearInterpolationConstructor(val config: LInterpolationConfig, var distanceToGoal: Supplier<Distance>) {
 
     fun getDesiredPoint(): Double {
-        val y = config.firstCoordinate.yHoodAngle.rotations  + ((distanceToGoal.get().meters - config.firstCoordinate.xDistanceToGoal.meters).times(
-                (config.secondCoordinate.yHoodAngle.rotations - config.firstCoordinate.yHoodAngle.rotations))).div(
-                (config.secondCoordinate.xDistanceToGoal.meters - config.firstCoordinate.xDistanceToGoal.meters))
+        val y = config.firstCoordinate.yHoodAngle.rotations +
+                ((distanceToGoal.get().meters - config.firstCoordinate.xDistanceToGoal.meters)
+                    .times(
+                        (config.secondCoordinate.yHoodAngle.rotations - config.firstCoordinate.yHoodAngle.rotations))).div(
+                        (config.secondCoordinate.xDistanceToGoal.meters - config.firstCoordinate.xDistanceToGoal.meters))
 
         return y
     }
