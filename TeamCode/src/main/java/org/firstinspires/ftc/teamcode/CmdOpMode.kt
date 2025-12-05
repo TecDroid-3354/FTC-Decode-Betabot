@@ -6,6 +6,7 @@ import com.seattlesolvers.solverslib.command.CommandOpMode
 import com.seattlesolvers.solverslib.command.CommandScheduler
 import com.seattlesolvers.solverslib.command.InstantCommand
 import com.seattlesolvers.solverslib.command.button.GamepadButton
+import com.seattlesolvers.solverslib.command.button.Trigger
 import com.seattlesolvers.solverslib.gamepad.GamepadEx
 import com.seattlesolvers.solverslib.gamepad.GamepadKeys
 import org.firstinspires.ftc.teamcode.commands.JoystickCmd
@@ -100,10 +101,10 @@ class CMDOpMode : CommandOpMode() {
             )
 
         // todo: make it so that the right TRIGGER is the one that shoots
-        GamepadButton(controller, GamepadKeys.Button.DPAD_RIGHT)
+        /*GamepadButton(controller, GamepadKeys.Button.DPAD_RIGHT)
             .whenPressed(
                 shooterSystem.shoot(limelight.getMotifPattern())
-            )
+            )*/
 
         GamepadButton(controller, GamepadKeys.Button.A)
             .whenPressed(
@@ -123,6 +124,16 @@ class CMDOpMode : CommandOpMode() {
         GamepadButton(controller, GamepadKeys.Button.Y)
             .whenPressed(
                 InstantCommand({ shooterSystem.hood.setHoodPosition(Angle.fromRotations(0.54)) })
+            )
+
+        Trigger({ controller.gamepad.right_trigger > 0.1 })
+            .whenActive(
+                shooterSystem.shoot(limelight.getMotifPattern())
+            )
+
+        Trigger({ controller.gamepad.left_trigger > 0.1 })
+            .whenActive(
+                shooterSystem.shooter.intakeCMD()
             )
     }
 

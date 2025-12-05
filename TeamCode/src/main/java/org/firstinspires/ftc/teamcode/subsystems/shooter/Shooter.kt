@@ -52,7 +52,13 @@ class Shooter(
         motor.setVelocity(20000.0, AngleUnit.DEGREES)
     }
 
-    fun shootCMD() : Command {
+    fun intakeCMD(): Command {
+        return InstantCommand({
+            motor.setVelocity(-20000.0, AngleUnit.DEGREES)
+        })
+    }
+
+    fun shootCMD(): Command {
         return InstantCommand({
             shoot()
         })
