@@ -43,7 +43,7 @@ class TurretConstants {
     class PIDF {
         companion object {
             @JvmField
-            var pidfCoefficients = PIDFCoefficients(0.028, 0.0, 0.0, 0.002)
+            var pidfCoefficients = PIDFCoefficients(0.02, 0.0, 0.0000000115, 0.019)
         }
     }
 }

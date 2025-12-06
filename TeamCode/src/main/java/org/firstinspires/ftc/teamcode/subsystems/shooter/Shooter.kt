@@ -1,16 +1,13 @@
 package org.firstinspires.ftc.teamcode.shooter
 
-import com.qualcomm.hardware.bosch.BNO055IMU
 import com.qualcomm.robotcore.hardware.DcMotor
 import com.qualcomm.robotcore.hardware.DcMotorEx
 import com.qualcomm.robotcore.hardware.HardwareMap
-import com.qualcomm.robotcore.hardware.PIDFCoefficients
 import com.seattlesolvers.solverslib.command.Command
 import com.seattlesolvers.solverslib.command.InstantCommand
 import com.seattlesolvers.solverslib.command.SubsystemBase
 import org.firstinspires.ftc.robotcore.external.Telemetry
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit
-import kotlin.time.Instant
 
 /**
  * This is the code for controlling the shooter wheels on our robot.
@@ -47,20 +44,14 @@ class Shooter(
      * Sets the motor's velocity to a desired angular velocity
      */
 
-    private fun shoot() {
+     fun shoot(inversionFactor: Double = 1.0) {
         motor.mode = DcMotor.RunMode.RUN_USING_ENCODERS
-        motor.setVelocity(20000.0, AngleUnit.DEGREES)
+        motor.setVelocity(20000.0 * inversionFactor, AngleUnit.DEGREES)
     }
 
-    fun intakeCMD(): Command {
+    fun shootCMD(inversionFactor: Double =  1.0): Command {
         return InstantCommand({
-            motor.setVelocity(-20000.0, AngleUnit.DEGREES)
-        })
-    }
-
-    fun shootCMD(): Command {
-        return InstantCommand({
-            shoot()
+            shoot(inversionFactor)
         })
     }
 
@@ -79,7 +70,7 @@ class Shooter(
      * @return true if the motor is running
      */
     fun isActive(): Boolean {
-        return motor.power > 0.1
+        return motor.power > 0.2 || motor.velocity > 0.2
     }
 
     /**

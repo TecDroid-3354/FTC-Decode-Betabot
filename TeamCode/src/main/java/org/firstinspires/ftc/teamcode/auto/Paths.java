@@ -47,8 +47,8 @@ public class Paths {
         // A PathChain is set. We can add multiple paths with the .addPath() method, but we will declare
         // each path individually through one variable to avoid confusion later on
         testPath1 = follower.pathBuilder()
-            // .addPath() adds a path or curve to the chain
-            .addPath(
+                // .addPath() adds a path or curve to the chain
+                .addPath(
 
                 /* This "new BezierCurve" is a Path object, simply declared within the .addPath method
                    There are two types of Path objects:
@@ -59,30 +59,30 @@ public class Paths {
                    2. BezierLines (take 2 points). The first and last ones are the defined points,
                       basically a straight line
                  */
-                new BezierCurve(
-                    // This "new Pose" is a Pose object, simply declared within the BezierCurve
-                    new Pose(14.014, 114.144),
-                    new Pose(78.804, 84.694),
-                    new Pose(49.200, 36.000)
+                        new BezierCurve(
+                                // This "new Pose" is a Pose object, simply declared within the BezierCurve
+                                new Pose(14.014, 114.144),
+                                new Pose(78.804, 84.694),
+                                new Pose(49.200, 36.000)
+                        )
                 )
-            )
-            // .setLinearHeadingInterpolation(start, end) basically sets the heading
-            // of the robot during the path. @start is the direction it'll start the path facing to
-            // & @end is the direction it'll end the path with
+                // .setLinearHeadingInterpolation(start, end) basically sets the heading
+                // of the robot during the path. @start is the direction it'll start the path facing to
+                // & @end is the direction it'll end the path with
 
-            /* Interpolation
-               Interpolation in PathPlanner represents the heading/rotation of the robot during/after a path
+                /* Interpolation
+                   Interpolation in PathPlanner represents the heading/rotation of the robot during/after a path
 
-               We have 3 main types of interpolation:
-               1. Linear Heading Interpolation: Basically makes the robot turn from a given startHeading
-                  to a given endHeading, for a duration given through endTime.
-               2. Constant Heading Interpolation: The robot's heading stays the same throughout the whole path
-               3. Tangent Heading Interpolation:
+                   We have 3 main types of interpolation:
+                   1. Linear Heading Interpolation: Basically makes the robot turn from a given startHeading
+                      to a given endHeading, for a duration given through endTime.
+                   2. Constant Heading Interpolation: The robot's heading stays the same throughout the whole path
+                   3. Tangent Heading Interpolation:
 
-               All measurements should be given in radians!
-            */
-            .setLinearHeadingInterpolation(Math.toRadians(90), Math.toRadians(180))
-            .build(); // Converts from pathBuilder to pathChain
+                   All measurements should be given in radians!
+                */
+                .setLinearHeadingInterpolation(Math.toRadians(90), Math.toRadians(180))
+                .build(); // Converts from pathBuilder to pathChain
 
 
         /* ! Actual paths ! */

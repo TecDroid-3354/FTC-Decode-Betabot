@@ -1,20 +1,12 @@
 package org.firstinspires.ftc.teamcode.auto;
 
-import com.bylazar.field.FieldManager;
-import com.bylazar.field.PanelsField;
-import com.bylazar.field.Style;
 import com.pedropathing.follower.Follower;
-import com.pedropathing.geometry.Pose;
-import com.pedropathing.math.Vector;
-import com.pedropathing.paths.Path;
-import com.pedropathing.paths.PathChain;
-import com.pedropathing.util.PoseHistory;
 import com.pedropathing.util.Timer;
-import com.qualcomm.hardware.sparkfun.SparkFunOTOS;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.seattlesolvers.solverslib.command.CommandOpMode;
 import com.seattlesolvers.solverslib.command.CommandScheduler;
 import com.seattlesolvers.solverslib.command.WaitCommand;
+import com.seattlesolvers.solverslib.command.WaitUntilCommand;
 
 import org.firstinspires.ftc.teamcode.auto.Visualizer.Draw;
 import org.firstinspires.ftc.teamcode.pedroPathing.Constants;
@@ -24,8 +16,6 @@ import org.firstinspires.ftc.teamcode.subsystems.intake.Intake;
 import org.firstinspires.ftc.teamcode.subsystems.intake.IntakeDirection;
 import org.firstinspires.ftc.teamcode.subsystems.shooter.Hood;
 import org.firstinspires.ftc.teamcode.subsystems.turret.Turret;
-import org.firstinspires.ftc.teamcode.systems.ShooterSystem;
-import org.firstinspires.ftc.teamcode.vision.Limelight;
 
 @Autonomous(name = "Red 9+3", group = "Red")
 public class Red9Plus3 extends CommandOpMode {
@@ -103,7 +93,6 @@ public class Red9Plus3 extends CommandOpMode {
         reset();
     }
 
-
     // The following class is in charge of changing the followed path. Logic should be added inside
     // here. It is the one called continuously during the autonomous
     public void autonomousPathUpdates() {
@@ -119,14 +108,15 @@ public class Red9Plus3 extends CommandOpMode {
                 break;
             case 1: // Path from intake position --> shooting position + indexing + shooting
                 if (!follower.isBusy()) {
-                    new WaitCommand(2000); // waits for the route to be perfectly aligned
                     // Starts rolling the rollers
-                    shooter.shootCMD().schedule();
+                    shooter.shoot(1.0);
                     // Feeds the shooter as the shooter's rollers roll
-                    indexer.feedAllShooter().schedule();
-                    new WaitCommand(3000); // waits for the shooter to finish shooting
-                    shooter.stop(); // stops the shooter
-                    setPathState(2);
+                    indexer.feedAllShooterAuto();
+                    sleep(3000); // waits for the shooter to finish shooting
+                    shooter.stop();// stops the shooter
+                    if (!shooter.isActive()) {
+                        setPathState(2);
+                    }
                 }
                 break;
 
@@ -134,25 +124,30 @@ public class Red9Plus3 extends CommandOpMode {
             // ! Pick up & shoot the first row of Artifacts ! //
             case 2: // Path from shooting -> intake position & intaking Artifacts
                 if (!follower.isBusy()) {
-                    intake.enableBothIntakes(1.0).schedule();
+                    intake.enableIntake(IntakeDirection.RIGHT, 1.0);
+                    intake.enableIntake(IntakeDirection.LEFT, 1.0);
                     follower.followPath(paths.red9Plus3PickFirstRow, true);
-                    new WaitCommand(4000); // waits for it to intake all the Artifacts
+                    sleep(2000); // waits for it to intake all the Artifacts
                     intake.stopBothIntakes().schedule();
-                    setPathState(3);
+                    if (!intake.isActive()) {
+                        setPathState(3);
+                    }
                 }
                 break;
             case 3: // Path from intake position --> shooting position + indexing + shooting
                 if (!follower.isBusy()) {
                     // TODO: try adding all of this inside a sequential command group
                     follower.followPath(paths.red9Plus3ShootFirstRow, true);
-                    new WaitCommand(2000); // waits for the route to be perfectly aligned
+                    sleep(2000); // waits for the route to be perfectly aligned
                     // Starts rolling the rollers
-                    shooter.shootCMD().schedule();
+                    shooter.shoot(1.0);
                     // Feeds the shooter as the shooter's rollers roll
-                    indexer.feedAllShooter().schedule();
-                    new WaitCommand(3000); // waits for the shooter to finish shooting
-                    shooter.stop(); // stops the shooter
-                    setPathState(4);
+                    indexer.feedAllShooterAuto();
+                    sleep(3000); // waits for the shooter to finish shooting
+                    shooter.stop();
+                    if (!shooter.isActive()) {
+                        setPathState(4);
+                    }
                 }
                 break;
 
@@ -160,25 +155,30 @@ public class Red9Plus3 extends CommandOpMode {
             // ! Pick up & shoot the second row of Artifacts ! //
             case 4: // Path from shooting position -> intake position
                 if (!follower.isBusy()) {
-                    intake.enableBothIntakes(1.0).schedule();
+                    intake.enableIntake(IntakeDirection.RIGHT, 1.0);
+                    intake.enableIntake(IntakeDirection.LEFT, 1.0);
                     follower.followPath(paths.red9Plus3PickSecondRow, true);
-                    new WaitCommand(4000); // waits for it to intake all the Artifacts
+                    sleep(4000); // waits for it to intake all the Artifacts
                     intake.stopBothIntakes().schedule();
-                    setPathState(5);
+                    if (!intake.isActive()) {
+                        setPathState(5);
+                    }
                 }
                 break;
             case 5: // Path from intake position --> shooting position + indexing + shooting
                 if (!follower.isBusy()) {
                     // TODO: try adding all of this inside a sequential command group
                     follower.followPath(paths.red9Plus3ShootSecondRow, true);
-                    new WaitCommand(2000); // waits for the route to be perfectly aligned
+                    sleep(2000); // waits for the route to be perfectly aligned
                     // Starts rolling the rollers
-                    shooter.shootCMD().schedule();
+                    shooter.shoot(1.0);
                     // Feeds the shooter as the shooter's rollers roll
-                    indexer.feedAllShooter().schedule();
-                    new WaitCommand(3000); // waits for the shooter to finish shooting
-                    shooter.stop(); // stops the shooter
-                    setPathState(6);
+                    indexer.feedAllShooterAuto();
+                    sleep(3000); // waits for the shooter to finish shooting
+                    shooter.stop();
+                    if (!shooter.isActive()) {
+                        setPathState(6);
+                    }
                 }
                 break;
 
@@ -186,25 +186,30 @@ public class Red9Plus3 extends CommandOpMode {
             // ! Pick up & shoot the third row of Artifacts ! //
             case 6: // Path from shooting position -> intake position
                 if (!follower.isBusy()) {
-                    intake.enableBothIntakes(1.0).schedule();
+                    intake.enableIntake(IntakeDirection.RIGHT, 1.0);
+                    intake.enableIntake(IntakeDirection.LEFT, 1.0);
                     follower.followPath(paths.red9Plus3PickThirdRow, true);
-                    new WaitCommand(4000); // waits for it to intake all the Artifacts
+                    sleep(4000); // waits for it to intake all the Artifacts
                     intake.stopBothIntakes().schedule();
-                    setPathState(7);
+                    if (!intake.isActive()) {
+                        setPathState(7);
+                    }
                 }
                 break;
             case 7: // Path from intake position --> shooting position + indexing + shooting
                 if (!follower.isBusy()) {
                     // TODO: try adding all of this inside a sequential command group
                     follower.followPath(paths.red9Plus3ShootThirdRow, true);
-                    new WaitCommand(2000); // waits for the route to be perfectly aligned
+                    sleep(2000); // waits for the route to be perfectly aligned
                     // Starts rolling the rollers
-                    shooter.shootCMD().schedule();
+                    shooter.shoot(1.0);
                     // Feeds the shooter as the shooter's rollers roll
-                    indexer.feedAllShooter().schedule();
-                    new WaitCommand(3000); // waits for the shooter to finish shooting
-                    shooter.stop(); // stops the shooter
-                    setPathState(8);
+                    indexer.feedAllShooterAuto();
+                    sleep(2000); // waits for the shooter to finish shooting
+                    shooter.stop();
+                    if (!shooter.isActive()) {
+                        setPathState(-1);
+                    }
                 }
                 break;
         }
@@ -220,7 +225,7 @@ public class Red9Plus3 extends CommandOpMode {
 
     // todo: test this function whenever it is intaking
     private void feedShooter() {
-        new WaitCommand(2000); // waits for the route to be perfectly aligned
+        new WaitCommand(2000).schedule(); // waits for the route to be perfectly aligned
         indexer.feedAllShooter().schedule();
     }
 

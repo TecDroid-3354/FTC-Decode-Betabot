@@ -36,7 +36,7 @@ class Turret(
     // Code ccalled every robot loop //
     override fun periodic() {
         // Un-comment this line if you want to modify in real-time the turret PIDF Coefficients
-        //motorController.setPIDFCoefficients(TurretConstants.PIDF.pidfCoefficients)
+        motorController.setPIDFCoefficients(TurretConstants.PIDF.pidfCoefficients)
 
         telemetry.addData("TurretPositionDegrees", motorController.getPosition().degrees)
     }

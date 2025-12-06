@@ -72,7 +72,10 @@ class Intake(
             stopIntake(IntakeDirection.RIGHT)
             stopIntake(IntakeDirection.LEFT)
         })
+    }
 
+    fun isActive(): Boolean {
+        return rightMotor.motor.motor.power > 0.1 || leftMotor.motor.motor.power > 0.1
     }
 
     // This code executes indefinitely during our robot's program

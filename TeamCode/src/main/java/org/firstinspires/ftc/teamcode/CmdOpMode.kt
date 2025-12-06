@@ -10,16 +10,12 @@ import com.seattlesolvers.solverslib.command.button.Trigger
 import com.seattlesolvers.solverslib.gamepad.GamepadEx
 import com.seattlesolvers.solverslib.gamepad.GamepadKeys
 import org.firstinspires.ftc.teamcode.commands.JoystickCmd
-import org.firstinspires.ftc.teamcode.pedroPathing.Tuning
-import org.firstinspires.ftc.teamcode.shooter.Shooter
 import org.firstinspires.ftc.teamcode.subsystems.drivetrain.SolversMecanum
-import org.firstinspires.ftc.teamcode.subsystems.indexer.Indexer
+import org.firstinspires.ftc.teamcode.subsystems.indexer.MotifPatterns
 import org.firstinspires.ftc.teamcode.subsystems.intake.Intake
-import org.firstinspires.ftc.teamcode.subsystems.shooter.Hood
 import org.firstinspires.ftc.teamcode.subsystems.turret.Turret
 import org.firstinspires.ftc.teamcode.systems.ShooterSystem
 import org.firstinspires.ftc.teamcode.vision.Limelight
-import java.time.Instant
 
 
 // Personally, I chose to run my code using a command-based Op Mode since it works better for me
@@ -44,10 +40,12 @@ class CMDOpMode : CommandOpMode() {
     lateinit var limelight: Limelight
 
     lateinit var shooterSystem: ShooterSystem
+
     // Declaring useful components
     lateinit var controller: GamepadEx
     lateinit var otos: SparkFunOTOS
     lateinit var limelightIdFilter: IntArray
+    var isPatternSaved: Boolean = false
 
     // Here, declare code to be executed right after pressing the INIT button
     override fun initialize() {
@@ -67,12 +65,14 @@ class CMDOpMode : CommandOpMode() {
 
         turret = Turret(hardwareMap, telemetry)
         limelight = Limelight(hardwareMap, telemetry, otos)
+        limelight.start()
 
         shooterSystem = ShooterSystem(hardwareMap, telemetry,
             { limelight.getDistanceToGoal(limelightIdFilter).inches },
             { limelight.llResult != null && limelight.llResult!!.isValid }
         )
 
+        isPatternSaved = limelight.getMotifPattern() != MotifPatterns.NO_PATTERN_DETECTED
 
         // Initializing controller & button bindings
         controller = GamepadEx(gamepad1)
@@ -100,12 +100,6 @@ class CMDOpMode : CommandOpMode() {
                 intake.stopBothIntakes()
             )
 
-        // todo: make it so that the right TRIGGER is the one that shoots
-        /*GamepadButton(controller, GamepadKeys.Button.DPAD_RIGHT)
-            .whenPressed(
-                shooterSystem.shoot(limelight.getMotifPattern())
-            )*/
-
         GamepadButton(controller, GamepadKeys.Button.A)
             .whenPressed(
                 InstantCommand({ shooterSystem.hood.modifyCurrentPositionBy(Angle.fromRotations(0.01)) })
@@ -116,24 +110,16 @@ class CMDOpMode : CommandOpMode() {
                 InstantCommand({ shooterSystem.hood.modifyCurrentPositionBy(Angle.fromRotations(-0.01)) })
             )
 
-        GamepadButton(controller, GamepadKeys.Button.X)
-            .whenPressed(
-                InstantCommand({ shooterSystem.hood.setHoodPosition(Angle.fromRotations(0.69)) })
-            )
-
-        GamepadButton(controller, GamepadKeys.Button.Y)
-            .whenPressed(
-                InstantCommand({ shooterSystem.hood.setHoodPosition(Angle.fromRotations(0.54)) })
-            )
-
-        Trigger({ controller.gamepad.right_trigger > 0.1 })
+        Trigger({ controller.gamepad.right_trigger > 0.2 })
             .whenActive(
                 shooterSystem.shoot(limelight.getMotifPattern())
             )
 
         Trigger({ controller.gamepad.left_trigger > 0.1 })
             .whenActive(
-                shooterSystem.shooter.intakeCMD()
+                shooterSystem.humanPlayerIntake()
+            ).whenInactive(
+                shooterSystem.stopShooter()
             )
     }
 
@@ -151,8 +137,8 @@ class CMDOpMode : CommandOpMode() {
         var index = 0
 
         while (!isStarted && !isStopRequested) {
-            if (gamepad1.dpad_down) index = (index - 1 + options.size) % options.size
-            if (gamepad1.dpad_up) index = (index + 1) % options.size
+            if (gamepad1.a) index = (index - 1 + options.size) % options.size
+            if (gamepad1.y) index = (index + 1) % options.size
 
             telemetry.addLine("Select the Alliance:")
             for (i in options.indices) {
@@ -163,7 +149,7 @@ class CMDOpMode : CommandOpMode() {
             }
             telemetry.update()
 
-            sleep(400) // evita múltiples cambios por una sola pulsación
+            sleep(200) // evita múltiples cambios por una sola pulsación
         }
 
         limelightIdFilter = when (options[index]) {
@@ -185,9 +171,8 @@ class CMDOpMode : CommandOpMode() {
             CommandScheduler.getInstance().run()
             periodic()
 
-            telemetry.addData("Set point hood", shooterSystem.getObtainedSetPointForHood())
-            telemetry.addData("HoodPositionDegrees CMD", shooterSystem.hood.currentAngle.degrees)
-            telemetry.addData("HoodPositionRotations CMD", shooterSystem.hood.currentAngle.rotations)
+            telemetry.addData("Pattern", limelight.getMotifPattern())
+            telemetry.addData("Is pattern saved", isPatternSaved)
             telemetry.update()
         }
 

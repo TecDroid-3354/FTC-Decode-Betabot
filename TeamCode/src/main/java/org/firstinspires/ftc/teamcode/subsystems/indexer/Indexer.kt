@@ -147,8 +147,7 @@ class Indexer(
         val cmdGroup = SequentialCommandGroup()
 
         if (rejectEvaluation()) {
-            //return feedShooter()
-            return feedAllShooter()
+            return feedShooter()
         }
 
         for ((index, color) in motifPatterns.pattern.withIndex()) {
@@ -209,9 +208,9 @@ class Indexer(
         return if (slot != null) {
             SequentialCommandGroup(
                 InstantCommand({ slot.feed() }),
-                WaitCommand(150),
+                WaitCommand(100),
                 InstantCommand({ slot.home() }),
-                WaitCommand(400)
+                WaitCommand(300)
             )
         } else {
             InstantCommand()
@@ -227,7 +226,7 @@ class Indexer(
     private fun feedCMD(slot: Slot): Command {
         return SequentialCommandGroup(
             InstantCommand({ slot.feed() }),
-            WaitCommand(150),
+            WaitCommand(200),
             InstantCommand({ slot.home() }),
             WaitCommand(400))
     }

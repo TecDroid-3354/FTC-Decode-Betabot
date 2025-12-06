@@ -21,11 +21,9 @@ import org.firstinspires.ftc.teamcode.pedroPathing.Constants;
 import org.firstinspires.ftc.teamcode.shooter.Shooter;
 import org.firstinspires.ftc.teamcode.subsystems.indexer.Indexer;
 import org.firstinspires.ftc.teamcode.subsystems.intake.Intake;
-import org.firstinspires.ftc.teamcode.subsystems.intake.IntakeDirection;
 import org.firstinspires.ftc.teamcode.subsystems.shooter.Hood;
 import org.firstinspires.ftc.teamcode.subsystems.turret.Turret;
-import org.firstinspires.ftc.teamcode.systems.ShooterSystem;
-import org.firstinspires.ftc.teamcode.vision.Limelight;
+
 
 @Autonomous(name = "Blue 9+3", group = "Blue")
 public class Blue9Plus3 extends CommandOpMode {
@@ -121,7 +119,7 @@ public class Blue9Plus3 extends CommandOpMode {
                 if (!follower.isBusy()) {
                     new WaitCommand(2000); // waits for the route to be perfectly aligned
                     // Starts rolling the rollers
-                    shooter.shootCMD().schedule();
+                    shooter.shootCMD(1.0).schedule();
                     // Feeds the shooter as the shooter's rollers roll
                     indexer.feedAllShooter().schedule();
                     new WaitCommand(3000); // waits for the shooter to finish shooting
@@ -147,7 +145,7 @@ public class Blue9Plus3 extends CommandOpMode {
                     follower.followPath(paths.blue9Plus3ShootFirstRow, true);
                     new WaitCommand(2000); // waits for the route to be perfectly aligned
                     // Starts rolling the rollers
-                    shooter.shootCMD().schedule();
+                    shooter.shootCMD(1.0).schedule();
                     // Feeds the shooter as the shooter's rollers roll
                     indexer.feedAllShooter().schedule();
                     new WaitCommand(3000); // waits for the shooter to finish shooting
@@ -173,7 +171,7 @@ public class Blue9Plus3 extends CommandOpMode {
                     follower.followPath(paths.blue9Plus3ShootSecondRow, true);
                     new WaitCommand(2000); // waits for the route to be perfectly aligned
                     // Starts rolling the rollers
-                    shooter.shootCMD().schedule();
+                    shooter.shootCMD(1.0).schedule();
                     // Feeds the shooter as the shooter's rollers roll
                     indexer.feedAllShooter().schedule();
                     new WaitCommand(3000); // waits for the shooter to finish shooting
@@ -199,7 +197,7 @@ public class Blue9Plus3 extends CommandOpMode {
                     follower.followPath(paths.blue9Plus3ShootThirdRow, true);
                     new WaitCommand(2000); // waits for the route to be perfectly aligned
                     // Starts rolling the rollers
-                    shooter.shootCMD().schedule();
+                    shooter.shootCMD(1.0).schedule();
                     // Feeds the shooter as the shooter's rollers roll
                     indexer.feedAllShooter().schedule();
                     new WaitCommand(3000); // waits for the shooter to finish shooting

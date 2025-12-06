@@ -20,7 +20,7 @@ class Limelight(
     var otos: SparkFunOTOS
 ) : SubsystemBase() {
 
-    private var limelight: Limelight3A? = null
+    var limelight: Limelight3A? = null
     private var obeliskId = 0
     var llResult: LLResult? = null
 
@@ -51,6 +51,10 @@ class Limelight(
         otos.resetTracking()
 
         // Starts the limelight's readings
+        limelight!!.start()
+    }
+
+    fun start() {
         limelight!!.start()
     }
 

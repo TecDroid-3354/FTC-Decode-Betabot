@@ -52,7 +52,7 @@ class SolversMecanum(
 
     // Robot-oriented chassis speeds
     // Only takes one parameter: the chassis speeds to be used
-    private fun setChassisSpeeds(chassisSpeeds: ChassisSpeeds) {
+    fun setChassisSpeeds(chassisSpeeds: ChassisSpeeds) {
         mecanum.driveRobotCentric(
             chassisSpeeds.vyMetersPerSecond,
             chassisSpeeds.vxMetersPerSecond,

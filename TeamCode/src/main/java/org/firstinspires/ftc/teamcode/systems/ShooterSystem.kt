@@ -33,12 +33,12 @@ val lInterpolationConfig = LInterpolationConfig(
 @Suppress("JoinDeclarationAndAssignment")
 class ShooterSystem(hw: HardwareMap, val telemetry: Telemetry, distanceToAprilTagInches: Supplier<Double>, val isLLResultValid: Supplier<Boolean>) {
 
-    val shooter: Shooter
-    val indexer: Indexer
+    private val indexer: Indexer
+    private val distanceToAprilTag = {Distance.fromInches(distanceToAprilTagInches.get())}
+    private val shooter: Shooter
     val hood: Hood
-    val distanceToAprilTag = {Distance.fromInches(distanceToAprilTagInches.get())}
 
-    val interpolation = LinearInterpolationConstructor(lInterpolationConfig, distanceToAprilTag)
+    private val interpolation = LinearInterpolationConstructor(lInterpolationConfig, distanceToAprilTag)
 
     init {
         shooter = Shooter(hw, telemetry)
@@ -58,9 +58,18 @@ class ShooterSystem(hw: HardwareMap, val telemetry: Telemetry, distanceToAprilTa
         return SequentialCommandGroup(
             shooter.shootCMD(),
             InstantCommand({ hood.setHoodPosition(getObtainedSetPointForHood()) }),
-            WaitCommand(1200),
-            indexer.feedShooter(motifPatterns),
+            WaitCommand(1400),
+            //indexer.feedShooter(motifPatterns),
+            indexer.feedAllShooter(),
             InstantCommand({ shooter.stop() })
         )
+    }
+
+    fun humanPlayerIntake(): Command {
+        return InstantCommand({ shooter.shootCMD(-1.0) })
+    }
+
+    fun stopShooter(): Command {
+        return InstantCommand({ shooter.stop() })
     }
 }
