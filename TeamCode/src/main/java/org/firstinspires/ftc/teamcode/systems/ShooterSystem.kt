@@ -59,8 +59,7 @@ class ShooterSystem(hw: HardwareMap, val telemetry: Telemetry, distanceToAprilTa
             shooter.shootCMD(),
             InstantCommand({ hood.setHoodPosition(getObtainedSetPointForHood()) }),
             WaitCommand(1400),
-            //indexer.feedShooter(motifPatterns),
-            indexer.feedAllShooter(),
+            indexer.feedShooter(motifPatterns),
             InstantCommand({ shooter.stop() })
         )
     }

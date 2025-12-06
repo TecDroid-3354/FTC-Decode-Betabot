@@ -1,5 +1,6 @@
 package org.firstinspires.ftc.teamcode.subsystems.indexer
 
+import android.graphics.Color
 import com.qualcomm.robotcore.hardware.HardwareMap
 import com.seattlesolvers.solverslib.command.Command
 import com.seattlesolvers.solverslib.command.InstantCommand
@@ -7,10 +8,12 @@ import com.seattlesolvers.solverslib.command.SequentialCommandGroup
 import com.seattlesolvers.solverslib.command.SubsystemBase
 import com.seattlesolvers.solverslib.command.WaitCommand
 import org.firstinspires.ftc.robotcore.external.Telemetry
+import org.firstinspires.ftc.teamcode.CMDOpMode
 import org.firstinspires.ftc.teamcode.subsystems.indexer.Slot.Slot
 import org.firstinspires.ftc.teamcode.subsystems.indexer.Slot.SlotConfig
 import org.firstinspires.ftc.teamcode.subsystems.indexer.IndexerConstants.Positions
 import org.firstinspires.ftc.teamcode.subsystems.indexer.IndexerConstants.Identification
+import org.firstinspires.ftc.teamcode.subsystems.indexer.IndexerConstants.ColorRanges
 import org.firstinspires.ftc.teamcode.subsystems.indexer.IndexerConstants.Configuration
 import org.firstinspires.ftc.teamcode.subsystems.indexer.IndexerConstants.Extensions
 import org.firstinspires.ftc.teamcode.utils.colorSensor.ColorSensorEx.DetectedColor
@@ -45,6 +48,8 @@ class Indexer(
                 Identification.FrontSlot.absFront,
                 Identification.FrontSlot.frontSlotRightSensor,
                 Identification.FrontSlot.frontSlotLeftSensor,
+                ColorRanges.FrontSlot.greenSATRange,
+                ColorRanges.FrontSlot.purpleHUERange,
                 Extensions.frontSlotExtension),
             hw,
             telemetry)
@@ -56,6 +61,8 @@ class Indexer(
                 Identification.MiddleSlot.absMiddle,
                 Identification.MiddleSlot.middleSlotRightSensor,
                 Identification.MiddleSlot.middleSlotLeftSensor,
+                ColorRanges.MiddleSlot.greenSATRange,
+                ColorRanges.MiddleSlot.purpleHUERange,
                 Extensions.frontSlotExtension),
             hw,
             telemetry)
@@ -67,6 +74,8 @@ class Indexer(
                 Identification.BackSlot.absBack,
                 Identification.BackSlot.backSlotRightSensor,
                 Identification.BackSlot.backSlotLeftSensor,
+                ColorRanges.BackSlot.greenSATRange,
+                ColorRanges.BackSlot.purpleHUERange,
                 Extensions.backSlotExtension),
             hw,
             telemetry)
@@ -76,17 +85,9 @@ class Indexer(
 
     // This code will execute indefinably during your operation
     override fun periodic() {
-        telemetry.addData("frontSlotRightHUE", frontSlot.getRightColorHSV()[0])
-        telemetry.addData("frontSlotRightSAT", frontSlot.getRightColorHSV()[1])
-        telemetry.addData("frontSlotRightVAL", frontSlot.getRightColorHSV()[2])
-
-        telemetry.addData("middleSlotRightHUE", middleSlot.getRightColorHSV()[0])
-        telemetry.addData("middleSlotRightSAT", middleSlot.getRightColorHSV()[1])
-        telemetry.addData("middleSlotRightVAL", middleSlot.getRightColorHSV()[2])
-
-        telemetry.addData("backSlotRightHUE", backSlot.getRightColorHSV()[0])
-        telemetry.addData("backSlotRightSAT", backSlot.getRightColorHSV()[1])
-        telemetry.addData("backSlotRightVAL", backSlot.getRightColorHSV()[2])
+        telemetry.addData("frontSlotColor", frontSlot.getDetectedColor())
+        telemetry.addData("middleSlotColor", middleSlot.getDetectedColor())
+        telemetry.addData("backSlotColor", backSlot.getDetectedColor())
     }
 
     /**
@@ -149,7 +150,7 @@ class Indexer(
         var slotOrder = arrayOf("", "", "")
         val cmdGroup = SequentialCommandGroup()
 
-        if (rejectEvaluation()) {
+        if (rejectEvaluation() || motifPatterns == MotifPatterns.NO_PATTERN_DETECTED) {
             return feedShooter()
         }
 
@@ -181,9 +182,9 @@ class Indexer(
 
     fun feedAuto(slot: Slot) {
         slot.feed()
-        WaitCommand(150)
+        WaitCommand(100)
         slot.home()
-        WaitCommand(400)
+        WaitCommand(300)
     }
     // TODO: AUTO
 
@@ -229,8 +230,8 @@ class Indexer(
     private fun feedCMD(slot: Slot): Command {
         return SequentialCommandGroup(
             InstantCommand({ slot.feed() }),
-            WaitCommand(200),
+            WaitCommand(100),
             InstantCommand({ slot.home() }),
-            WaitCommand(400))
+            WaitCommand(300))
     }
 }

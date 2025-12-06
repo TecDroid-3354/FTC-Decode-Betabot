@@ -1,9 +1,5 @@
 package org.firstinspires.ftc.teamcode.auto;
 
-import com.pedropathing.follower.Follower;
-import com.pedropathing.geometry.BezierLine;
-import com.pedropathing.geometry.Pose;
-import com.pedropathing.paths.PathChain;
 import com.pedropathing.util.Timer;
 import com.qualcomm.hardware.sparkfun.SparkFunOTOS;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
@@ -15,18 +11,15 @@ import com.seattlesolvers.solverslib.command.WaitCommand;
 import com.seattlesolvers.solverslib.command.button.Trigger;
 import com.seattlesolvers.solverslib.kinematics.wpilibkinematics.ChassisSpeeds;
 
-import org.firstinspires.ftc.teamcode.auto.Visualizer.Draw;
-import org.firstinspires.ftc.teamcode.pedroPathing.Constants;
 import org.firstinspires.ftc.teamcode.shooter.Shooter;
 import org.firstinspires.ftc.teamcode.subsystems.drivetrain.SolversMecanum;
 import org.firstinspires.ftc.teamcode.subsystems.indexer.Indexer;
 import org.firstinspires.ftc.teamcode.subsystems.intake.Intake;
-import org.firstinspires.ftc.teamcode.subsystems.intake.IntakeDirection;
 import org.firstinspires.ftc.teamcode.subsystems.shooter.Hood;
 import org.firstinspires.ftc.teamcode.subsystems.turret.Turret;
 
-@Autonomous(name = "3Balls", group = "All")
-public class balls3 extends CommandOpMode {
+@Autonomous(name = "3BallsBlue", group = "All")
+public class Blue3Balls extends CommandOpMode {
 
     /* ! SETUP CODE ! */
     // This following variable, pathState, will serve as the counter variable to determine
@@ -44,7 +37,6 @@ public class balls3 extends CommandOpMode {
     private Shooter shooter;
     private SolversMecanum mecanum;
     private SparkFunOTOS otos;
-
     private Boolean readyToShoot = false;
 
     @Override
@@ -68,7 +60,9 @@ public class balls3 extends CommandOpMode {
                         shooter.shootCMD(1.0),
                         new WaitCommand(1400),
                         indexer.feedAllShooter(),
+                        new WaitCommand(2000),
                         new InstantCommand(() -> shooter.stop()),
+                        new InstantCommand(() -> setPathState(2)),
                         new InstantCommand(() -> readyToShoot = false)
                 ));
     }
@@ -121,7 +115,15 @@ public class balls3 extends CommandOpMode {
                 break;
             case 1: // Path from intake position --> shooting position + indexing + shooting
                 readyToShoot = true;
-                setPathState(2);
+                //sleep(4000);
+                //setPathState(2);
+                break;
+            case 2:
+                readyToShoot = false;
+                mecanum.setChassisSpeeds(new ChassisSpeeds(1.0, 0.0, 0.0));
+                sleep(600);
+                mecanum.setChassisSpeeds(new ChassisSpeeds(0.0, 0.0, 0.0));
+                setPathState(-1);
                 break;
         }
     }
@@ -132,11 +134,5 @@ public class balls3 extends CommandOpMode {
         pathState = number;
         pathTimer.resetTimer();
         telemetry.addData("Current path state to be followed", number);
-    }
-
-    // todo: test this function whenever it is intaking
-    private void feedShooter() {
-        new WaitCommand(2000).schedule(); // waits for the route to be perfectly aligned
-        indexer.feedAllShooter().schedule();
     }
 }

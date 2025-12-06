@@ -88,16 +88,24 @@ class IndexerConstants {
 
         object FrontSlot{
 
+            val purpleHUERange = 200.0..300.0
 
+            val greenSATRange = 0.40..0.70
         }
 
 
         object MiddleSlot{
 
+            val purpleHUERange = 230.0..300.0
+
+            val greenSATRange = 0.40..0.70
         }
 
         object BackSlot{
 
+            val purpleHUERange = 230.0..300.0
+
+            val greenSATRange = 0.40..0.80
         }
     }
 

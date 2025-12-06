@@ -9,6 +9,7 @@ import com.seattlesolvers.solverslib.hardware.AbsoluteAnalogEncoder
 import com.seattlesolvers.solverslib.hardware.ServoEx
 import org.firstinspires.ftc.robotcore.external.Telemetry
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit
+import org.firstinspires.ftc.teamcode.subsystems.indexer.IndexerConstants
 import org.firstinspires.ftc.teamcode.utils.colorSensor.ColorSensorEx
 import org.firstinspires.ftc.teamcode.utils.colorSensor.ColorSensorEx.DetectedColor
 
@@ -20,6 +21,8 @@ data class SlotConfig(
     val absoluteId: String,
     val rightColorSensorId: String,
     val leftColorSensorId: String,
+    val greenSATRange: ClosedFloatingPointRange<Double>,
+    val purpleHUERange: ClosedFloatingPointRange<Double>,
     val archiveExtension: String
 )
 
@@ -53,6 +56,8 @@ class Slot (val config: SlotConfig, hw: HardwareMap, telemetry: Telemetry) {
             telemetry,
             config.archiveExtension)
 
+        val range = 0.0..0.2
+
         awakeServo()
     }
 
@@ -66,16 +71,18 @@ class Slot (val config: SlotConfig, hw: HardwareMap, telemetry: Telemetry) {
      * @return the [DetectedColor] of the [Slot]
      */
     fun getDetectedColor(): DetectedColor {
-        // Ensure both readings are equal to correctly detect the ball inside the slot
-        return DetectedColor.UNKNOWN
+
+        return if (getRightColorHSV()[0] in config.purpleHUERange) {
+            DetectedColor.PURPLE
+        } else if (getRightColorHSV()[1] in config.greenSATRange) {
+            DetectedColor.GREEN
+        } else {
+            DetectedColor.UNKNOWN
+        }
     }
 
-    fun getRightColorHSV(): FloatArray {
+    private fun getRightColorHSV(): FloatArray {
         return rightColorSensor.hsv
-    }
-
-    fun getLeftColorHSV(): FloatArray {
-        return leftColorSensor.hsv
     }
 
     /**
