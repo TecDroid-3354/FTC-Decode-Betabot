@@ -84,6 +84,23 @@ class IndexerConstants {
         }
     }
 
+    object ColorRanges{
+
+        object FrontSlot{
+
+
+        }
+
+
+        object MiddleSlot{
+
+        }
+
+        object BackSlot{
+
+        }
+    }
+
     object Extensions {
 
         // These are useful for configuring each slot color detection and tune them separately

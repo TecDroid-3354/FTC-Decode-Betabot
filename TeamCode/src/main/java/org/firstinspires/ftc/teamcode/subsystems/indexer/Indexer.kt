@@ -76,14 +76,17 @@ class Indexer(
 
     // This code will execute indefinably during your operation
     override fun periodic() {
-        telemetry.addData("frontSlotLeftColor", frontSlot.leftColorSensor.colorFromSensor)
-        telemetry.addData("frontSlotRightColor", frontSlot.rightColorSensor.colorFromSensor)
+        telemetry.addData("frontSlotRightHUE", frontSlot.getRightColorHSV()[0])
+        telemetry.addData("frontSlotRightSAT", frontSlot.getRightColorHSV()[1])
+        telemetry.addData("frontSlotRightVAL", frontSlot.getRightColorHSV()[2])
 
-        telemetry.addData("middleSlotLeftColor", middleSlot.leftColorSensor.colorFromSensor)
-        telemetry.addData("middleSlotRightColor", middleSlot.rightColorSensor.colorFromSensor)
+        telemetry.addData("middleSlotRightHUE", middleSlot.getRightColorHSV()[0])
+        telemetry.addData("middleSlotRightSAT", middleSlot.getRightColorHSV()[1])
+        telemetry.addData("middleSlotRightVAL", middleSlot.getRightColorHSV()[2])
 
-        telemetry.addData("backSlotLeftColor", backSlot.leftColorSensor.colorFromSensor)
-        telemetry.addData("backSlotRightColor", backSlot.rightColorSensor.colorFromSensor)
+        telemetry.addData("backSlotRightHUE", backSlot.getRightColorHSV()[0])
+        telemetry.addData("backSlotRightSAT", backSlot.getRightColorHSV()[1])
+        telemetry.addData("backSlotRightVAL", backSlot.getRightColorHSV()[2])
     }
 
     /**

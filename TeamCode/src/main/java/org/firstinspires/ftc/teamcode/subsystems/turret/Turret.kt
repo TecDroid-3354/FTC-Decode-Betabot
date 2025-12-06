@@ -3,6 +3,7 @@ package org.firstinspires.ftc.teamcode.subsystems.turret
 import Angle
 import com.qualcomm.robotcore.hardware.HardwareMap
 import com.seattlesolvers.solverslib.command.SubsystemBase
+import com.seattlesolvers.solverslib.controller.PIDFController
 import com.seattlesolvers.solverslib.hardware.motors.Motor
 import com.seattlesolvers.solverslib.util.MathUtils
 import org.firstinspires.ftc.robotcore.external.Telemetry
@@ -22,6 +23,7 @@ class Turret(
 
     // Motor that controls the Turret. Motor: GoBilda 435 RPM
     private val motorController: PositionMotorEx
+    private val turretAnglePIDFController = PIDFController(TurretConstants.PIDF.turretAnglePIDFController)
 
     // Initialization //
     init {
@@ -36,7 +38,7 @@ class Turret(
     // Code ccalled every robot loop //
     override fun periodic() {
         // Un-comment this line if you want to modify in real-time the turret PIDF Coefficients
-        motorController.setPIDFCoefficients(TurretConstants.PIDF.pidfCoefficients)
+        motorController.setPIDFCoefficients(TurretConstants.PIDF.pidLLCoefficients)
 
         telemetry.addData("TurretPositionDegrees", motorController.getPosition().degrees)
     }
@@ -66,9 +68,8 @@ class Turret(
             Limits.maximumLimit.degrees)
         )
 
-        val power = motorController.pidfController.calculate(motorController.getPosition().degrees, coercedAngle.degrees)
+        val power = turretAnglePIDFController.calculate(motorController.getPosition().degrees, coercedAngle.degrees)
         setTurretVoltage(power)
-
     }
 
     /**

@@ -67,15 +67,15 @@ class Slot (val config: SlotConfig, hw: HardwareMap, telemetry: Telemetry) {
      */
     fun getDetectedColor(): DetectedColor {
         // Ensure both readings are equal to correctly detect the ball inside the slot
-        return if (rightColorSensor.colorFromSensor != DetectedColor.UNKNOWN) {
-            // Now that we know they are the same, we can grab either the right or left reading
-            // In this case we grabbed the right one
-            rightColorSensor.colorFromSensor
-        } else if (leftColorSensor.colorFromSensor != DetectedColor.UNKNOWN) {
-            leftColorSensor.colorFromSensor
-        } else {
-            DetectedColor.UNKNOWN
-        }
+        return DetectedColor.UNKNOWN
+    }
+
+    fun getRightColorHSV(): FloatArray {
+        return rightColorSensor.hsv
+    }
+
+    fun getLeftColorHSV(): FloatArray {
+        return leftColorSensor.hsv
     }
 
     /**

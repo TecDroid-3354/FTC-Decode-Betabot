@@ -90,7 +90,7 @@ public class ColorDetectionJSON extends LinearOpMode {
         return closestColor;
     }
 
-    private float[] getHSV() {
+    float[] getHSV() {
         float r = colorSensor.red();
         float g = colorSensor.green();
         float b = colorSensor.blue();
@@ -111,4 +111,5 @@ public class ColorDetectionJSON extends LinearOpMode {
 
         return hsv; // [hue, sat, val]
     }
+
 }

@@ -64,6 +64,7 @@ public class balls3 extends CommandOpMode {
 
         new Trigger(() -> readyToShoot)
                 .whenActive(new SequentialCommandGroup(
+                        new InstantCommand(() -> hood.setHoodPosition(0.6)),
                         shooter.shootCMD(1.0),
                         new WaitCommand(1400),
                         indexer.feedAllShooter(),

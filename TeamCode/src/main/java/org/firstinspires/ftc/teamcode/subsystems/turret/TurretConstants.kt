@@ -43,7 +43,8 @@ class TurretConstants {
     class PIDF {
         companion object {
             @JvmField
-            var pidfCoefficients = PIDFCoefficients(0.02, 0.0, 0.0000000115, 0.019)
+            var pidLLCoefficients = PIDFCoefficients(0.02, 0.0, 0.0000000115, 0.019)
+            var turretAnglePIDFController = PIDFCoefficients(0.01, 0.0, 0.0, 0.0)
         }
     }
 }
@@ -55,7 +56,7 @@ val turretMotorConfig = PositionMotorExConfig(
     TurretConstants.Configuration.zeroPowerBehavior,
     TurretConstants.Configuration.direction,
     TurretConstants.Configuration.ticksPerRevolution,
-    TurretConstants.PIDF.pidfCoefficients,
+    TurretConstants.PIDF.pidLLCoefficients,
     TurretConstants.Configuration.gearRatio,
     TurretConstants.Configuration.powerThreshold
 )
