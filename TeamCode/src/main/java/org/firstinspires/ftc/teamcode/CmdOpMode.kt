@@ -5,6 +5,7 @@ import com.qualcomm.robotcore.eventloop.opmode.TeleOp
 import com.seattlesolvers.solverslib.command.CommandOpMode
 import com.seattlesolvers.solverslib.command.CommandScheduler
 import com.seattlesolvers.solverslib.command.InstantCommand
+import com.seattlesolvers.solverslib.command.SequentialCommandGroup
 import com.seattlesolvers.solverslib.command.button.GamepadButton
 import com.seattlesolvers.solverslib.command.button.Trigger
 import com.seattlesolvers.solverslib.gamepad.GamepadEx
@@ -28,6 +29,10 @@ import org.firstinspires.ftc.teamcode.vision.Limelight
  * To visit the FTC dashboard online (while connected to the Control Hub's internet)
  *    http://192.168.43.1:8080/?page=connection.html&pop=true
  */
+enum class Alliance {
+    Blue_Alliance,
+    Red_Alliance
+}
 @TeleOp(name = "CMD", group = "Op Mode")
 class CMDOpMode : CommandOpMode() {
 
@@ -45,6 +50,7 @@ class CMDOpMode : CommandOpMode() {
     lateinit var controller: GamepadEx
     lateinit var otos: SparkFunOTOS
     lateinit var limelightIdFilter: IntArray
+    var alliance: Alliance = Alliance.Blue_Alliance
     var isPatternSaved: Boolean = false
 
     // Here, declare code to be executed right after pressing the INIT button
@@ -57,7 +63,7 @@ class CMDOpMode : CommandOpMode() {
         mecanum.defaultCommand = JoystickCmd(
             { controller.leftX },
             { controller.leftY },
-            { controller.rightX * 0.8 },
+            { controller.rightX },
             mecanum
         )
 
@@ -110,21 +116,35 @@ class CMDOpMode : CommandOpMode() {
                 InstantCommand({ shooterSystem.hood.modifyCurrentPositionBy(Angle.fromRotations(-0.01)) })
             )
 
+        GamepadButton(controller, GamepadKeys.Button.Y)
+            .whenPressed(
+                shooterSystem.indexer.feedAllShooter()
+            )
+
         Trigger({ controller.gamepad.right_trigger > 0.2 })
             .whenActive(
-                shooterSystem.shoot(limelight.getMotifPattern())
+                SequentialCommandGroup(
+                    shooterSystem.ajustHood(),
+                    shooterSystem.shoot(limelight.getMotifPattern())
+                )
+            ).whenInactive(
+                shooterSystem.stopShooter()
             )
 
         Trigger({ controller.gamepad.left_trigger > 0.1 })
             .whenActive(
-                shooterSystem.humanPlayerIntake()
+                SequentialCommandGroup(
+                    InstantCommand({ shooterSystem.hood.setHoodPosition(0.73) }),
+                    shooterSystem.shoot(limelight.getMotifPattern())
+                )
+
             ).whenInactive(
                 shooterSystem.stopShooter()
             )
     }
 
     fun periodic() {
-        turret.alignToAprilTag(limelight.getAngleToGoal(limelightIdFilter))
+        turret.alignToAprilTag(limelight.getAngleToGoal(limelightIdFilter), 3.0 * (if (alliance == Alliance.Blue_Alliance) -1.0 else 1.0))
     }
 
     // Main code body
@@ -157,6 +177,13 @@ class CMDOpMode : CommandOpMode() {
             "RedAlliance" -> intArrayOf(24)
             "Test" -> intArrayOf(20, 24)
             else -> intArrayOf(20, 24)
+        }
+
+        alliance = when (options[index]) {
+            "BlueAlliance" -> Alliance.Blue_Alliance
+            "RedAlliance" -> Alliance.Red_Alliance
+            "Test" -> Alliance.Blue_Alliance
+            else -> Alliance.Blue_Alliance
         }
 
         // Pauses OpMode until the START button is pressed on the Driver Hub

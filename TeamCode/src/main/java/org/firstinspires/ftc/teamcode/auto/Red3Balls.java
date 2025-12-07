@@ -111,6 +111,10 @@ public class Red3Balls extends CommandOpMode {
                 mecanum.setChassisSpeeds(new ChassisSpeeds(0.0, -1.0,0.0));
                 sleep(800);
                 mecanum.setChassisSpeeds(new ChassisSpeeds(0.0, 0.0, 0.0));
+                /*sleep(300);
+                mecanum.setChassisSpeeds(new ChassisSpeeds(0.0, 0.0, 0.4));
+                sleep(300);
+                mecanum.setChassisSpeeds(new ChassisSpeeds(0.0, 0.0, 0.0));*/
                 setPathState(1);
                 break;
             case 1: // Path from intake position --> shooting position + indexing + shooting

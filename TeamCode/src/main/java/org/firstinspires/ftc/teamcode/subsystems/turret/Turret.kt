@@ -77,8 +77,8 @@ class Turret(
      * the motor's necessary output to align the whole turret
      * @param tx the current offset angle from the [Limelight] to the April Tag
      */
-    fun alignToAprilTag(tx: Double) {
-        val power = motorController.pidfController.calculate(tx, 0.0)
+    fun alignToAprilTag(tx: Double, offset: Double) {
+        val power = motorController.pidfController.calculate(tx, 0.0 + offset)
         setTurretVoltage(-power)
     }
 }

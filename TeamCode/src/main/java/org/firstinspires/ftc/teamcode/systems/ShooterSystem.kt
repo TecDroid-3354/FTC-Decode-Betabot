@@ -15,30 +15,30 @@ import org.firstinspires.ftc.teamcode.subsystems.indexer.MotifPatterns
 import org.firstinspires.ftc.teamcode.subsystems.shooter.Hood
 import org.firstinspires.ftc.teamcode.subsystems.shooter.HoodConstants
 
-
 /**
  * These values need to be measured physically
  */
-val lInterpolationConfig = LInterpolationConfig(
+val lInterpolationFarConfig = LInterpolationConfig(
     // The angle asked for is the hood's angle at that position, NOT RELATED TO THE APRILTAG
 
     // TODO: TUNE IN FIELD CALIBRATION; WORKS PERFECTLY WITH OUR MANCRAFT GOAL, BUT CAN'T ASSURE
     // TODO: IT DOES WITH THE ACTUAL GOAL
     // angle at 19.18in was 0.69 rotations
     // angle at 58.31in was 0.54 rotations
-    firstCoordinate = Point(Distance.fromInches(58.31), Angle.fromRotations(0.54)),
-    secondCoordinate = Point(Distance.fromInches(19.18), Angle.fromRotations(0.68))
+    firstCoordinate = Point(Distance.fromInches(54.82), Angle.fromRotations(0.67)),
+    secondCoordinate = Point(Distance.fromInches(36.0), Angle.fromRotations(0.71))
 )
 
 @Suppress("JoinDeclarationAndAssignment")
 class ShooterSystem(hw: HardwareMap, val telemetry: Telemetry, distanceToAprilTagInches: Supplier<Double>, val isLLResultValid: Supplier<Boolean>) {
 
-    private val indexer: Indexer
+    val indexer: Indexer
     private val distanceToAprilTag = {Distance.fromInches(distanceToAprilTagInches.get())}
-    private val shooter: Shooter
+    private val inflectionDistance = Distance.fromInches(36.0)
+    val shooter: Shooter
     val hood: Hood
 
-    private val interpolation = LinearInterpolationConstructor(lInterpolationConfig, distanceToAprilTag)
+    private val interpolationFar = LinearInterpolationConstructor(lInterpolationFarConfig, distanceToAprilTag)
 
     init {
         shooter = Shooter(hw, telemetry)
@@ -48,7 +48,7 @@ class ShooterSystem(hw: HardwareMap, val telemetry: Telemetry, distanceToAprilTa
 
     fun getObtainedSetPointForHood(): Angle {
         return if (isLLResultValid.get()) {
-            Angle.fromRotations(interpolation.getDesiredPoint())
+            Angle.fromRotations(interpolationFar.getDesiredPoint())
         } else {
             return Angle.fromDegrees(HoodConstants.Positions.homePosition.degrees)
         }
@@ -57,13 +57,15 @@ class ShooterSystem(hw: HardwareMap, val telemetry: Telemetry, distanceToAprilTa
     fun shoot(motifPatterns: MotifPatterns) : Command {
         return SequentialCommandGroup(
             shooter.shootCMD(),
-            InstantCommand({ hood.setHoodPosition(getObtainedSetPointForHood()) }),
             WaitCommand(1400),
-            indexer.feedShooter(motifPatterns),
+            indexer.feedAllShooter(),
             InstantCommand({ shooter.stop() })
         )
     }
 
+    fun ajustHood(): Command {
+        return InstantCommand({ hood.setHoodPosition(getObtainedSetPointForHood()) })
+    }
     fun humanPlayerIntake(): Command {
         return InstantCommand({ shooter.shootCMD(-1.0) })
     }

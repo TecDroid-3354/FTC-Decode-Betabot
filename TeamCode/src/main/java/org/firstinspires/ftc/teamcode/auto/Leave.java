@@ -18,8 +18,8 @@ import org.firstinspires.ftc.teamcode.subsystems.intake.Intake;
 import org.firstinspires.ftc.teamcode.subsystems.shooter.Hood;
 import org.firstinspires.ftc.teamcode.subsystems.turret.Turret;
 
-@Autonomous(name = "3BallsBlue", group = "All")
-public class Blue3Balls extends CommandOpMode {
+@Autonomous(name = "Leave", group = "All")
+public class Leave extends CommandOpMode {
 
     /* ! SETUP CODE ! */
     // This following variable, pathState, will serve as the counter variable to determine
@@ -28,16 +28,8 @@ public class Blue3Balls extends CommandOpMode {
 
     // The following timer allows to set a time limit to each path
     private Timer pathTimer;
-
-    // Declaring all subsystems
-    private Intake intake;
-    private Indexer indexer;
-    private Hood hood;
-    private Turret turret;
-    private Shooter shooter;
     private SolversMecanum mecanum;
     private SparkFunOTOS otos;
-    private Boolean readyToShoot = false;
 
     @Override
     public void initialize() {
@@ -46,25 +38,6 @@ public class Blue3Balls extends CommandOpMode {
 
         otos = hardwareMap.get(SparkFunOTOS.class, "otos");
         mecanum = new SolversMecanum(hardwareMap, telemetry, otos);
-
-        // Initializing subsystems
-        intake = new Intake(hardwareMap, telemetry);
-        turret = new Turret(hardwareMap, telemetry);
-        shooter = new Shooter(hardwareMap, telemetry);
-        hood = new Hood(hardwareMap, telemetry);
-        indexer = new Indexer(hardwareMap, telemetry);
-
-        new Trigger(() -> readyToShoot)
-                .whenActive(new SequentialCommandGroup(
-                        new InstantCommand(() -> hood.setHoodPosition(0.6)),
-                        shooter.shootCMD(1.0),
-                        new WaitCommand(1400),
-                        indexer.feedAllShooter(),
-                        new WaitCommand(2000),
-                        new InstantCommand(() -> shooter.stop()),
-                        new InstantCommand(() -> setPathState(2)),
-                        new InstantCommand(() -> readyToShoot = false)
-                ));
     }
 
 
@@ -97,36 +70,17 @@ public class Blue3Balls extends CommandOpMode {
         reset();
     }
 
-    // The following class is in charge of changing the followed path. Logic should be added inside
-    // here. It is the one called continuously during the autonomous
     public void autonomousPathUpdates() {
         switch (pathState) {
-            // The follower is in charge of following a PathChain declared within the Paths object
-
-            // TODO: THE ONLY WAY TO MAKE MOTORS WORK IN AUTO IS THROUGH NON-COMMAND CODE
-
             // ! Shoot precharged artifacts ! //
             case 0: // Path from starting -> shooting position
                 //follower.followPath(ball3Path, true);
-                mecanum.setChassisSpeeds(new ChassisSpeeds(0.0, -1.0,0.0));
+                mecanum.setChassisSpeeds(new ChassisSpeeds(1.0, 0.0,0.0));
                 sleep(800);
                 mecanum.setChassisSpeeds(new ChassisSpeeds(0.0, 0.0, 0.0));
-                /*sleep(300);
-                mecanum.setChassisSpeeds(new ChassisSpeeds(0.0, 0.0, 0.4));
-                sleep(300);
-                mecanum.setChassisSpeeds(new ChassisSpeeds(0.0, 0.0, 0.0));*/
                 setPathState(1);
                 break;
             case 1: // Path from intake position --> shooting position + indexing + shooting
-                readyToShoot = true;
-                //sleep(4000);
-                //setPathState(2);
-                break;
-            case 2:
-                readyToShoot = false;
-                mecanum.setChassisSpeeds(new ChassisSpeeds(1.0, 0.0, 0.0));
-                sleep(600);
-                mecanum.setChassisSpeeds(new ChassisSpeeds(0.0, 0.0, 0.0));
                 setPathState(-1);
                 break;
         }
