@@ -1,6 +1,5 @@
 package org.firstinspires.ftc.teamcode.subsystems.indexer
 
-import android.graphics.Color
 import com.qualcomm.robotcore.hardware.HardwareMap
 import com.seattlesolvers.solverslib.command.Command
 import com.seattlesolvers.solverslib.command.InstantCommand
@@ -8,12 +7,9 @@ import com.seattlesolvers.solverslib.command.SequentialCommandGroup
 import com.seattlesolvers.solverslib.command.SubsystemBase
 import com.seattlesolvers.solverslib.command.WaitCommand
 import org.firstinspires.ftc.robotcore.external.Telemetry
-import org.firstinspires.ftc.teamcode.CMDOpMode
 import org.firstinspires.ftc.teamcode.subsystems.indexer.Slot.Slot
 import org.firstinspires.ftc.teamcode.subsystems.indexer.Slot.SlotConfig
-import org.firstinspires.ftc.teamcode.subsystems.indexer.IndexerConstants.Positions
 import org.firstinspires.ftc.teamcode.subsystems.indexer.IndexerConstants.Identification
-import org.firstinspires.ftc.teamcode.subsystems.indexer.IndexerConstants.ColorRanges
 import org.firstinspires.ftc.teamcode.subsystems.indexer.IndexerConstants.Configuration
 import org.firstinspires.ftc.teamcode.subsystems.indexer.IndexerConstants.Extensions
 import org.firstinspires.ftc.teamcode.utils.colorSensor.ColorSensorEx.DetectedColor
@@ -43,39 +39,24 @@ class Indexer(
         // Giving each slot its corresponding servo, absolute, color sensors and positions
         frontSlot = Slot(
             SlotConfig(Identification.FrontSlot.frontServoId, Configuration.isFrontServoInverted,
-                Positions.FrontPositions.FEED,
-                Positions.FrontPositions.HOME,
-                Identification.FrontSlot.absFront,
                 Identification.FrontSlot.frontSlotRightSensor,
                 Identification.FrontSlot.frontSlotLeftSensor,
-                ColorRanges.FrontSlot.greenSATRange,
-                ColorRanges.FrontSlot.purpleHUERange,
                 Extensions.frontSlotExtension),
             hw,
             telemetry)
 
         middleSlot = Slot(
             SlotConfig(Identification.MiddleSlot.middleServoId, Configuration.isMiddleServoInverted,
-                Positions.MiddlePositions.FEED,
-                Positions.MiddlePositions.HOME,
-                Identification.MiddleSlot.absMiddle,
                 Identification.MiddleSlot.middleSlotRightSensor,
                 Identification.MiddleSlot.middleSlotLeftSensor,
-                ColorRanges.MiddleSlot.greenSATRange,
-                ColorRanges.MiddleSlot.purpleHUERange,
                 Extensions.frontSlotExtension),
             hw,
             telemetry)
 
         backSlot = Slot(
             SlotConfig(Identification.BackSlot.backServoId, Configuration.isBackServoInverted,
-                Positions.BackPositions.FEED,
-                Positions.BackPositions.HOME,
-                Identification.BackSlot.absBack,
                 Identification.BackSlot.backSlotRightSensor,
                 Identification.BackSlot.backSlotLeftSensor,
-                ColorRanges.BackSlot.greenSATRange,
-                ColorRanges.BackSlot.purpleHUERange,
                 Extensions.backSlotExtension),
             hw,
             telemetry)
@@ -126,13 +107,11 @@ class Indexer(
      * @return a [SequentialCommandGroup] that feeds every slot that has a ball
      */
     fun feedShooter(): SequentialCommandGroup {
-        var slotOrder = arrayOf("", "", "")
         val cmdGroup = SequentialCommandGroup()
 
-        for ((index, slot) in slotList.withIndex()) {
+        for (slot in slotList) {
             if (slot.getDetectedColor() != DetectedColor.UNKNOWN) {
-                slotOrder.fill(slot.config.archiveExtension, index)
-                cmdGroup.addCommands(feedCMD(slotOrder[index]))
+                cmdGroup.addCommands(feedCMD(slot))
             }
         }
 
@@ -147,8 +126,8 @@ class Indexer(
      * @return a [SequentialCommandGroup] that executes the feed sequence on each valid slot
      */
     fun feedShooter(motifPatterns: MotifPatterns): SequentialCommandGroup {
-        var slotOrder = arrayOf("", "", "")
         val cmdGroup = SequentialCommandGroup()
+        lateinit var slotTracker: MutableList<String>
 
         if (rejectEvaluation() || motifPatterns == MotifPatterns.NO_PATTERN_DETECTED) {
             return feedShooter()
@@ -156,9 +135,9 @@ class Indexer(
 
         for ((index, color) in motifPatterns.pattern.withIndex()) {
             for (slot in slotList) {
-                if (slot.getDetectedColor() == color && !slotOrder.contains(slot.config.archiveExtension)) {
-                    slotOrder.fill(slot.config.archiveExtension, index)
-                    cmdGroup.addCommands(feedCMD(slotOrder[index]))
+                if (slot.getDetectedColor() == color && slot.config.archiveExtension !in slotTracker) {
+                    slotTracker.add(index, slot.config.archiveExtension)
+                    cmdGroup.addCommands(feedCMD(slot))
                     break
                 }
             }

@@ -5,24 +5,18 @@ import com.qualcomm.robotcore.hardware.HardwareMap
 import com.seattlesolvers.solverslib.command.InstantCommand
 import com.seattlesolvers.solverslib.command.SequentialCommandGroup
 import com.seattlesolvers.solverslib.command.WaitCommand
-import com.seattlesolvers.solverslib.hardware.AbsoluteAnalogEncoder
 import com.seattlesolvers.solverslib.hardware.ServoEx
 import org.firstinspires.ftc.robotcore.external.Telemetry
-import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit
-import org.firstinspires.ftc.teamcode.subsystems.indexer.IndexerConstants
+import org.firstinspires.ftc.teamcode.subsystems.indexer.IndexerConstants.ColorRanges
+import org.firstinspires.ftc.teamcode.subsystems.indexer.IndexerConstants.Positions
 import org.firstinspires.ftc.teamcode.utils.colorSensor.ColorSensorEx
 import org.firstinspires.ftc.teamcode.utils.colorSensor.ColorSensorEx.DetectedColor
 
 data class SlotConfig(
     val servoName: String,
     val isInverted: Boolean,
-    val feedPosition: Double,
-    val homePosition: Double,
-    val absoluteId: String,
-    val rightColorSensorId: String,
-    val leftColorSensorId: String,
-    val greenSATRange: ClosedFloatingPointRange<Double>,
-    val purpleHUERange: ClosedFloatingPointRange<Double>,
+    val rightCSId: String,
+    val leftCSId: String,
     val archiveExtension: String
 )
 
@@ -31,9 +25,8 @@ class Slot (val config: SlotConfig, hw: HardwareMap, telemetry: Telemetry) {
 
     // Declare the slot components
     private var servo: ServoEx
-    private var absEncoder: AbsoluteAnalogEncoder
-    var rightColorSensor: ColorSensorEx
-    var leftColorSensor: ColorSensorEx
+    var rightCS: ColorSensorEx
+    var leftCS: ColorSensorEx
 
     // Initialization code //
     init {
@@ -41,48 +34,42 @@ class Slot (val config: SlotConfig, hw: HardwareMap, telemetry: Telemetry) {
         servo = ServoEx(hw, config.servoName)
         servo.inverted = config.isInverted
         // Initialize the absolute encoder
-        absEncoder = AbsoluteAnalogEncoder(hw, config.absoluteId, 90.0, AngleUnit.RADIANS)
 
         // Initialize both coclor sensors
-        rightColorSensor = ColorSensorEx(hw.get(
+        rightCS = ColorSensorEx(hw.get(
             ColorSensor::class.java,
-            config.rightColorSensorId),
+            config.rightCSId),
             telemetry,
             config.archiveExtension)
 
-        leftColorSensor = ColorSensorEx(hw.get(
+        leftCS = ColorSensorEx(hw.get(
             ColorSensor::class.java,
-            config.leftColorSensorId),
+            config.leftCSId),
             telemetry,
             config.archiveExtension)
-
-        val range = 0.0..0.2
 
         awakeServo()
     }
 
     /**
-     * @return the reading of the absolute encoder in [AngleUnit.RADIANS]
-     */
-    fun getAbsoluteReading(): Double = absEncoder.currentPosition
-
-    /**
      * Compares the reading of both color sensors and if they are the same, it returns the [DetectedColor]
      * @return the [DetectedColor] of the [Slot]
      */
-    fun getDetectedColor(): DetectedColor {
-
-        return if (getRightColorHSV()[0] in config.purpleHUERange) {
-            DetectedColor.PURPLE
-        } else if (getRightColorHSV()[1] in config.greenSATRange) {
-            DetectedColor.GREEN
-        } else {
-            DetectedColor.UNKNOWN
+    private fun getDetectedColor(colorSensor: ColorSensorEx): DetectedColor {
+        return when {
+            colorSensor.hsv[0] in ColorRanges.purpleHUERange -> DetectedColor.PURPLE
+            colorSensor.hsv[1] in ColorRanges.greenSATRange -> DetectedColor.GREEN
+            else -> DetectedColor.UNKNOWN
         }
     }
 
-    private fun getRightColorHSV(): FloatArray {
-        return rightColorSensor.hsv
+    fun getDetectedColor(): DetectedColor {
+        return when {
+            getDetectedColor(rightCS) == getDetectedColor(leftCS) -> getDetectedColor(leftCS)
+            getDetectedColor(rightCS) != DetectedColor.UNKNOWN -> getDetectedColor(rightCS)
+            getDetectedColor(leftCS) != DetectedColor.UNKNOWN -> getDetectedColor(leftCS)
+            else -> DetectedColor.UNKNOWN
+        }
     }
 
     /**
@@ -96,14 +83,14 @@ class Slot (val config: SlotConfig, hw: HardwareMap, telemetry: Telemetry) {
      * Moves the servo to the feed position
      */
     fun feed() {
-        setServoPosition(config.feedPosition)
+        setServoPosition(Positions.FEED)
     }
 
     /**
      * Moves the servo to the home position
      */
     fun home() {
-        setServoPosition(config.homePosition)
+        setServoPosition(Positions.HOME)
     }
 
     /**
@@ -114,7 +101,7 @@ class Slot (val config: SlotConfig, hw: HardwareMap, telemetry: Telemetry) {
         SequentialCommandGroup(
             InstantCommand({ home() }),
             WaitCommand(500),
-            InstantCommand({ setServoPosition(config.homePosition + 0.001)})
+            InstantCommand({ setServoPosition(Positions.HOME + 0.001)})
         ).schedule()
     }
 }

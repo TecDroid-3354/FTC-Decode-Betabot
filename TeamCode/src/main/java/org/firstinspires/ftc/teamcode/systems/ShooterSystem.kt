@@ -34,11 +34,10 @@ class ShooterSystem(hw: HardwareMap, val telemetry: Telemetry, distanceToAprilTa
 
     val indexer: Indexer
     private val distanceToAprilTag = {Distance.fromInches(distanceToAprilTagInches.get())}
-    private val inflectionDistance = Distance.fromInches(36.0)
     val shooter: Shooter
     val hood: Hood
 
-    private val interpolationFar = LinearInterpolationConstructor(lInterpolationFarConfig, distanceToAprilTag)
+    private val interpolator = LinearInterpolationConstructor(lInterpolationFarConfig, distanceToAprilTag)
 
     init {
         shooter = Shooter(hw, telemetry)
@@ -48,7 +47,7 @@ class ShooterSystem(hw: HardwareMap, val telemetry: Telemetry, distanceToAprilTa
 
     fun getObtainedSetPointForHood(): Angle {
         return if (isLLResultValid.get()) {
-            Angle.fromRotations(interpolationFar.getDesiredPoint())
+            Angle.fromRotations(interpolator.getDesiredPoint())
         } else {
             return Angle.fromDegrees(HoodConstants.Positions.homePosition.degrees)
         }
@@ -65,9 +64,6 @@ class ShooterSystem(hw: HardwareMap, val telemetry: Telemetry, distanceToAprilTa
 
     fun ajustHood(): Command {
         return InstantCommand({ hood.setHoodPosition(getObtainedSetPointForHood()) })
-    }
-    fun humanPlayerIntake(): Command {
-        return InstantCommand({ shooter.shootCMD(-1.0) })
     }
 
     fun stopShooter(): Command {

@@ -10,6 +10,7 @@ import com.seattlesolvers.solverslib.command.button.GamepadButton
 import com.seattlesolvers.solverslib.command.button.Trigger
 import com.seattlesolvers.solverslib.gamepad.GamepadEx
 import com.seattlesolvers.solverslib.gamepad.GamepadKeys
+import com.seattlesolvers.solverslib.gamepad.whenInactive
 import org.firstinspires.ftc.teamcode.commands.JoystickCmd
 import org.firstinspires.ftc.teamcode.subsystems.drivetrain.SolversMecanum
 import org.firstinspires.ftc.teamcode.subsystems.indexer.MotifPatterns
@@ -51,7 +52,6 @@ class CMDOpMode : CommandOpMode() {
     lateinit var otos: SparkFunOTOS
     lateinit var limelightIdFilter: IntArray
     var alliance: Alliance = Alliance.Blue_Alliance
-    var isPatternSaved: Boolean = false
 
     // Here, declare code to be executed right after pressing the INIT button
     override fun initialize() {
@@ -77,9 +77,6 @@ class CMDOpMode : CommandOpMode() {
             { limelight.getDistanceToGoal(limelightIdFilter).inches },
             { limelight.llResult != null && limelight.llResult!!.isValid }
         )
-
-        isPatternSaved = limelight.getMotifPattern() != MotifPatterns.NO_PATTERN_DETECTED
-
         // Initializing controller & button bindings
         controller = GamepadEx(gamepad1)
         configureButtonBindings()
@@ -118,29 +115,34 @@ class CMDOpMode : CommandOpMode() {
 
         GamepadButton(controller, GamepadKeys.Button.Y)
             .whenPressed(
-                shooterSystem.indexer.feedAllShooter()
+                shooterSystem.indexer.feedShooter(limelight.getMotifPattern())
             )
 
         Trigger({ controller.gamepad.right_trigger > 0.2 })
-            .whenActive(
-                SequentialCommandGroup(
-                    shooterSystem.ajustHood(),
-                    shooterSystem.shoot(limelight.getMotifPattern())
-                )
-            ).whenInactive(
-                shooterSystem.stopShooter()
-            )
+            .whenActive(shooterSystem.shooter.shootCMD())
+            .whenInactive(shooterSystem.stopShooter())
 
-        Trigger({ controller.gamepad.left_trigger > 0.1 })
-            .whenActive(
-                SequentialCommandGroup(
-                    InstantCommand({ shooterSystem.hood.setHoodPosition(0.73) }),
-                    shooterSystem.shoot(limelight.getMotifPattern())
-                )
 
-            ).whenInactive(
-                shooterSystem.stopShooter()
-            )
+//        Trigger({ controller.gamepad.right_trigger > 0.2 })
+//            .whenActive(
+//                SequentialCommandGroup(
+//                    shooterSystem.ajustHood(),
+//                    shooterSystem.shoot(limelight.getMotifPattern())
+//                )
+//            ).whenInactive(
+//                shooterSystem.stopShooter()
+//            )
+
+//        Trigger({ controller.gamepad.left_trigger > 0.1 })
+//            .whenActive(
+//                SequentialCommandGroup(
+//                    InstantCommand({ shooterSystem.hood.setHoodPosition(0.73) }),
+//                    shooterSystem.shoot(limelight.getMotifPattern())
+//                )
+//
+//            ).whenInactive(
+//                shooterSystem.stopShooter()
+//            )
     }
 
     fun periodic() {
@@ -157,8 +159,8 @@ class CMDOpMode : CommandOpMode() {
         var index = 0
 
         while (!isStarted && !isStopRequested) {
-            if (gamepad1.a) index = (index - 1 + options.size) % options.size
-            if (gamepad1.y) index = (index + 1) % options.size
+            if (gamepad1.y) index = (index - 1 + options.size) % options.size
+            if (gamepad1.a) index = (index + 1) % options.size
 
             telemetry.addLine("Select the Alliance:")
             for (i in options.indices) {
@@ -199,7 +201,6 @@ class CMDOpMode : CommandOpMode() {
             periodic()
 
             telemetry.addData("Pattern", limelight.getMotifPattern())
-            telemetry.addData("Is pattern saved", isPatternSaved)
             telemetry.update()
         }
 

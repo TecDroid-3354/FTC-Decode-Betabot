@@ -44,14 +44,14 @@ class Shooter(
      * Sets the motor's velocity to a desired angular velocity
      */
 
-     fun shoot(inversionFactor: Double = 1.0) {
+     fun shoot() {
         motor.mode = DcMotor.RunMode.RUN_USING_ENCODERS
-        motor.setVelocity(20000.0 * inversionFactor, AngleUnit.DEGREES)
+        motor.setVelocity(20000.0, AngleUnit.DEGREES)
     }
 
-    fun shootCMD(inversionFactor: Double =  1.0): Command {
+    fun shootCMD(): Command {
         return InstantCommand({
-            shoot(inversionFactor)
+            shoot()
         })
     }
 

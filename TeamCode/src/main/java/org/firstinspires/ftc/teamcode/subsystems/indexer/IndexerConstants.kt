@@ -59,54 +59,19 @@ class IndexerConstants {
     }
 
     object Positions {
-
         // The HOME, and FEED positions for each servo, these are passed through the slot Config and grabbed by
         // the Slot class
-        object FrontPositions {
+        const val FEED: Double = 0.3
 
-            const val FEED: Double = 0.3
-
-            const val HOME: Double = 0.01
-        }
-
-        object MiddlePositions {
-
-            const val FEED: Double = 0.3
-
-            const val HOME: Double = 0.01
-        }
-
-        object BackPositions {
-
-            const val FEED: Double = 0.3
-
-            const val HOME: Double = 0.0
-        }
+        const val HOME: Double = 0.01
     }
 
     object ColorRanges{
 
-        object FrontSlot{
 
-            val purpleHUERange = 200.0..300.0
+        val purpleHUERange = 200.0..300.0
 
-            val greenSATRange = 0.40..0.70
-        }
-
-
-        object MiddleSlot{
-
-            val purpleHUERange = 230.0..300.0
-
-            val greenSATRange = 0.40..0.70
-        }
-
-        object BackSlot{
-
-            val purpleHUERange = 230.0..300.0
-
-            val greenSATRange = 0.40..0.80
-        }
+        val greenSATRange = 0.40..0.70
     }
 
     object Extensions {

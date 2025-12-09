@@ -119,7 +119,7 @@ public class Blue9Plus3 extends CommandOpMode {
                 if (!follower.isBusy()) {
                     new WaitCommand(2000); // waits for the route to be perfectly aligned
                     // Starts rolling the rollers
-                    shooter.shootCMD(1.0).schedule();
+                    shooter.shootCMD().schedule();
                     // Feeds the shooter as the shooter's rollers roll
                     indexer.feedAllShooter().schedule();
                     new WaitCommand(3000); // waits for the shooter to finish shooting
@@ -145,7 +145,7 @@ public class Blue9Plus3 extends CommandOpMode {
                     follower.followPath(paths.blue9Plus3ShootFirstRow, true);
                     new WaitCommand(2000); // waits for the route to be perfectly aligned
                     // Starts rolling the rollers
-                    shooter.shootCMD(1.0).schedule();
+                    shooter.shootCMD().schedule();
                     // Feeds the shooter as the shooter's rollers roll
                     indexer.feedAllShooter().schedule();
                     new WaitCommand(3000); // waits for the shooter to finish shooting
@@ -171,7 +171,7 @@ public class Blue9Plus3 extends CommandOpMode {
                     follower.followPath(paths.blue9Plus3ShootSecondRow, true);
                     new WaitCommand(2000); // waits for the route to be perfectly aligned
                     // Starts rolling the rollers
-                    shooter.shootCMD(1.0).schedule();
+                    shooter.shootCMD().schedule();
                     // Feeds the shooter as the shooter's rollers roll
                     indexer.feedAllShooter().schedule();
                     new WaitCommand(3000); // waits for the shooter to finish shooting
@@ -197,7 +197,7 @@ public class Blue9Plus3 extends CommandOpMode {
                     follower.followPath(paths.blue9Plus3ShootThirdRow, true);
                     new WaitCommand(2000); // waits for the route to be perfectly aligned
                     // Starts rolling the rollers
-                    shooter.shootCMD(1.0).schedule();
+                    shooter.shootCMD().schedule();
                     // Feeds the shooter as the shooter's rollers roll
                     indexer.feedAllShooter().schedule();
                     new WaitCommand(3000); // waits for the shooter to finish shooting

@@ -57,7 +57,7 @@ public class Red3Balls extends CommandOpMode {
         new Trigger(() -> readyToShoot)
                 .whenActive(new SequentialCommandGroup(
                         new InstantCommand(() -> hood.setHoodPosition(0.6)),
-                        shooter.shootCMD(1.0),
+                        shooter.shootCMD(),
                         new WaitCommand(1400),
                         indexer.feedAllShooter(),
                         new WaitCommand(2000),

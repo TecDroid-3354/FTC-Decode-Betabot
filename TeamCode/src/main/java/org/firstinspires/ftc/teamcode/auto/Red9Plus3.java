@@ -109,7 +109,7 @@ public class Red9Plus3 extends CommandOpMode {
             case 1: // Path from intake position --> shooting position + indexing + shooting
                 if (!follower.isBusy()) {
                     // Starts rolling the rollers
-                    shooter.shoot(1.0);
+                    shooter.shoot();
                     // Feeds the shooter as the shooter's rollers roll
                     indexer.feedAllShooterAuto();
                     sleep(3000); // waits for the shooter to finish shooting
@@ -140,7 +140,7 @@ public class Red9Plus3 extends CommandOpMode {
                     follower.followPath(paths.red9Plus3ShootFirstRow, true);
                     sleep(2000); // waits for the route to be perfectly aligned
                     // Starts rolling the rollers
-                    shooter.shoot(1.0);
+                    shooter.shoot();
                     // Feeds the shooter as the shooter's rollers roll
                     indexer.feedAllShooterAuto();
                     sleep(3000); // waits for the shooter to finish shooting
@@ -171,7 +171,7 @@ public class Red9Plus3 extends CommandOpMode {
                     follower.followPath(paths.red9Plus3ShootSecondRow, true);
                     sleep(2000); // waits for the route to be perfectly aligned
                     // Starts rolling the rollers
-                    shooter.shoot(1.0);
+                    shooter.shoot();
                     // Feeds the shooter as the shooter's rollers roll
                     indexer.feedAllShooterAuto();
                     sleep(3000); // waits for the shooter to finish shooting
@@ -202,7 +202,7 @@ public class Red9Plus3 extends CommandOpMode {
                     follower.followPath(paths.red9Plus3ShootThirdRow, true);
                     sleep(2000); // waits for the route to be perfectly aligned
                     // Starts rolling the rollers
-                    shooter.shoot(1.0);
+                    shooter.shoot();
                     // Feeds the shooter as the shooter's rollers roll
                     indexer.feedAllShooterAuto();
                     sleep(2000); // waits for the shooter to finish shooting
