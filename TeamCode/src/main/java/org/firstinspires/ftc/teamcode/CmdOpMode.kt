@@ -2,9 +2,11 @@ package org.firstinspires.ftc.teamcode
 
 import com.qualcomm.hardware.sparkfun.SparkFunOTOS
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp
+import com.seattlesolvers.solverslib.command.Command
 import com.seattlesolvers.solverslib.command.CommandOpMode
 import com.seattlesolvers.solverslib.command.CommandScheduler
 import com.seattlesolvers.solverslib.command.InstantCommand
+import com.seattlesolvers.solverslib.command.RunCommand
 import com.seattlesolvers.solverslib.command.SequentialCommandGroup
 import com.seattlesolvers.solverslib.command.button.GamepadButton
 import com.seattlesolvers.solverslib.command.button.Trigger
@@ -113,14 +115,23 @@ class CMDOpMode : CommandOpMode() {
                 InstantCommand({ shooterSystem.hood.modifyCurrentPositionBy(Angle.fromRotations(-0.01)) })
             )
 
-        GamepadButton(controller, GamepadKeys.Button.Y)
+        GamepadButton(controller, GamepadKeys.Button.X)
             .whenPressed(
-                shooterSystem.indexer.feedShooter(limelight.getMotifPattern())
+                InstantCommand({ turret.setTurretAngle(Angle.fromDegrees(90.0)) })
             )
 
-        Trigger({ controller.gamepad.right_trigger > 0.2 })
+        GamepadButton(controller, GamepadKeys.Button.Y)
+            .whenPressed(
+                InstantCommand({ shooterSystem.indexer.feedShooter(limelight.getMotifPattern()).schedule() })
+            )
+
+        Trigger { controller.gamepad.right_trigger > 0.2 }
             .whenActive(shooterSystem.shooter.shootCMD())
             .whenInactive(shooterSystem.stopShooter())
+
+//        Trigger { shooterSystem.isFull() }
+//            .whenActive(turret.alignToAprilTag(limelight.getAngleToGoal(limelightIdFilter)))
+//            .whenInactive(turret)
 
 
 //        Trigger({ controller.gamepad.right_trigger > 0.2 })
@@ -145,9 +156,9 @@ class CMDOpMode : CommandOpMode() {
 //            )
     }
 
-    fun periodic() {
-        turret.alignToAprilTag(limelight.getAngleToGoal(limelightIdFilter), 3.0 * (if (alliance == Alliance.Blue_Alliance) -1.0 else 1.0))
-    }
+//    fun periodic() {
+//        turret.alignToAprilTag(limelight.getAngleToGoal(limelightIdFilter))
+//    }
 
     // Main code body
     override fun runOpMode() {
@@ -198,7 +209,9 @@ class CMDOpMode : CommandOpMode() {
 
             // Command for actually running the scheduler
             CommandScheduler.getInstance().run()
-            periodic()
+            //periodic()
+
+            controller.readButtons()
 
             telemetry.addData("Pattern", limelight.getMotifPattern())
             telemetry.update()

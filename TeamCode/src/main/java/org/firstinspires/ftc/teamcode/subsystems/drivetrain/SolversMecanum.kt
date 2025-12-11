@@ -42,10 +42,9 @@ class SolversMecanum(
 
     override fun periodic() {
         // Telemetry to retrieve useful data
-//        telemetry.addData("RobotYaw", getRobotYaw())
-//        telemetry.addData("X", otos.position.x)
-//        telemetry.addData("Y", otos.position.y)
-        telemetry.addData("Heading", otos.position.h)
+        telemetry.addData("RobotYaw", getRobotYaw())
+        telemetry.addData("X", otos.position.x)
+        telemetry.addData("Y", otos.position.y)
     }
 
     // Functional code //

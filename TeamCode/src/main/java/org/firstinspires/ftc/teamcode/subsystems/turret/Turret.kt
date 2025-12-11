@@ -2,6 +2,8 @@ package org.firstinspires.ftc.teamcode.subsystems.turret
 
 import Angle
 import com.qualcomm.robotcore.hardware.HardwareMap
+import com.seattlesolvers.solverslib.command.Command
+import com.seattlesolvers.solverslib.command.InstantCommand
 import com.seattlesolvers.solverslib.command.SubsystemBase
 import com.seattlesolvers.solverslib.controller.PIDFController
 import com.seattlesolvers.solverslib.hardware.motors.Motor
@@ -61,7 +63,7 @@ class Turret(
      * Sets the angle of the subsystem. Takes into account limits defined in [TurretConstants.Limits]
      * @param angle must be the angle of the subsystem, not the motor.
      */
-    fun setTurretAngle(angle: Angle) {
+    fun setTurretAngle(angle: Angle): Command {
         val coercedAngle = Angle.fromDegrees(
             MathUtils.clamp(angle.degrees,
             Limits.minimumLimit.degrees,
@@ -69,7 +71,7 @@ class Turret(
         )
 
         val power = turretAnglePIDFController.calculate(motorController.getPosition().degrees, coercedAngle.degrees)
-        setTurretVoltage(power)
+        return InstantCommand({ setTurretVoltage(power) })
     }
 
     /**
@@ -77,8 +79,8 @@ class Turret(
      * the motor's necessary output to align the whole turret
      * @param tx the current offset angle from the [Limelight] to the April Tag
      */
-    fun alignToAprilTag(tx: Double, offset: Double) {
+    fun alignToAprilTag(tx: Double, offset: Double = 0.0): Command {
         val power = motorController.pidfController.calculate(tx, 0.0 + offset)
-        setTurretVoltage(-power)
+        return InstantCommand({ setTurretVoltage(-power) })
     }
 }

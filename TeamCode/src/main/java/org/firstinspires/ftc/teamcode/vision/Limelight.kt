@@ -106,10 +106,6 @@ class Limelight(
         return Distance.fromInches(0.0)
     }
 
-    fun getDistanceToGoalAsDouble(filterArray: IntArray): Double {
-        return getDistanceToGoal(filterArray).inches
-    }
-
     /**
      * Checks if the limelight detects any obelisk april tag and assigns that value to [obeliskId] so it can be retrieved from
      * [getMotifPattern]

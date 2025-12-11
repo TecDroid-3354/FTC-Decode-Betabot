@@ -56,9 +56,10 @@ class ShooterSystem(hw: HardwareMap, val telemetry: Telemetry, distanceToAprilTa
     fun shoot(motifPatterns: MotifPatterns) : Command {
         return SequentialCommandGroup(
             shooter.shootCMD(),
-            WaitCommand(1400),
-            indexer.feedAllShooter(),
-            InstantCommand({ shooter.stop() })
+            WaitCommand(400),
+            //InstantCommand({ indexer.feedShooter(motifPatterns).schedule() }),
+            WaitCommand(2000),
+            stopShooter()
         )
     }
 
@@ -68,5 +69,9 @@ class ShooterSystem(hw: HardwareMap, val telemetry: Telemetry, distanceToAprilTa
 
     fun stopShooter(): Command {
         return InstantCommand({ shooter.stop() })
+    }
+
+    fun isFull(): Boolean {
+        return indexer.isFull()
     }
 }
