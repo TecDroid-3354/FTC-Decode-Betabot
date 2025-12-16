@@ -28,7 +28,8 @@ public class Paths {
     public PathChain red9Plus3ShootPrecharged,
             red9Plus3PickFirstRow, red9Plus3ShootFirstRow,
             red9Plus3PickSecondRow, red9Plus3ShootSecondRow,
-            red9Plus3PickThirdRow, red9Plus3ShootThirdRow;
+            red9Plus3PickThirdRow, red9Plus3ShootThirdRow,
+            red9Plus3Test;
 
 
 
@@ -103,6 +104,19 @@ public class Paths {
 
     // Red 9 + 3
     private void Red9Plus3Paths(Follower follower) {
+        red9Plus3Test = follower.pathBuilder()
+            .addPath(
+                new BezierLine(
+                    red9Plus3Poses.red9Plus3ShootingPose,
+                    red9Plus3Poses.red9Plus3StartPose
+                )
+            )
+            .setLinearHeadingInterpolation(
+                red9Plus3Poses.red9Plus3ShootingPose.getHeading(),
+                red9Plus3Poses.red9Plus3StartPose.getHeading()
+            )
+            .build();
+
         red9Plus3ShootPrecharged = follower.pathBuilder()
             .addPath(
                 new BezierLine(

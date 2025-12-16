@@ -63,6 +63,12 @@ class Shooter(
         motor.velocity = 0.0
     }
 
+    fun stopCMD(): Command {
+        return InstantCommand({
+            stop();
+        })
+    }
+
     // Getters //
 
     /**

@@ -10,7 +10,7 @@ import com.pedropathing.geometry.Pose;
    Then, after joining several Paths together, we form the PathChain object */
 
 class Red9Plus3Poses {
-    final Pose red9Plus3StartPose = new Pose(129, 112, Math.toRadians(90));
+    final Pose red9Plus3StartPose = new Pose(129, 112, Math.toRadians(0));
     final Pose red9Plus3ShootingPose = new Pose(84, 84, Math.toRadians(50));
 }
 

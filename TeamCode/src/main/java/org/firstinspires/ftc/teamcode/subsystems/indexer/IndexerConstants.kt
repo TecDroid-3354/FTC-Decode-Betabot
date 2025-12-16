@@ -63,9 +63,9 @@ class IndexerConstants {
 
         object MiddlePositions {
 
-            const val FEED: Double = 0.45
+            const val FEED: Double = 0.3
 
-            const val HOME: Double = 0.01
+            const val HOME: Double = 0.05
         }
 
     }

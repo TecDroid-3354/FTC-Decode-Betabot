@@ -1,10 +1,16 @@
 package org.firstinspires.ftc.teamcode.auto;
 
 import com.pedropathing.follower.Follower;
+import com.pedropathing.geometry.BezierLine;
+import com.pedropathing.paths.Path;
 import com.pedropathing.util.Timer;
+import com.qualcomm.hardware.ams.AMSColorSensor;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.seattlesolvers.solverslib.command.CommandOpMode;
 import com.seattlesolvers.solverslib.command.CommandScheduler;
+import com.seattlesolvers.solverslib.command.InstantCommand;
+import com.seattlesolvers.solverslib.command.ParallelCommandGroup;
+import com.seattlesolvers.solverslib.command.SequentialCommandGroup;
 import com.seattlesolvers.solverslib.command.WaitCommand;
 import com.seattlesolvers.solverslib.command.WaitUntilCommand;
 
@@ -12,6 +18,7 @@ import org.firstinspires.ftc.teamcode.auto.Visualizer.Draw;
 import org.firstinspires.ftc.teamcode.pedroPathing.Constants;
 import org.firstinspires.ftc.teamcode.shooter.Shooter;
 import org.firstinspires.ftc.teamcode.subsystems.indexer.Indexer;
+import org.firstinspires.ftc.teamcode.subsystems.indexer.Slot.Slot;
 import org.firstinspires.ftc.teamcode.subsystems.intake.Intake;
 import org.firstinspires.ftc.teamcode.subsystems.intake.IntakeDirection;
 import org.firstinspires.ftc.teamcode.subsystems.shooter.Hood;
@@ -75,6 +82,9 @@ public class Red9Plus3 extends CommandOpMode {
         // The following line sets the first path to be followed to be Path number 0
         setPathState(0);
 
+        //indexer.getFrontSlot().home();
+        //indexer.getBackSlot().home();
+
         // Run the scheduler
         while (!isStopRequested() && opModeIsActive()) {
             // Command for actually running the scheduler
@@ -86,6 +96,7 @@ public class Red9Plus3 extends CommandOpMode {
             drawCurrent();
 
             // Updating the telemetry
+            telemetry.addData("current pathState", pathState);
             telemetry.update();
         }
 
@@ -99,8 +110,6 @@ public class Red9Plus3 extends CommandOpMode {
         switch (pathState) {
             // The follower is in charge of following a PathChain declared within the Paths object
 
-            // TODO: THE ONLY WAY TO MAKE MOTORS WORK IN AUTO IS THROUGH NON-COMMAND CODE
-
             // ! Shoot precharged artifacts ! //
             case 0: // Path from starting -> shooting position
                 follower.followPath(paths.red9Plus3ShootPrecharged, true);
@@ -108,110 +117,145 @@ public class Red9Plus3 extends CommandOpMode {
                 break;
             case 1: // Path from intake position --> shooting position + indexing + shooting
                 if (!follower.isBusy()) {
-                    // Starts rolling the rollers
-                    shooter.shoot();
-                    // Feeds the shooter as the shooter's rollers roll
-                    indexer.feedAllShooterAuto();
-                    sleep(3000); // waits for the shooter to finish shooting
-                    shooter.stop();// stops the shooter
-                    if (!shooter.isActive()) {
-                        setPathState(2);
+                    follower.breakFollowing(); // Stop the previous path
+
+                    new SequentialCommandGroup(
+                            shooter.shootCMD(),
+                            // sleep() is the way to go for waiting a period of time
+                            new InstantCommand(() -> sleep(1000)),
+                            indexer.feedAllShooter(),
+                            new InstantCommand(() -> sleep(1000)),
+                            shooter.stopCMD(),
+
+
+                            // todo: probar (#1)
+//                            new InstantCommand(() -> sleep(3000)),
+//                            new InstantCommand(
+//                                () -> {
+//                                    if (follower.atPose(paths.red9Plus3Poses.red9Plus3ShootingPose, 0.5, 0.5)
+//                                        && !shooter.isActive()) {
+//                                        setPathState(2); //todo: verify auto
+//                                    }
+//                                }
+//                            )
+
+
+
+                            // todo: esto ya jala (#9)
+                            new InstantCommand(() -> sleep(3000)),
+                            new InstantCommand(() -> setPathState(2))
+                    ).schedule();
+
+                    // todo: check the validity of this line (#9)
+                    if (
+                        follower.atPose(paths.red9Plus3Poses.red9Plus3ShootingPose, 0.5, 0.5)
+                        && !shooter.isActive()) {
+                        setPathState(25); //todo: verify auto (#9)
                     }
+                }
+                break;
+
+            // ! Pick up & shoot the first row of Artifacts ! //
+            case 2: // Path from shooting -> intake position & intaking Artifacts
+                if (!follower.isBusy()) {
+                    //follower.followPath(paths.red9Plus3PickFirstRow, true); todo: #9
+                    follower.followPath(paths.red9Plus3Test, true);
+                    setPathState(4);
                 }
                 break;
 
 
             // ! Pick up & shoot the first row of Artifacts ! //
-            case 2: // Path from shooting -> intake position & intaking Artifacts
-                if (!follower.isBusy()) {
-                    intake.enableIntake(IntakeDirection.RIGHT, 1.0);
-                    intake.enableIntake(IntakeDirection.LEFT, 1.0);
-                    follower.followPath(paths.red9Plus3PickFirstRow, true);
-                    sleep(2000); // waits for it to intake all the Artifacts
-                    intake.stopBothIntakes().schedule();
-                    if (!intake.isActive()) {
-                        setPathState(3);
-                    }
-                }
-                break;
-            case 3: // Path from intake position --> shooting position + indexing + shooting
-                if (!follower.isBusy()) {
-                    // TODO: try adding all of this inside a sequential command group
-                    follower.followPath(paths.red9Plus3ShootFirstRow, true);
-                    sleep(2000); // waits for the route to be perfectly aligned
-                    // Starts rolling the rollers
-                    shooter.shoot();
-                    // Feeds the shooter as the shooter's rollers roll
-                    indexer.feedAllShooterAuto();
-                    sleep(3000); // waits for the shooter to finish shooting
-                    shooter.stop();
-                    if (!shooter.isActive()) {
-                        setPathState(4);
-                    }
-                }
-                break;
-
-
-            // ! Pick up & shoot the second row of Artifacts ! //
-            case 4: // Path from shooting position -> intake position
-                if (!follower.isBusy()) {
-                    intake.enableIntake(IntakeDirection.RIGHT, 1.0);
-                    intake.enableIntake(IntakeDirection.LEFT, 1.0);
-                    follower.followPath(paths.red9Plus3PickSecondRow, true);
-                    sleep(4000); // waits for it to intake all the Artifacts
-                    intake.stopBothIntakes().schedule();
-                    if (!intake.isActive()) {
-                        setPathState(5);
-                    }
-                }
-                break;
-            case 5: // Path from intake position --> shooting position + indexing + shooting
-                if (!follower.isBusy()) {
-                    // TODO: try adding all of this inside a sequential command group
-                    follower.followPath(paths.red9Plus3ShootSecondRow, true);
-                    sleep(2000); // waits for the route to be perfectly aligned
-                    // Starts rolling the rollers
-                    shooter.shoot();
-                    // Feeds the shooter as the shooter's rollers roll
-                    indexer.feedAllShooterAuto();
-                    sleep(3000); // waits for the shooter to finish shooting
-                    shooter.stop();
-                    if (!shooter.isActive()) {
-                        setPathState(6);
-                    }
-                }
-                break;
-
-
-            // ! Pick up & shoot the third row of Artifacts ! //
-            case 6: // Path from shooting position -> intake position
-                if (!follower.isBusy()) {
-                    intake.enableIntake(IntakeDirection.RIGHT, 1.0);
-                    intake.enableIntake(IntakeDirection.LEFT, 1.0);
-                    follower.followPath(paths.red9Plus3PickThirdRow, true);
-                    sleep(4000); // waits for it to intake all the Artifacts
-                    intake.stopBothIntakes().schedule();
-                    if (!intake.isActive()) {
-                        setPathState(7);
-                    }
-                }
-                break;
-            case 7: // Path from intake position --> shooting position + indexing + shooting
-                if (!follower.isBusy()) {
-                    // TODO: try adding all of this inside a sequential command group
-                    follower.followPath(paths.red9Plus3ShootThirdRow, true);
-                    sleep(2000); // waits for the route to be perfectly aligned
-                    // Starts rolling the rollers
-                    shooter.shoot();
-                    // Feeds the shooter as the shooter's rollers roll
-                    indexer.feedAllShooterAuto();
-                    sleep(2000); // waits for the shooter to finish shooting
-                    shooter.stop();
-                    if (!shooter.isActive()) {
-                        setPathState(-1);
-                    }
-                }
-                break;
+//            case 2: // Path from shooting -> intake position & intaking Artifacts
+//                if (!follower.isBusy()) {
+//                    intake.enableIntake(IntakeDirection.RIGHT, 1.0);
+//                    intake.enableIntake(IntakeDirection.LEFT, 1.0);
+//                    follower.followPath(paths.red9Plus3PickFirstRow, true);
+//                    sleep(2000); // waits for it to intake all the Artifacts
+//                    intake.stopBothIntakes().schedule();
+//                    if (!intake.isActive()) {
+//                        setPathState(3);
+//                    }
+//                }
+//                break;
+//            case 3: // Path from intake position --> shooting position + indexing + shooting
+//                if (!follower.isBusy()) {
+//                    // TODO: try adding all of this inside a sequential command group
+//                    follower.followPath(paths.red9Plus3ShootFirstRow, true);
+//                    sleep(2000); // waits for the route to be perfectly aligned
+//                    // Starts rolling the rollers
+//                    shooter.shoot();
+//                    // Feeds the shooter as the shooter's rollers roll
+//                    indexer.feedAllShooterAuto();
+//                    sleep(3000); // waits for the shooter to finish shooting
+//                    shooter.stop();
+//                    if (!shooter.isActive()) {
+//                        setPathState(4);
+//                    }
+//                }
+//                break;
+//
+//
+//            // ! Pick up & shoot the second row of Artifacts ! //
+//            case 4: // Path from shooting position -> intake position
+//                if (!follower.isBusy()) {
+//                    intake.enableIntake(IntakeDirection.RIGHT, 1.0);
+//                    intake.enableIntake(IntakeDirection.LEFT, 1.0);
+//                    follower.followPath(paths.red9Plus3PickSecondRow, true);
+//                    sleep(4000); // waits for it to intake all the Artifacts
+//                    intake.stopBothIntakes().schedule();
+//                    if (!intake.isActive()) {
+//                        setPathState(5);
+//                    }
+//                }
+//                break;
+//            case 5: // Path from intake position --> shooting position + indexing + shooting
+//                if (!follower.isBusy()) {
+//                    // TODO: try adding all of this inside a sequential command group
+//                    follower.followPath(paths.red9Plus3ShootSecondRow, true);
+//                    sleep(2000); // waits for the route to be perfectly aligned
+//                    // Starts rolling the rollers
+//                    shooter.shoot();
+//                    // Feeds the shooter as the shooter's rollers roll
+//                    indexer.feedAllShooterAuto();
+//                    sleep(3000); // waits for the shooter to finish shooting
+//                    shooter.stop();
+//                    if (!shooter.isActive()) {
+//                        setPathState(6);
+//                    }
+//                }
+//                break;
+//
+//
+//            // ! Pick up & shoot the third row of Artifacts ! //
+//            case 6: // Path from shooting position -> intake position
+//                if (!follower.isBusy()) {
+//                    intake.enableIntake(IntakeDirection.RIGHT, 1.0);
+//                    intake.enableIntake(IntakeDirection.LEFT, 1.0);
+//                    follower.followPath(paths.red9Plus3PickThirdRow, true);
+//                    sleep(4000); // waits for it to intake all the Artifacts
+//                    intake.stopBothIntakes().schedule();
+//                    if (!intake.isActive()) {
+//                        setPathState(7);
+//                    }
+//                }
+//                break;
+//            case 7: // Path from intake position --> shooting position + indexing + shooting
+//                if (!follower.isBusy()) {
+//                    // TODO: try adding all of this inside a sequential command group
+//                    follower.followPath(paths.red9Plus3ShootThirdRow, true);
+//                    sleep(2000); // waits for the route to be perfectly aligned
+//                    // Starts rolling the rollers
+//                    shooter.shoot();
+//                    // Feeds the shooter as the shooter's rollers roll
+//                    indexer.feedAllShooterAuto();
+//                    sleep(2000); // waits for the shooter to finish shooting
+//                    shooter.stop();
+//                    if (!shooter.isActive()) {
+//                        setPathState(-1);
+//                    }
+//                }
+//                break;
         }
     }
 

@@ -69,6 +69,8 @@ class Indexer(
             telemetry)
 
         slotList = arrayOf(frontSlot, middleSlot, backSlot)
+
+        //frontSlot.awakeServo()
     }
 
     // This code will execute indefinably during your operation
@@ -229,9 +231,9 @@ class Indexer(
      */
     private fun feedCMD(slot: Slot): Command {
         return SequentialCommandGroup(
-            WaitCommand(250),
+            WaitCommand(450),
             InstantCommand({ slot.feed() }),
-            WaitCommand(100),
+            WaitCommand(200),
             InstantCommand({ slot.home() })
         )
     }
