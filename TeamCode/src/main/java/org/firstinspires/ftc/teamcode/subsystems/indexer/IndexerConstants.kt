@@ -63,7 +63,7 @@ class IndexerConstants {
 
         object MiddlePositions {
 
-            const val FEED: Double = 0.3
+            const val FEED: Double = 0.4
 
             const val HOME: Double = 0.05
         }
@@ -74,7 +74,7 @@ class IndexerConstants {
 
         val purpleHUERange = 200.0..300.0
 
-        val greenSATRange = 0.40..0.70
+        val greenSATRange = 0.5..0.70
     }
 
     object Extensions {

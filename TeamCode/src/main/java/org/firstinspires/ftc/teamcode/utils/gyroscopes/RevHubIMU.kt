@@ -27,17 +27,19 @@ class RevHubIMU(hw: HardwareMap, config: RevHubIMUConfig) {
         )
 
         imu.initialize(IMU.Parameters(revHubOrientationOnRobot))
-    }
-
-    fun getAngularVelocity() {
-        imu.getRobotAngularVelocity(AngleUnit.DEGREES)
-    }
-
-    fun getYaw() {
-        imu.robotYawPitchRollAngles.getYaw(AngleUnit.DEGREES)
-    }
-
-    fun resetYaw() {
         imu.resetYaw()
     }
+
+    fun getYaw(): Double {
+        return if (imu.robotYawPitchRollAngles.getYaw(AngleUnit.DEGREES) < 0) {
+            imu.robotYawPitchRollAngles.getYaw(AngleUnit.DEGREES) + 360.0
+        } else {
+            imu.robotYawPitchRollAngles.getYaw(AngleUnit.DEGREES)
+        }
+    }
+
+    fun getIMU(): IMU {
+        return imu
+    }
+
 }

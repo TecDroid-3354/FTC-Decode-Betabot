@@ -1,6 +1,7 @@
 package org.firstinspires.ftc.teamcode
 
 import com.qualcomm.hardware.sparkfun.SparkFunOTOS
+import com.qualcomm.robotcore.eventloop.opmode.Disabled
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp
 import com.seattlesolvers.solverslib.command.Command
 import com.seattlesolvers.solverslib.command.CommandOpMode
@@ -36,6 +37,8 @@ enum class Alliance {
     Blue_Alliance,
     Red_Alliance
 }
+
+@Disabled
 @TeleOp(name = "CMD", group = "Op Mode")
 class CMDOpMode : CommandOpMode() {
 
@@ -52,8 +55,7 @@ class CMDOpMode : CommandOpMode() {
     // Declaring useful components
     lateinit var controller: GamepadEx
     lateinit var otos: SparkFunOTOS
-    lateinit var limelightIdFilter: IntArray
-    var alliance: Alliance = Alliance.Blue_Alliance
+    val limelightIdFilter: IntArray = intArrayOf(20, 24)
 
     // Here, declare code to be executed right after pressing the INIT button
     override fun initialize() {
@@ -128,81 +130,15 @@ class CMDOpMode : CommandOpMode() {
         Trigger { controller.gamepad.right_trigger > 0.2 }
             .whenActive(shooterSystem.shooter.shootCMD())
             .whenInactive(shooterSystem.stopShooter())
-
-//        Trigger { shooterSystem.isFull() }
-//            .whenActive(turret.alignToAprilTag(limelight.getAngleToGoal(limelightIdFilter)))
-//            .whenInactive(turret)
-
-
-//        Trigger({ controller.gamepad.right_trigger > 0.2 })
-//            .whenActive(
-//                SequentialCommandGroup(
-//                    shooterSystem.ajustHood(),
-//                    shooterSystem.shoot(limelight.getMotifPattern())
-//                )
-//            ).whenInactive(
-//                shooterSystem.stopShooter()
-//            )
-
-//        Trigger({ controller.gamepad.left_trigger > 0.1 })
-//            .whenActive(
-//                SequentialCommandGroup(
-//                    InstantCommand({ shooterSystem.hood.setHoodPosition(0.73) }),
-//                    shooterSystem.shoot(limelight.getMotifPattern())
-//                )
-//
-//            ).whenInactive(
-//                shooterSystem.stopShooter()
-//            )
     }
-
-//    fun periodic() {
-//        turret.alignToAprilTag(limelight.getAngleToGoal(limelightIdFilter))
-//    }
 
     // Main code body
     override fun runOpMode() {
         // Code executed at the very beginning, right after hitting the INIT Button
         initialize()
 
-        // select side
-        val options = listOf("BlueAlliance", "RedAlliance", "Test")
-        var index = 0
-
-        while (!isStarted && !isStopRequested) {
-            if (gamepad1.y) index = (index - 1 + options.size) % options.size
-            if (gamepad1.a) index = (index + 1) % options.size
-
-            telemetry.addLine("Select the Alliance:")
-            for (i in options.indices) {
-                if (i == index)
-                    telemetry.addLine(" ➤ ${options[i]}")  // seleccionado
-                else
-                    telemetry.addLine("   ${options[i]}")
-            }
-            telemetry.update()
-
-            sleep(200) // evita múltiples cambios por una sola pulsación
-        }
-
-        limelightIdFilter = when (options[index]) {
-            "BlueAlliance" -> intArrayOf(20)
-            "RedAlliance" -> intArrayOf(24)
-            "Test" -> intArrayOf(20, 24)
-            else -> intArrayOf(20, 24)
-        }
-
-        alliance = when (options[index]) {
-            "BlueAlliance" -> Alliance.Blue_Alliance
-            "RedAlliance" -> Alliance.Red_Alliance
-            "Test" -> Alliance.Blue_Alliance
-            else -> Alliance.Blue_Alliance
-        }
-
         // Pauses OpMode until the START button is pressed on the Driver Hub
         waitForStart()
-
-        //limelight.getMotifPattern()
 
         // Run the scheduler
         while (!isStopRequested && opModeIsActive()) {

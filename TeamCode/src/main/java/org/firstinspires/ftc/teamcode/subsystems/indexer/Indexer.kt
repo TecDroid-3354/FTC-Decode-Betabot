@@ -69,15 +69,14 @@ class Indexer(
             telemetry)
 
         slotList = arrayOf(frontSlot, middleSlot, backSlot)
-
-        //frontSlot.awakeServo()
     }
 
     // This code will execute indefinably during your operation
     override fun periodic() {
-//        telemetry.addData("frontSlotColor", frontSlot.getDetectedColor())
-//        telemetry.addData("middleSlotColor", middleSlot.getDetectedColor())
-//        telemetry.addData("backSlotColor", backSlot.getDetectedColor())
+        telemetry.addData("FrontSlotColor", frontSlot.getDetectedColor())
+        telemetry.addData("MiddleSlotColor", middleSlot.getDetectedColor())
+        telemetry.addData("BackSlotColor", backSlot.getDetectedColor())
+
     }
 
     /**
