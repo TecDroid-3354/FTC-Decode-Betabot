@@ -16,7 +16,7 @@ data class RTPServoConfig(
 )
 
 @Suppress("JoinDeclarationAndAssignment")
-class RTPServo(hw: HardwareMap, val config: RTPServoConfig, ) {
+class RTPServo(hw: HardwareMap, val config: RTPServoConfig) {
 
     private var servo: CRServo
     private var analogInput: AnalogInput
@@ -30,22 +30,19 @@ class RTPServo(hw: HardwareMap, val config: RTPServoConfig, ) {
 
         rtpServo.maxPower = config.maxPower
         rtpServo.setPidCoeffs(config.pidCoefficients.p, config.pidCoefficients.i, config.pidCoefficients.d)
-
-        rtpServo.changeTargetRotation(0.1)
-    }
-
-    fun update() {
-        rtpServo.update()
-        rtpServo.setPidCoeffs(config.pidCoefficients.p, config.pidCoefficients.i, config.pidCoefficients.d)
     }
 
     fun setTargetRotation(target: Angle) {
         rtpServo.targetRotation = target.degrees / config.gearRatio
     }
 
-
     fun changeTargetRotation(change: Angle) {
-        rtpServo.targetRotation = change.degrees / config.gearRatio
+        rtpServo.changeTargetRotation(change.degrees / config.gearRatio)
+    }
+
+    fun update() {
+        rtpServo.update()
+        rtpServo.setPidCoeffs(config.pidCoefficients.p, config.pidCoefficients.i, config.pidCoefficients.d)
     }
 
     fun getServo(): RTPAxon {

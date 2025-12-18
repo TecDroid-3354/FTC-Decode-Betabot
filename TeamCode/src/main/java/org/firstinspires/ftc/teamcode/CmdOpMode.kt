@@ -33,10 +33,6 @@ import org.firstinspires.ftc.teamcode.vision.Limelight
  * To visit the FTC dashboard online (while connected to the Control Hub's internet)
  *    http://192.168.43.1:8080/?page=connection.html&pop=true
  */
-enum class Alliance {
-    Blue_Alliance,
-    Red_Alliance
-}
 
 @Disabled
 @TeleOp(name = "CMD", group = "Op Mode")

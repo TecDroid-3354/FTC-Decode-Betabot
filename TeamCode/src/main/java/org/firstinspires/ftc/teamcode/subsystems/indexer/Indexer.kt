@@ -73,9 +73,9 @@ class Indexer(
 
     // This code will execute indefinably during your operation
     override fun periodic() {
-        telemetry.addData("FrontSlotColor", frontSlot.getDetectedColor())
-        telemetry.addData("MiddleSlotColor", middleSlot.getDetectedColor())
-        telemetry.addData("BackSlotColor", backSlot.getDetectedColor())
+//        telemetry.addData("FrontSlotColor", frontSlot.getDetectedColor())
+//        telemetry.addData("MiddleSlotColor", middleSlot.getDetectedColor())
+//        telemetry.addData("BackSlotColor", backSlot.getDetectedColor())
 
     }
 

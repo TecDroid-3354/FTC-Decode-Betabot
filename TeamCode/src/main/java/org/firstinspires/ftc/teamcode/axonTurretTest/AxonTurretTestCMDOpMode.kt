@@ -19,6 +19,7 @@ import org.firstinspires.ftc.teamcode.utils.RTPServo.RTPServo
 import org.firstinspires.ftc.teamcode.utils.RTPServo.RTPServoConfig
 import org.firstinspires.ftc.teamcode.utils.gyroscopes.RevHubIMU
 import org.firstinspires.ftc.teamcode.utils.gyroscopes.RevHubIMUConfig
+import kotlin.math.PI
 
 
 // Personally, I chose to run my code using a command-based Op Mode since it works better for me
@@ -46,23 +47,22 @@ private class AxonConstants {
     }
     companion object PIDF {
         @JvmField
-        var pidCoefficients = PIDCoefficients(0.002, 0.0, 0.0)
+        var pidCoefficients = PIDCoefficients(0.0038, 0.0, 0.000085)
     }
 }
 
 private val servoConfig = RTPServoConfig(
-    "servo",
-    "abs",
-    1.0  / 1.0,
-    1.0,
-    AxonConstants.pidCoefficients
+    servoId = "servo",
+    absoluteId = "abs",
+    gearRatio = 1.0  / 1.0,
+    maxPower = 1.0,
+    pidCoefficients = AxonConstants.PIDF.pidCoefficients
 )
 
 private val revHubIMUConfig = RevHubIMUConfig(
     "imu",
     RevHubOrientationOnRobot.LogoFacingDirection.UP,
     RevHubOrientationOnRobot.UsbFacingDirection.BACKWARD
-
 )
 
 @TeleOp(name = "AxonTest", group = "Op Mode")
@@ -80,11 +80,11 @@ class CMDOpMode : CommandOpMode() {
         /* Subsystem initialization */
         servo = RTPServo(hardwareMap, servoConfig)
 
+        servo.getServo().forceResetTotalRotation()
+
         imu = RevHubIMU(hardwareMap, revHubIMUConfig)
 
         controller = GamepadEx(gamepad1)
-
-        servo.getServo().currentAngle
 
         configureButtonBindings()
     }
@@ -94,7 +94,7 @@ class CMDOpMode : CommandOpMode() {
 
         GamepadButton(controller, GamepadKeys.Button.A)
             .whenPressed(InstantCommand({
-                servo.getServo().targetRotation = 150.0
+                servo.getServo().targetRotation = 359.0
             }))
 
         GamepadButton(controller, GamepadKeys.Button.B)
@@ -136,10 +136,8 @@ class CMDOpMode : CommandOpMode() {
             servo.getServo().targetRotation = robotOrientationDifference
 
             telemetry.addData("imu reading", imu.getYaw())
-            telemetry.addData("absolutePosition", servo.getServo().totalRotation)
-            telemetry.addData("current Angle", servo.getServo().currentAngle)
-            telemetry.addData("current Angle", servo.getServo().targetRotation)
             telemetry.addData("difference", robotOrientationDifference)
+            telemetry.addLine(servo.getServo().log())
             telemetry.update()
         }
 
