@@ -20,6 +20,8 @@ import org.firstinspires.ftc.teamcode.subsystems.indexer.MotifPatterns
 import org.firstinspires.ftc.teamcode.subsystems.intake.Intake
 import org.firstinspires.ftc.teamcode.subsystems.turret.Turret
 import org.firstinspires.ftc.teamcode.systems.ShooterSystem
+import org.firstinspires.ftc.teamcode.utils.interpolation.InterpolatingDouble
+import org.firstinspires.ftc.teamcode.utils.interpolation.InterpolatingTreeMap
 import org.firstinspires.ftc.teamcode.vision.Limelight
 
 
@@ -38,7 +40,6 @@ enum class Alliance {
     Red_Alliance
 }
 
-@Disabled
 @TeleOp(name = "CMD", group = "Op Mode")
 class CMDOpMode : CommandOpMode() {
 
@@ -55,7 +56,7 @@ class CMDOpMode : CommandOpMode() {
     // Declaring useful components
     lateinit var controller: GamepadEx
     lateinit var otos: SparkFunOTOS
-    val limelightIdFilter: IntArray = intArrayOf(20, 24)
+    val limelightIdFilter: IntArray = intArrayOf(20, 21, 22, 23, 24)
 
     // Here, declare code to be executed right after pressing the INIT button
     override fun initialize() {
@@ -148,6 +149,10 @@ class CMDOpMode : CommandOpMode() {
             //periodic()
 
             controller.readButtons()
+
+            telemetry.addData("distance to apriltag", limelight.getDistanceToGoal(limelightIdFilter))
+            telemetry.addData("interpolation", shooterSystem.getObtainedSetPointForHood().degrees)
+
 
             telemetry.addData("Pattern", limelight.getMotifPattern())
             telemetry.update()

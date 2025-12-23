@@ -104,7 +104,9 @@ class CMDOpMode : CommandOpMode() {
 
         GamepadButton(controller, GamepadKeys.Button.X)
             .whenPressed(InstantCommand({
-                servo.getServo().targetRotation = 90.0
+                //servo.getServo().targetRotation = 90.0
+                // todo: test
+                servo.setTargetRotation(Angle.fromDegrees(90.0))
             }))
 
         GamepadButton(controller, GamepadKeys.Button.Y)

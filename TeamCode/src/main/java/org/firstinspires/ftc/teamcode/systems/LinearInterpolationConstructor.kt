@@ -4,14 +4,14 @@ import Angle
 import Distance
 import androidx.core.util.Supplier
 
-data class Point(
+data class Pointer(
     val xDistanceToGoal: Distance,
     val yHoodAngle: Angle
 )
 
 data class LInterpolationConfig (
-    val firstCoordinate: Point,
-    val secondCoordinate: Point
+    val firstCoordinate: Pointer,
+    val secondCoordinate: Pointer
 )
 
 class LinearInterpolationConstructor(val config: LInterpolationConfig, var distanceToGoal: Supplier<Distance>) {
