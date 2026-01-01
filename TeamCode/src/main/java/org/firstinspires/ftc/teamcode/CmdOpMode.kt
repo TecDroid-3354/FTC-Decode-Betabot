@@ -9,6 +9,7 @@ import com.seattlesolvers.solverslib.command.CommandScheduler
 import com.seattlesolvers.solverslib.command.InstantCommand
 import com.seattlesolvers.solverslib.command.RunCommand
 import com.seattlesolvers.solverslib.command.SequentialCommandGroup
+import com.seattlesolvers.solverslib.command.WaitUntilCommand
 import com.seattlesolvers.solverslib.command.button.GamepadButton
 import com.seattlesolvers.solverslib.command.button.Trigger
 import com.seattlesolvers.solverslib.gamepad.GamepadEx
@@ -133,6 +134,7 @@ class CMDOpMode : CommandOpMode() {
         // Code executed at the very beginning, right after hitting the INIT Button
         initialize()
 
+        WaitUntilCommand { otos.calibrateImu() }
         // Pauses OpMode until the START button is pressed on the Driver Hub
         waitForStart()
 

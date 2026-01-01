@@ -10,8 +10,11 @@ import com.qualcomm.robotcore.hardware.PIDCoefficients
 data class RTPServoConfig(
     val servoId: String,
     val absoluteId: String,
-    val gearRatio: Double,
-    val maxPower: Double,
+    val absoluteOffset: Angle,
+    val direction: RTPAxon.Direction,
+    val gearRatio: Double = 1.0,
+    val limits: ClosedFloatingPointRange<Double>,
+    val maxPower: Double = 1.0,
     val pidCoefficients: PIDCoefficients
 )
 
@@ -29,7 +32,15 @@ class RTPServo(hw: HardwareMap, val config: RTPServoConfig) {
         rtpServo = RTPAxon(servo, analogInput)
 
         rtpServo.maxPower = config.maxPower
-        rtpServo.setPidCoeffs(config.pidCoefficients.p, config.pidCoefficients.i, config.pidCoefficients.d)
+        rtpServo.setDirection(config.direction)
+        //rtpServo.setPidCoeffs(config.pidCoefficients.p, config.pidCoefficients.i, config.pidCoefficients.d)
+
+        rtpServo.forceResetTotalRotation()
+    }
+
+    fun update() {
+        rtpServo.update()
+        //rtpServo.setPidCoeffs(config.pidCoefficients.p, config.pidCoefficients.i, config.pidCoefficients.d)
     }
 
     fun setTargetRotation(target: Angle) {
@@ -40,9 +51,13 @@ class RTPServo(hw: HardwareMap, val config: RTPServoConfig) {
         rtpServo.changeTargetRotation(change.degrees / config.gearRatio)
     }
 
-    fun update() {
-        rtpServo.update()
-        rtpServo.setPidCoeffs(config.pidCoefficients.p, config.pidCoefficients.i, config.pidCoefficients.d)
+
+    fun getCurrentAbsoluteAngle(): Double {
+        return if (rtpServo.currentAngle + config.absoluteOffset.degrees < 0.0) {
+            rtpServo.currentAngle + config.absoluteOffset.degrees + 360.0
+        } else {
+            rtpServo.currentAngle + config.absoluteOffset.degrees
+        }
     }
 
     fun getServo(): RTPAxon {

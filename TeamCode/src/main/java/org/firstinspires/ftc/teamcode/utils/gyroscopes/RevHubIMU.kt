@@ -31,7 +31,11 @@ class RevHubIMU(hw: HardwareMap, config: RevHubIMUConfig) {
     }
 
     fun getYaw(): Double {
-        return imu.robotYawPitchRollAngles.getYaw(AngleUnit.DEGREES)
+        return if (imu.robotYawPitchRollAngles.getYaw(AngleUnit.DEGREES) < 0.0) {
+            imu.robotYawPitchRollAngles.getYaw(AngleUnit.DEGREES) + 360.0
+        } else {
+            imu.robotYawPitchRollAngles.getYaw(AngleUnit.DEGREES)
+        }
     }
 
     fun getIMU(): IMU {
