@@ -32,15 +32,17 @@ class RTPServo(hw: HardwareMap, val config: RTPServoConfig) {
         rtpServo = RTPAxon(servo, analogInput)
 
         rtpServo.maxPower = config.maxPower
+
+        // Sets the direction of the encoder, not the servo. REVERSE will just make the values negative
         rtpServo.setDirection(config.direction)
-        //rtpServo.setPidCoeffs(config.pidCoefficients.p, config.pidCoefficients.i, config.pidCoefficients.d)
+        rtpServo.setPidCoeffs(config.pidCoefficients.p, config.pidCoefficients.i, config.pidCoefficients.d)
 
         rtpServo.forceResetTotalRotation()
     }
 
     fun update() {
         rtpServo.update()
-        //rtpServo.setPidCoeffs(config.pidCoefficients.p, config.pidCoefficients.i, config.pidCoefficients.d)
+        rtpServo.setPidCoeffs(config.pidCoefficients.p, config.pidCoefficients.i, config.pidCoefficients.d)
     }
 
     fun setTargetRotation(target: Angle) {

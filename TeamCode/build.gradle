@@ -72,4 +72,7 @@ dependencies {
 
     // Panels Dashboard
     implementation "com.bylazar:fullpanels:1.0.9"
+
+    // KMath Interpolation
+    implementation("space.kscience:kmath-functions:0.4.2")
 }
