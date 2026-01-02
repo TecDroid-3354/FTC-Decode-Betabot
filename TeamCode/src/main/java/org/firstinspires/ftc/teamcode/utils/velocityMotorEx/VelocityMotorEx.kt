@@ -4,6 +4,7 @@ import Angle
 import AngularVelocity
 import Distance
 import LinearVelocity
+import com.qualcomm.robotcore.hardware.PIDFCoefficients
 import com.seattlesolvers.solverslib.controller.PIDFController
 import com.seattlesolvers.solverslib.hardware.motors.Motor
 import com.seattlesolvers.solverslib.hardware.motors.MotorEx
@@ -89,7 +90,7 @@ class VelocityMotorEx(
         config.gearRatio = gearRatio
     }
 
-    override fun setPIDFCoefficients(pidfCoefficients: PIDFController) {
+    override fun setPIDFCoefficients(pidfCoefficients: PIDFCoefficients) {
         // TODO: Consider F
         val coefficients = config.pidfCoefficients
         motor.setVeloCoefficients(coefficients.p, coefficients.i, coefficients.d)

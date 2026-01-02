@@ -28,13 +28,13 @@ class Shooter(
     // This is the code that will execute when the class is initialized
     init {
         motor = hw.get(DcMotorEx::class.java, ShooterConstants.Identification.shooterMotorId)
-        motor.setPIDFCoefficients(DcMotor.RunMode.RUN_USING_ENCODERS, ShooterConstants.PIDF.pidController)
+        motor.setPIDFCoefficients(DcMotor.RunMode.RUN_USING_ENCODERS, ShooterConstants.PIDF.pidfCoefficients)
         motorConfiguration()
     }
 
     // Periodic method //
     override fun periodic() {
-        motor.setPIDFCoefficients(DcMotor.RunMode.RUN_USING_ENCODERS, ShooterConstants.PIDF.pidController)
+        motor.setPIDFCoefficients(DcMotor.RunMode.RUN_USING_ENCODERS, ShooterConstants.PIDF.pidfCoefficients)
     }
 
     // Functional code //

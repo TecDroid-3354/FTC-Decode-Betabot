@@ -5,12 +5,15 @@ import com.qualcomm.robotcore.hardware.AnalogInput
 import com.qualcomm.robotcore.hardware.CRServo
 import com.qualcomm.robotcore.hardware.HardwareMap
 import com.qualcomm.robotcore.hardware.PIDCoefficients
+import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit.normalizeDegrees
+import org.firstinspires.ftc.robotcore.external.Telemetry
 
 
 data class RTPServoConfig(
     val servoId: String,
     val absoluteId: String,
     val encoderDirection: RTPAxon.Direction,
+    val encoderOffset: Angle,
     val gearRatio: Double = 1.0,
     val limits: ClosedFloatingPointRange<Double>,
     val maxPower: Double = 1.0,
@@ -18,7 +21,7 @@ data class RTPServoConfig(
 )
 
 @Suppress("JoinDeclarationAndAssignment")
-class RTPServo(hw: HardwareMap, val config: RTPServoConfig) {
+class RTPServo(hw: HardwareMap, val telemetry: Telemetry, val config: RTPServoConfig) {
 
     private var servo: CRServo
     private var analogInput: AnalogInput
@@ -56,7 +59,9 @@ class RTPServo(hw: HardwareMap, val config: RTPServoConfig) {
 
     // Gets the absolute position considering gear ratios
     fun getAbsoluteAngle(): Angle {
-        return Angle.fromDegrees(rtpServo.currentAngle * config.gearRatio)
+        val currentAngle = Angle.fromDegrees(rtpServo.currentAngle * config.gearRatio) - config.encoderOffset
+
+        return Angle.fromDegrees(normalizeDegrees(currentAngle.degrees))
     }
 
     // Returns the servo, provides more methods regarding servo's PID and behavior

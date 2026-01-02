@@ -4,7 +4,6 @@ import com.bylazar.configurables.annotations.Configurable
 import com.qualcomm.robotcore.hardware.DcMotor
 import com.qualcomm.robotcore.hardware.DcMotorSimple
 import com.qualcomm.robotcore.hardware.PIDFCoefficients
-import com.seattlesolvers.solverslib.controller.PIDController
 
 class ShooterConstants {
 
@@ -32,7 +31,7 @@ class ShooterConstants {
         companion object {
             @JvmField
             // The PID controller used for the subsytem's motor
-            var pidController = PIDFCoefficients(15.0, 0.0, 0.0, 15.0)
+            var pidfCoefficients = PIDFCoefficients(15.0, 0.0, 0.0, 15.0)
         }
     }
 }

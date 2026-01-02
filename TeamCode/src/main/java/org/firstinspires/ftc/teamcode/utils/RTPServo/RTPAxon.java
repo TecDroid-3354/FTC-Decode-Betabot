@@ -45,6 +45,8 @@ public class RTPAxon {
     public int cliffs = 0;
     public double homeAngle;
 
+    private boolean isNull = false;
+
     // Direction enum for servo
     public enum Direction {
         FORWARD,
@@ -229,7 +231,10 @@ public class RTPAxon {
 
     // Get current angle from encoder (in degrees)
     public double getCurrentAngle() {
-        if (servoEncoder == null) return 0;
+        if (servoEncoder == null){
+            isNull = true;
+            return 0;
+        }
         return (servoEncoder.getVoltage() / 3.3) * (direction.equals(Direction.REVERSE) ? -360 : 360);
     }
 
@@ -245,7 +250,7 @@ public class RTPAxon {
 
     // Force reset total rotation and PID state
     public void forceResetTotalRotation() {
-        totalRotation = 0;
+        totalRotation = 0.0;
         previousAngle = getCurrentAngle();
         resetPID();
     }
@@ -352,8 +357,8 @@ public class RTPAxon {
         @Override
         public void runOpMode() throws InterruptedException {
             telemetry = new MultipleTelemetry(telemetry, FtcDashboard.getInstance().getTelemetry());
-            CRServo crservo = hardwareMap.crservo.get("rightHorizSlide");
-            AnalogInput encoder = hardwareMap.get(AnalogInput.class, "rightHorizSlideEncoder");
+            CRServo crservo = hardwareMap.crservo.get("rightServo");
+            AnalogInput encoder = hardwareMap.get(AnalogInput.class, "rightAbs");
             GamepadEx controller = new GamepadEx(gamepad1);
             RTPAxon servo = new RTPAxon(crservo, encoder);
 
@@ -370,14 +375,14 @@ public class RTPAxon {
                 if (controller.gamepad.dpad_down) {
                     servo.changeTargetRotation(-15);
                 }
-                if (controller.gamepad.cross) {
+                if (controller.gamepad.a) {
                     servo.setTargetRotation(0);
                 }
 
-                if (controller.gamepad.triangle) {
+                if (controller.gamepad.y) {
                     servo.setKP(servo.getKP() + 0.001);
                 }
-                if (controller.gamepad.square) {
+                if (controller.gamepad.x) {
                     servo.setKP(Math.max(0, servo.getKP() - 0.001));
                 }
 
@@ -390,8 +395,8 @@ public class RTPAxon {
 
                 if (controller.gamepad.touchpad) {
                     servo.setKP(0.015);
-                    servo.setKI(0.0005);
-                    servo.setKD(0.0025);
+                    servo.setKI(0.0);
+                    servo.setKD(0.0);
                     servo.resetPID();
                 }
 

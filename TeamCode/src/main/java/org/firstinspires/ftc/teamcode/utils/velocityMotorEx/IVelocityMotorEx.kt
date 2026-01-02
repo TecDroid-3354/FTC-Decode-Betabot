@@ -5,6 +5,7 @@ import AngularVelocity
 import Distance
 import LinearVelocity
 import com.qualcomm.robotcore.hardware.DcMotorSimple
+import com.qualcomm.robotcore.hardware.PIDFCoefficients
 import com.seattlesolvers.solverslib.controller.PIDFController
 import com.seattlesolvers.solverslib.hardware.motors.Motor
 
@@ -12,7 +13,7 @@ data class VelocityMotorConfig(
     val zeroPowerBehavior: Motor.ZeroPowerBehavior = Motor.ZeroPowerBehavior.FLOAT,
     val isInverted: Boolean,
     val ticksPerRevolution: Double = 1.0,
-    val pidfCoefficients: PIDFController,
+    val pidfCoefficients: PIDFCoefficients,
     var gearRatio: Double = 1.0,
     val powerThreshold: Double = 0.01,
 )
@@ -38,7 +39,7 @@ interface IVelocityMotorEx {
 
     /* ! SETTER METHODS ! */
     fun setGearRatio(gearRatio: Double)
-    fun setPIDFCoefficients(pidfCoefficients: PIDFController)
+    fun setPIDFCoefficients(pidfCoefficients: PIDFCoefficients)
     fun setDirection(direction: Motor.Direction)
     fun setCircumference(circumference: Distance)
     fun setMode(mode: Motor.RunMode)

@@ -80,8 +80,8 @@ class Intake(
 
     // This code executes indefinitely during our robot's program
     override fun periodic() {
-        rightMotor.setPIDFCoefficients(IntakeConstants.PIDF.pidfController)
-        leftMotor.setPIDFCoefficients(IntakeConstants.PIDF.pidfController)
+        rightMotor.setPIDFCoefficients(IntakeConstants.PIDF.pidfCoefficients)
+        leftMotor.setPIDFCoefficients(IntakeConstants.PIDF.pidfCoefficients)
     }
 
     // Setup code //
@@ -94,7 +94,7 @@ class Intake(
             VelocityMotorConfig(
                 IntakeConstants.Configuration.zeroPowerBehavior,
                 IntakeConstants.Configuration.rightIsInverted,
-                pidfCoefficients = IntakeConstants.PIDF.pidfController)
+                pidfCoefficients = IntakeConstants.PIDF.pidfCoefficients)
         )
 
         leftMotor = VelocityMotorEx(
@@ -103,7 +103,7 @@ class Intake(
             VelocityMotorConfig(
                 IntakeConstants.Configuration.zeroPowerBehavior,
                 IntakeConstants.Configuration.leftIsInverted,
-                pidfCoefficients = IntakeConstants.PIDF.pidfController)
+                pidfCoefficients = IntakeConstants.PIDF.pidfCoefficients)
         )
     }
 }

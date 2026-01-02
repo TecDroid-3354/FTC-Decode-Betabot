@@ -1,7 +1,7 @@
 package org.firstinspires.ftc.teamcode.shooter
 
 import com.bylazar.configurables.annotations.Configurable
-import com.seattlesolvers.solverslib.controller.PIDFController
+import com.qualcomm.robotcore.hardware.PIDFCoefficients
 import com.seattlesolvers.solverslib.hardware.motors.Motor
 
 class IntakeConstants {
@@ -34,7 +34,7 @@ class IntakeConstants {
         companion object {
             @JvmField
             // The PID controller used for the subsytem's motor
-            var pidfController = PIDFController(0.5, 0.0, 0.0, 0.1)
+            var pidfCoefficients = PIDFCoefficients(15.0, 0.0, 0.0, 15.0)
         }
     }
 }

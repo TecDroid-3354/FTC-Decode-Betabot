@@ -37,7 +37,7 @@ class Turret(
         motorController.setMode(Motor.RunMode.RawPower)
     }
 
-    // Code ccalled every robot loop //
+    // Code called every robot loop //
     override fun periodic() {
         // Un-comment this line if you want to modify in real-time the turret PIDF Coefficients
         motorController.setPIDFCoefficients(TurretConstants.PIDF.pidLLCoefficients)

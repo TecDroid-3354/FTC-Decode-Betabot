@@ -1,9 +1,11 @@
 package org.firstinspires.ftc.teamcode.utils.gyroscopes
 
+import Angle
 import com.qualcomm.hardware.rev.RevHubOrientationOnRobot
 import com.qualcomm.robotcore.hardware.HardwareMap
 import com.qualcomm.robotcore.hardware.IMU
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit
+import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit.normalizeDegrees
 
 
 data class RevHubIMUConfig(
@@ -30,12 +32,8 @@ class RevHubIMU(hw: HardwareMap, config: RevHubIMUConfig) {
         imu.resetYaw()
     }
 
-    fun getYaw(): Double {
-        return if (imu.robotYawPitchRollAngles.getYaw(AngleUnit.DEGREES) < 0.0) {
-            imu.robotYawPitchRollAngles.getYaw(AngleUnit.DEGREES) + 360.0
-        } else {
-            imu.robotYawPitchRollAngles.getYaw(AngleUnit.DEGREES)
-        }
+    fun getYaw(): Angle {
+        return Angle.fromDegrees(normalizeDegrees(imu.robotYawPitchRollAngles.getYaw(AngleUnit.DEGREES)))
     }
 
     fun getIMU(): IMU {
