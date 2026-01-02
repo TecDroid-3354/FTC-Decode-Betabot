@@ -70,7 +70,7 @@ class ShooterSystem(hw: HardwareMap, val telemetry: Telemetry, distanceToAprilTa
         return SequentialCommandGroup(
             shooter.shootCMD(),
             WaitCommand(400),
-            //InstantCommand({ indexer.feedShooter(motifPatterns).schedule() }),
+            InstantCommand({ indexer.feedShooter(motifPatterns).schedule() }),
             WaitCommand(2000),
             stopShooter()
         )

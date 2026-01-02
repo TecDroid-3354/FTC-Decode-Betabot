@@ -2,17 +2,11 @@ package org.firstinspires.ftc.teamcode.subsystems.turret
 
 import Angle
 import com.qualcomm.robotcore.hardware.HardwareMap
-import com.qualcomm.robotcore.hardware.PIDCoefficients
 import com.seattlesolvers.solverslib.command.Command
 import com.seattlesolvers.solverslib.command.InstantCommand
 import com.seattlesolvers.solverslib.command.SubsystemBase
 import com.seattlesolvers.solverslib.controller.PIDController
 import org.firstinspires.ftc.robotcore.external.Telemetry
-import org.firstinspires.ftc.teamcode.axonTurretTest.AprilTagLocationInDegrees
-import org.firstinspires.ftc.teamcode.axonTurretTest.AxonConstants
-import org.firstinspires.ftc.teamcode.axonTurretTest.rightServoConfig
-import org.firstinspires.ftc.teamcode.utils.Alliance
-import org.firstinspires.ftc.teamcode.utils.RTPServo.RTPAxon
 import org.firstinspires.ftc.teamcode.utils.RTPServo.RTPServo
 import org.firstinspires.ftc.teamcode.utils.RTPServo.RTPServoConfig
 
@@ -26,37 +20,56 @@ data class AxonTurretConfig(
 class AxonTurret(val hw: HardwareMap, val telemetry: Telemetry, val config: AxonTurretConfig): SubsystemBase() {
 
     lateinit var rightServo: RTPServo
-    //lateinit var leftServo: RTPServo
-
-    val isRTP = false
+    lateinit var leftServo: RTPServo
 
     init {
-        //config.pidController.setIntegrationBounds()
-
         servoConfig()
     }
 
-    override fun periodic() {
-        rightServo.getServo().rtp = isRTP
-        telemetry.addData("Total Rotation", rightServo.getServo().totalRotation)
-        telemetry.addData("Current Absolute Angle", rightServo.getCurrentAbsoluteAngle())
+    override fun periodic() {}
+
+    private fun setPower(servo: RTPServo, output: Double = 1.0) {
+        servo.getServo().power = output
     }
 
-    fun setPower(output: Double = 1.0) {
-        rightServo.getServo().power = output
+    fun stopTurret() {
+        setPower(rightServo, 0.0)
+        setPower(leftServo, 0.0)
     }
 
-    fun alignToGoal(target: Angle): Command {
-        return InstantCommand({ rightServo.setTargetRotation(target) })
+    fun setTurretPower(output: Double) {
+        when {
+            getAbsoluteAngle().degrees in config.limits -> {
+                setPower(rightServo, output)
+                setPower(leftServo, output)
+            }
+            else -> stopTurret()
+        }
+    }
+
+    // Needs to be called inside the opMode loop in order to correctly update target
+    fun alignToTarget(target: Angle): Command {
+        // TODO Need to test if this actually works
+        val output = config.pidController.calculate(getAbsoluteAngle().degrees, target.degrees)
+
+        return InstantCommand({ setTurretPower(output) })
+
+        // TODO Try tuning extremely well the servo's PID in case option one does not work
+        //return InstantCommand({ rightServo.setTargetRotation(target) })
+    }
+
+    // Just need one encoder's reading
+    fun getAbsoluteAngle(): Angle {
+        return rightServo.getAbsoluteAngle()
     }
 
     fun update() {
         rightServo.update()
-        //leftServo.update()
+        leftServo.update()
     }
 
     fun servoConfig() {
         rightServo = RTPServo(hw, config.rightServoConfig)
-        //leftServo = RTPServo(hw, config.leftServoConfig)
+        leftServo = RTPServo(hw, config.leftServoConfig)
     }
 }

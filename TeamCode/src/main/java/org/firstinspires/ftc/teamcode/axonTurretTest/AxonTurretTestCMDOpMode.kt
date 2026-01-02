@@ -4,8 +4,6 @@ import Angle
 import com.bylazar.configurables.annotations.Configurable
 import com.qualcomm.hardware.rev.RevHubOrientationOnRobot
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp
-import com.qualcomm.robotcore.hardware.AnalogInput
-import com.qualcomm.robotcore.hardware.CRServo
 import com.qualcomm.robotcore.hardware.PIDCoefficients
 import com.seattlesolvers.solverslib.command.CommandOpMode
 import com.seattlesolvers.solverslib.command.CommandScheduler
@@ -14,17 +12,13 @@ import com.seattlesolvers.solverslib.command.button.GamepadButton
 import com.seattlesolvers.solverslib.controller.PIDController
 import com.seattlesolvers.solverslib.gamepad.GamepadEx
 import com.seattlesolvers.solverslib.gamepad.GamepadKeys
-import com.seattlesolvers.solverslib.hardware.motors.CRServoEx
 import org.firstinspires.ftc.teamcode.subsystems.turret.AxonTurret
 import org.firstinspires.ftc.teamcode.subsystems.turret.AxonTurretConfig
-import org.firstinspires.ftc.teamcode.systems.LinearInterpolationConstructor
 import org.firstinspires.ftc.teamcode.utils.Alliance
 import org.firstinspires.ftc.teamcode.utils.RTPServo.RTPAxon
-import org.firstinspires.ftc.teamcode.utils.RTPServo.RTPServo
 import org.firstinspires.ftc.teamcode.utils.RTPServo.RTPServoConfig
 import org.firstinspires.ftc.teamcode.utils.gyroscopes.RevHubIMU
 import org.firstinspires.ftc.teamcode.utils.gyroscopes.RevHubIMUConfig
-import kotlin.math.PI
 
 
 // Personally, I chose to run my code using a command-based Op Mode since it works better for me
@@ -40,16 +34,14 @@ import kotlin.math.PI
  */
 
 object AprilTagLocationInDegrees {
-
     val blueAprilTag = Angle.fromDegrees(135.0)
 
     val redAprilTag = Angle.fromDegrees(45.0)
-
 }
 
 // Real-time pid configuration
 @Configurable
-class AxonConstants {
+class AxonTurretConstants {
 
     companion object PIDF {
         @JvmField
@@ -64,10 +56,9 @@ class AxonConstants {
 val rightServoConfig = RTPServoConfig(
     "rightServo",
     "rightAbs",
-    Angle.fromDegrees(-178.03),
     RTPAxon.Direction.FORWARD,
     1.0,
-    AxonConstants.Limits.turretAngleLimits,
+    AxonTurretConstants.Limits.turretAngleLimits,
     1.0,
     pidCoefficients = PIDCoefficients(0.004, 0.0, 0.0)
 )
@@ -75,10 +66,9 @@ val rightServoConfig = RTPServoConfig(
 val leftServoConfig = RTPServoConfig(
     "leftServo",
     "leftAbs",
-    Angle.fromDegrees(200.0),
-    RTPAxon.Direction.REVERSE,
+    RTPAxon.Direction.FORWARD,
     1.0,
-    AxonConstants.Limits.turretAngleLimits,
+    AxonTurretConstants.Limits.turretAngleLimits,
     1.0,
     pidCoefficients = PIDCoefficients(0.004, 0.0, 0.0)
 )
@@ -86,8 +76,8 @@ val leftServoConfig = RTPServoConfig(
 private val turretConfig = AxonTurretConfig(
     rightServoConfig,
     leftServoConfig,
-    AxonConstants.Limits.turretAngleLimits,
-    AxonConstants.PIDF.pidCoefficients,
+    AxonTurretConstants.Limits.turretAngleLimits,
+    AxonTurretConstants.PIDF.pidCoefficients,
 )
 
 private val revHubIMUConfig = RevHubIMUConfig(
@@ -97,7 +87,7 @@ private val revHubIMUConfig = RevHubIMUConfig(
 )
 
 @TeleOp(name = "AxonTest", group = "Op Mode")
-class CMDOpMode : CommandOpMode() {
+class CMDOpMode: CommandOpMode() {
 
     /* ! SET UP CODE ! */
     lateinit var turret: AxonTurret
@@ -106,7 +96,11 @@ class CMDOpMode : CommandOpMode() {
 
     lateinit var controller: GamepadEx
 
-    var robotOrientationDifference: Angle = Angle.fromDegrees(0.0)
+    var turretTarget: Angle = Angle.fromDegrees(0.0)
+
+    // Change this line if the RED April tag location is needed
+    val alliance = Alliance.BLUE
+    var targetAprilTagLocation: Angle = Angle.fromDegrees(0.0)
 
     // Here, declare code to be executed right after pressing the INIT button
     override fun initialize() {
@@ -117,36 +111,18 @@ class CMDOpMode : CommandOpMode() {
 
         controller = GamepadEx(gamepad1)
 
+        targetAprilTagLocation =
+            if (alliance == Alliance.BLUE) AprilTagLocationInDegrees.blueAprilTag
+            else AprilTagLocationInDegrees.redAprilTag
+
         configureButtonBindings()
     }
 
     // All control bindings that involve command execution are declared here
     fun configureButtonBindings() {
-
-        GamepadButton(controller, GamepadKeys.Button.A)
-            .whenPressed(InstantCommand({
-                turret.setPower(1.0)
-            }))
-
-        GamepadButton(controller, GamepadKeys.Button.B)
-            .whenPressed(InstantCommand({
-                turret.setPower(0.0)
-            }))
-
-//
-        GamepadButton(controller, GamepadKeys.Button.B)
-            .whenPressed(InstantCommand({
-                turret.rightServo.setTargetRotation(Angle.fromDegrees(180.0))
-            }))
-//
-//        GamepadButton(controller, GamepadKeys.Button.X)
+//        GamepadButton(controller, GamepadKeys.Button.B)
 //            .whenPressed(InstantCommand({
-//                servo.getServo().targetRotation = 90.0
-//            }))
 //
-//        GamepadButton(controller, GamepadKeys.Button.Y)
-//            .whenPressed(InstantCommand({
-//                servo.getServo().targetRotation = 0.0
 //            }))
 
     }
@@ -168,12 +144,15 @@ class CMDOpMode : CommandOpMode() {
             // SUPER IMPORTANT calling this line for the servo to update the PID feedback
             turret.update()
 
-            robotOrientationDifference = AprilTagLocationInDegrees.blueAprilTag - Angle.fromDegrees(imu.getYaw())
+            // Updating the target in relation to the robot's heading
+            turretTarget = targetAprilTagLocation - Angle.fromDegrees(imu.getYaw())
 
-            turret.alignToGoal(Angle.fromDegrees(imu.getYaw())).schedule()
+            // Actually aligning to it
+            turret.alignToTarget(turretTarget)
 
+            // Useful data
             telemetry.addData("imu reading", imu.getYaw())
-            telemetry.addData("difference", robotOrientationDifference.degrees)
+            telemetry.addData("Turret Target", turretTarget.degrees)
             telemetry.update()
         }
 

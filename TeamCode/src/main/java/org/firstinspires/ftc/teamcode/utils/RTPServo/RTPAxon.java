@@ -277,7 +277,7 @@ public class RTPAxon {
         }
 
         // Update total rotation with wraparound correction
-        totalRotation = currentAngle - homeAngle + cliffs * 360;
+        totalRotation = currentAngle - homeAngle + (cliffs * 360);
         previousAngle = currentAngle;
 
         if (!rtp) return;
