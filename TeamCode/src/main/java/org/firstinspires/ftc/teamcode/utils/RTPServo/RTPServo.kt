@@ -4,74 +4,94 @@ import Angle
 import com.qualcomm.robotcore.hardware.AnalogInput
 import com.qualcomm.robotcore.hardware.CRServo
 import com.qualcomm.robotcore.hardware.HardwareMap
-import com.qualcomm.robotcore.hardware.PIDCoefficients
-import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit.normalizeDegrees
+import com.qualcomm.robotcore.hardware.PIDFCoefficients
 import org.firstinspires.ftc.robotcore.external.Telemetry
-
+import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit.normalizeDegrees
+import org.firstinspires.ftc.teamcode.utils.controllers.PIDFAngleController
+import kotlin.math.max
+import kotlin.math.min
 
 data class RTPServoConfig(
     val servoId: String,
     val absoluteId: String,
-    val encoderDirection: RTPAxon.Direction,
+    val direction: RTPServo.Direction,
     val encoderOffset: Angle,
-    val gearRatio: Double = 1.0,
-    val limits: ClosedFloatingPointRange<Double>,
     val maxPower: Double = 1.0,
-    val pidCoefficients: PIDCoefficients
+    val pidfCoefficients: PIDFCoefficients
 )
 
 @Suppress("JoinDeclarationAndAssignment")
 class RTPServo(hw: HardwareMap, val telemetry: Telemetry, val config: RTPServoConfig) {
 
+    enum class Direction {
+        FORWARD, REVERSE;
+    }
+
     private var servo: CRServo
-    private var analogInput: AnalogInput
-    private var rtpServo: RTPAxon
+    var servoEncoder: AnalogInput
+
+    private val pidfController = PIDFAngleController(config.pidfCoefficients)
 
     init {
         /* INITIALIZATION CODE */
 
         // Initialize both the CR servo and absolute encoder
         servo = hw.get(CRServo::class.java, config.servoId)
-        analogInput = hw.get(AnalogInput::class.java, config.absoluteId)
+        servoEncoder = hw.get(AnalogInput::class.java, config.absoluteId)
 
-        // Actually initialize the RTP Servo
-        rtpServo = RTPAxon(servo, analogInput)
+        pidfController.setTolerance(2.0)
 
-        //Set the maximum power the servo can achieve
-        rtpServo.maxPower = config.maxPower
-        // Sets the direction of the encoder, not the servo. REVERSE will just make the values negative
-        rtpServo.setDirection(config.encoderDirection)
-        // Sets the Servo's PID Coefficients, not doing so will result in normal servo's behavior
-        rtpServo.setPidCoeffs(config.pidCoefficients.p, config.pidCoefficients.i, config.pidCoefficients.d)
-        // Reset the rotation tracker and PID timer's
-        rtpServo.forceResetTotalRotation()
+        setPower(0.0)
     }
 
-    // Sets an absolute angle target to the servo
-    fun setTargetRotation(target: Angle) {
-        rtpServo.targetRotation = target.degrees / config.gearRatio
+    fun setPower(output: Double) {
+        val power = max(-config.maxPower, min(config.maxPower, output))
+        servo.power = power * (if (config.direction == Direction.REVERSE) -1 else 1)
+    }
+
+    fun stop() {
+        setPower(0.0)
+    }
+
+    // Sets an absolute angle target to the servo, needs to be called in a loop for PIDF Feedback
+    fun setTargetAngle(target: Angle) {
+        val normalizedAngle: Angle = Angle.fromDegrees(normalizeDegrees(target.degrees))
+
+        val output = pidfController.calculate(getAbsoluteAngle().degrees, normalizedAngle.degrees)
+
+        setPower(output)
     }
 
     // Gets the current angle and adds the desired change in it
-    fun changeTargetRotation(change: Angle) {
-        rtpServo.changeTargetRotation(change.degrees / config.gearRatio)
+    fun changeTargetAngle(change: Angle) {
+        setTargetAngle(getAbsoluteAngle() + change)
     }
 
     // Gets the absolute position considering gear ratios
     fun getAbsoluteAngle(): Angle {
-        val currentAngle = Angle.fromDegrees(rtpServo.currentAngle * config.gearRatio) - config.encoderOffset
+        val currentAngle = Angle.fromDegrees(
+            (servoEncoder.voltage / 3.2) * (if (config.direction == Direction.REVERSE) -360 else 360)
+        )
+        val transformedAngle = Angle.fromDegrees(
+            (currentAngle.degrees - config.encoderOffset.degrees)
+        )
 
-        return Angle.fromDegrees(normalizeDegrees(currentAngle.degrees))
+        return Angle.fromDegrees(normalizeDegrees(transformedAngle.degrees))
     }
 
-    // Returns the servo, provides more methods regarding servo's PID and behavior
-    fun getServo(): RTPAxon {
-        return rtpServo
+    fun isAtSetPoint(): Boolean {
+        return pidfController.atSetPoint()
     }
 
-    // Must be called once in a loop in order to update PIDs and actually move the servo
-    fun update() {
-        rtpServo.update()
-        rtpServo.setPidCoeffs(config.pidCoefficients.p, config.pidCoefficients.i, config.pidCoefficients.d)
+    fun setPIDFTolerance(tolerance: Angle) {
+        pidfController.setTolerance(tolerance.degrees)
+    }
+
+
+    fun setPIDF(pidfCoefficients: PIDFCoefficients) {
+        pidfController.setPIDF(
+            pidfCoefficients.p, pidfCoefficients.i,
+            pidfCoefficients.d, pidfCoefficients.f
+        )
     }
 }

@@ -4,22 +4,21 @@ import Angle
 import com.bylazar.configurables.annotations.Configurable
 import com.qualcomm.hardware.rev.RevHubOrientationOnRobot
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp
-import com.qualcomm.robotcore.hardware.PIDCoefficients
 import com.qualcomm.robotcore.hardware.PIDFCoefficients
 import com.seattlesolvers.solverslib.command.CommandOpMode
 import com.seattlesolvers.solverslib.command.CommandScheduler
 import com.seattlesolvers.solverslib.command.InstantCommand
 import com.seattlesolvers.solverslib.command.button.GamepadButton
-import com.seattlesolvers.solverslib.controller.PIDController
 import com.seattlesolvers.solverslib.gamepad.GamepadEx
 import com.seattlesolvers.solverslib.gamepad.GamepadKeys
 import org.firstinspires.ftc.teamcode.subsystems.turret.AxonTurret
 import org.firstinspires.ftc.teamcode.subsystems.turret.AxonTurretConfig
 import org.firstinspires.ftc.teamcode.utils.Alliance
-import org.firstinspires.ftc.teamcode.utils.RTPServo.RTPAxon
 import org.firstinspires.ftc.teamcode.utils.RTPServo.RTPServoConfig
 import org.firstinspires.ftc.teamcode.utils.gyroscopes.RevHubIMU
 import org.firstinspires.ftc.teamcode.utils.gyroscopes.RevHubIMUConfig
+import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit.normalizeDegrees
+import org.firstinspires.ftc.teamcode.utils.RTPServo.RTPServo
 
 
 // Personally, I chose to run my code using a command-based Op Mode since it works better for me
@@ -45,7 +44,7 @@ object AprilTagLocationInDegrees {
 class AxonTurretConstants {
     companion object {
         @JvmField
-        var pidCoefficients = PIDFCoefficients(0.004, 0.0, 0.0, 0.0)
+        var pidCoefficients = PIDFCoefficients(0.015, 0.0, 0.0, 0.000025)
     }
     object Limits {
         val turretAngleLimits = Angle.fromDegrees(-180.0).degrees..Angle.fromDegrees(180.0).degrees
@@ -55,23 +54,19 @@ class AxonTurretConstants {
 val rightServoConfig = RTPServoConfig(
     "rightServo",
     "rightAbs",
-    RTPAxon.Direction.REVERSE,
-    Angle.fromDegrees(-12.2),
+    RTPServo.Direction.REVERSE,
+    Angle.fromDegrees((-13.76 - 56.77)),
     1.0,
-    AxonTurretConstants.Limits.turretAngleLimits,
-    1.0,
-    pidCoefficients = PIDCoefficients(0.004, 0.0, 0.0)
+    AxonTurretConstants.pidCoefficients
 )
 
 val leftServoConfig = RTPServoConfig(
     "leftServo",
     "leftAbs",
-    RTPAxon.Direction.FORWARD,
+    RTPServo.Direction.FORWARD,
     Angle.fromDegrees(180.0),
     1.0,
-    AxonTurretConstants.Limits.turretAngleLimits,
-    1.0,
-    pidCoefficients = PIDCoefficients(0.004, 0.0, 0.0)
+    AxonTurretConstants.pidCoefficients
 )
 
 private val turretConfig = AxonTurretConfig(
@@ -123,18 +118,18 @@ class CMDOpMode: CommandOpMode() {
     fun configureButtonBindings() {
         GamepadButton(controller, GamepadKeys.Button.B)
             .whenPressed(InstantCommand({
-                turret.rightServo.setTargetRotation(Angle.fromDegrees(180.0))
+                turret.toggleState()
             }))
 
-        GamepadButton(controller, GamepadKeys.Button.Y)
-            .whenPressed(InstantCommand({
-                turret.rightServo.changeTargetRotation(Angle.fromDegrees(90.0))
-            }))
-
-        GamepadButton(controller, GamepadKeys.Button.X)
-            .whenPressed(InstantCommand({
-                turret.rightServo.changeTargetRotation(Angle.fromDegrees(-90.0))
-            }))
+//        GamepadButton(controller, GamepadKeys.Button.Y)
+//            .whenPressed(InstantCommand({
+//                turret.rightServo.changeTargetRotation(Angle.fromDegrees(90.0))
+//            }))
+//
+//        GamepadButton(controller, GamepadKeys.Button.X)
+//            .whenPressed(InstantCommand({
+//                turret.rightServo.changeTargetRotation(Angle.fromDegrees(-90.0))
+//            }))
     }
 
     // Main code body
@@ -152,17 +147,16 @@ class CMDOpMode: CommandOpMode() {
             CommandScheduler.getInstance().run()
 
             // SUPER IMPORTANT calling this line for the servo to update the PID feedback
-            //turret.update()
 
             // Updating the target in relation to the robot's heading
             turretTarget = targetAprilTagLocation - Angle.fromDegrees(imu.getYaw().degrees)
 
             // Actually aligning to it
-            turret.alignToTarget(turretTarget)
+            //turret.setTargetTurretAngle(turretTarget)
 
             // Useful data
             telemetry.addData("imu reading", imu.getYaw().degrees)
-            telemetry.addData("Turret Target", turretTarget.degrees)
+            telemetry.addData("Turret Target", normalizeDegrees(turretTarget.degrees))
             telemetry.update()
         }
 
