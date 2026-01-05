@@ -44,8 +44,11 @@ object AprilTagLocationInDegrees {
 class AxonTurretConstants {
     companion object {
         @JvmField
-        var pidCoefficients = PIDFCoefficients(0.015, 0.0, 0.0, 0.000025)
+        var rightPIDCoefficients = PIDFCoefficients(0.00725, 0.0, 0.0, 0.000025)
+        @JvmField
+        var leftPIDCoefficients = PIDFCoefficients(0.006, 0.0, 0.0, 0.0)
     }
+
     object Limits {
         val turretAngleLimits = Angle.fromDegrees(-180.0).degrees..Angle.fromDegrees(180.0).degrees
     }
@@ -54,26 +57,28 @@ class AxonTurretConstants {
 val rightServoConfig = RTPServoConfig(
     "rightServo",
     "rightAbs",
+    Voltage.fromVolts(3.178),
     RTPServo.Direction.REVERSE,
     Angle.fromDegrees((-13.76 - 56.77)),
     1.0,
-    AxonTurretConstants.pidCoefficients
+    AxonTurretConstants.rightPIDCoefficients
 )
 
 val leftServoConfig = RTPServoConfig(
     "leftServo",
     "leftAbs",
-    RTPServo.Direction.FORWARD,
-    Angle.fromDegrees(180.0),
+    Voltage.fromVolts(3.205),
+    RTPServo.Direction.REVERSE,
+    Angle.fromDegrees(86.5125 + 7.5),
     1.0,
-    AxonTurretConstants.pidCoefficients
+    AxonTurretConstants.leftPIDCoefficients
 )
 
 private val turretConfig = AxonTurretConfig(
     rightServoConfig,
     leftServoConfig,
     AxonTurretConstants.Limits.turretAngleLimits,
-    AxonTurretConstants.pidCoefficients,
+    AxonTurretConstants.rightPIDCoefficients,
 )
 
 private val revHubIMUConfig = RevHubIMUConfig(
@@ -152,7 +157,7 @@ class CMDOpMode: CommandOpMode() {
             turretTarget = targetAprilTagLocation - Angle.fromDegrees(imu.getYaw().degrees)
 
             // Actually aligning to it
-            //turret.setTargetTurretAngle(turretTarget)
+            turret.setTargetTurretAngle(turretTarget)
 
             // Useful data
             telemetry.addData("imu reading", imu.getYaw().degrees)

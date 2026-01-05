@@ -1,6 +1,7 @@
 package org.firstinspires.ftc.teamcode.utils.RTPServo
 
 import Angle
+import Voltage
 import com.qualcomm.robotcore.hardware.AnalogInput
 import com.qualcomm.robotcore.hardware.CRServo
 import com.qualcomm.robotcore.hardware.HardwareMap
@@ -14,6 +15,7 @@ import kotlin.math.min
 data class RTPServoConfig(
     val servoId: String,
     val absoluteId: String,
+    val absoluteMaxVoltage: Voltage,
     val direction: RTPServo.Direction,
     val encoderOffset: Angle,
     val maxPower: Double = 1.0,
@@ -70,7 +72,7 @@ class RTPServo(hw: HardwareMap, val telemetry: Telemetry, val config: RTPServoCo
     // Gets the absolute position considering gear ratios
     fun getAbsoluteAngle(): Angle {
         val currentAngle = Angle.fromDegrees(
-            (servoEncoder.voltage / 3.2) * (if (config.direction == Direction.REVERSE) -360 else 360)
+            (servoEncoder.voltage / config.absoluteMaxVoltage.volts) * (if (config.direction == Direction.REVERSE) -360 else 360)
         )
         val transformedAngle = Angle.fromDegrees(
             (currentAngle.degrees - config.encoderOffset.degrees)

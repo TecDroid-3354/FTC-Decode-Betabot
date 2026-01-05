@@ -75,3 +75,16 @@ value class AngularVelocity(val rotPerSec: Double) {
     operator fun times(factor: Double) = AngularVelocity(rotPerSec * factor)
     operator fun div(factor: Double) = AngularVelocity(rotPerSec / factor)
 }
+
+@JvmInline
+value class Voltage(val volts: Double) {
+
+    companion object {
+        fun fromVolts(volts: Double) = Voltage(volts)
+    }
+
+    operator fun plus(other: Voltage) = Voltage(volts + other.volts)
+    operator fun minus(other: Voltage) = Voltage(volts - other.volts)
+    operator fun times(factor: Double) = Voltage(volts * factor)
+    operator fun div(factor: Double) = Voltage(volts / factor)
+}
