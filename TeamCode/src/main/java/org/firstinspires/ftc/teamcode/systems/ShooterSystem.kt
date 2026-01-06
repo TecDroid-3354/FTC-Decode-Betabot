@@ -41,7 +41,7 @@ import org.firstinspires.ftc.teamcode.subsystems.shooter.HoodConstants
 class ShooterSystem(hw: HardwareMap, val telemetry: Telemetry, distanceToAprilTagInches: Supplier<Double>, val isLLResultValid: Supplier<Boolean>) {
 
     val indexer: Indexer
-    private val distanceToAprilTag = {Distance.fromInches(distanceToAprilTagInches.get())}
+    private val distanceToAprilTag = { Distance.fromInches(distanceToAprilTagInches.get()) }
     val shooter: Shooter
     val hood: Hood
 

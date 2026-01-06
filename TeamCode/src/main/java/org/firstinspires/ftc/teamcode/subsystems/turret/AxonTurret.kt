@@ -4,23 +4,23 @@ import Angle
 import com.qualcomm.robotcore.hardware.HardwareMap
 import com.qualcomm.robotcore.hardware.PIDFCoefficients
 import com.seattlesolvers.solverslib.command.SubsystemBase
+import org.firstinspires.ftc.robotcore.external.Supplier
 import org.firstinspires.ftc.robotcore.external.Telemetry
-import org.firstinspires.ftc.teamcode.axonTurretTest.AxonTurretConstants
+import org.firstinspires.ftc.teamcode.OpModes.AxonTurretConstants
 import org.firstinspires.ftc.teamcode.utils.RTPServo.RTPServo
 import org.firstinspires.ftc.teamcode.utils.RTPServo.RTPServoConfig
 
 data class AxonTurretConfig(
     val rightServoConfig: RTPServoConfig,
     val leftServoConfig: RTPServoConfig,
-    val limits: ClosedFloatingPointRange<Double>,
-    val pidCoefficients: PIDFCoefficients
+    val limits: ClosedFloatingPointRange<Double>
 )
 
 enum class TurretState {
     LockAngle, Off
 }
 
-class AxonTurret(val hw: HardwareMap, val telemetry: Telemetry, val config: AxonTurretConfig): SubsystemBase() {
+class AxonTurret(val hw: HardwareMap, val telemetry: Telemetry, val config: AxonTurretConfig, val turretTarget: Supplier<Angle>): SubsystemBase() {
 
     lateinit var rightServo: RTPServo
     lateinit var leftServo: RTPServo
@@ -36,6 +36,8 @@ class AxonTurret(val hw: HardwareMap, val telemetry: Telemetry, val config: Axon
         telemetry.addData("Absolute reading left", leftServo.getAbsoluteAngle().degrees)
         setPIDFCoefficients(rightServo, AxonTurretConstants.rightPIDCoefficients)
         setPIDFCoefficients(leftServo, AxonTurretConstants.leftPIDCoefficients)
+
+        setTargetTurretAngle(turretTarget.get())
     }
 
     fun stopTurret() {

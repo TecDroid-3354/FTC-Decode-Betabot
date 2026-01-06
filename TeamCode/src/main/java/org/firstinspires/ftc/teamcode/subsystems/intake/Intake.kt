@@ -1,6 +1,6 @@
 package org.firstinspires.ftc.teamcode.subsystems.intake
 
-import org.firstinspires.ftc.teamcode.axonTurretTest.CMDOpMode
+import org.firstinspires.ftc.teamcode.OpModes.CMDOpMode
 import com.qualcomm.robotcore.hardware.HardwareMap
 import com.seattlesolvers.solverslib.command.Command
 import com.seattlesolvers.solverslib.command.InstantCommand

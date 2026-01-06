@@ -1,8 +1,9 @@
-package org.firstinspires.ftc.teamcode.axonTurretTest
+package org.firstinspires.ftc.teamcode.OpModes
 
 import Angle
 import com.bylazar.configurables.annotations.Configurable
 import com.qualcomm.hardware.rev.RevHubOrientationOnRobot
+import com.qualcomm.robotcore.eventloop.opmode.Disabled
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp
 import com.qualcomm.robotcore.hardware.PIDFCoefficients
 import com.seattlesolvers.solverslib.command.CommandOpMode
@@ -77,8 +78,7 @@ val leftServoConfig = RTPServoConfig(
 private val turretConfig = AxonTurretConfig(
     rightServoConfig,
     leftServoConfig,
-    AxonTurretConstants.Limits.turretAngleLimits,
-    AxonTurretConstants.rightPIDCoefficients,
+    AxonTurretConstants.Limits.turretAngleLimits
 )
 
 private val revHubIMUConfig = RevHubIMUConfig(
@@ -88,7 +88,8 @@ private val revHubIMUConfig = RevHubIMUConfig(
 )
 
 @TeleOp(name = "AxonTest", group = "Op Mode")
-class CMDOpMode: CommandOpMode() {
+@Disabled
+class AxonTurretTestCMDOpMode: CommandOpMode() {
 
     /* ! SET UP CODE ! */
     lateinit var turret: AxonTurret
@@ -106,7 +107,7 @@ class CMDOpMode: CommandOpMode() {
     // Here, declare code to be executed right after pressing the INIT button
     override fun initialize() {
 
-        turret = AxonTurret(hardwareMap, telemetry, turretConfig)
+        turret = AxonTurret(hardwareMap, telemetry, turretConfig) { turretTarget }
 
         imu = RevHubIMU(hardwareMap, revHubIMUConfig)
 
@@ -125,16 +126,6 @@ class CMDOpMode: CommandOpMode() {
             .whenPressed(InstantCommand({
                 turret.toggleState()
             }))
-
-//        GamepadButton(controller, GamepadKeys.Button.Y)
-//            .whenPressed(InstantCommand({
-//                turret.rightServo.changeTargetRotation(Angle.fromDegrees(90.0))
-//            }))
-//
-//        GamepadButton(controller, GamepadKeys.Button.X)
-//            .whenPressed(InstantCommand({
-//                turret.rightServo.changeTargetRotation(Angle.fromDegrees(-90.0))
-//            }))
     }
 
     // Main code body
@@ -155,9 +146,6 @@ class CMDOpMode: CommandOpMode() {
 
             // Updating the target in relation to the robot's heading
             turretTarget = targetAprilTagLocation - Angle.fromDegrees(imu.getYaw().degrees)
-
-            // Actually aligning to it
-            turret.setTargetTurretAngle(turretTarget)
 
             // Useful data
             telemetry.addData("imu reading", imu.getYaw().degrees)

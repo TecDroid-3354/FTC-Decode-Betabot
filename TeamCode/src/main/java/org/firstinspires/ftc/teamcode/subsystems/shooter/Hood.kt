@@ -32,7 +32,6 @@ class Hood(val hardwareMap: HardwareMap, val telemetry: Telemetry): SubsystemBas
     // Code called every robot loop //
     override fun periodic() {
         // Telemetry to retrieve useful data
-        telemetry.addData("HoodPositionDegrees", currentAngle.degrees)
         telemetry.addData("HoodPositionRotations", currentAngle.rotations)
         currentAngle = Angle.fromRotations(servo.servo.position)
     }

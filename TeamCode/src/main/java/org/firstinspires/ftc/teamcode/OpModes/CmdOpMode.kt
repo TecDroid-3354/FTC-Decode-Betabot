@@ -1,4 +1,4 @@
-package org.firstinspires.ftc.teamcode
+package org.firstinspires.ftc.teamcode.OpModes
 
 import com.qualcomm.hardware.sparkfun.SparkFunOTOS
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp
@@ -109,7 +109,7 @@ class CMDOpMode : CommandOpMode() {
 
         GamepadButton(controller, GamepadKeys.Button.X)
             .whenPressed(
-                InstantCommand({ turret.setTurretAngle(Angle.fromDegrees(90.0)) })
+                InstantCommand({ shooterSystem.hood.setHoodPosition(Angle.fromRotations(0.0)) })
             )
 
         GamepadButton(controller, GamepadKeys.Button.Y)
