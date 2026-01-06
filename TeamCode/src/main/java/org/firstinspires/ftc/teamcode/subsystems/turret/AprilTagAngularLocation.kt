@@ -1,0 +1,7 @@
+package org.firstinspires.ftc.teamcode.subsystems.turret
+
+object AprilTagLocationInDegrees {
+    val blueAprilTag = Angle.fromDegrees(135.0)
+
+    val redAprilTag = Angle.fromDegrees(45.0)
+}

@@ -19,6 +19,8 @@ import org.firstinspires.ftc.teamcode.utils.RTPServo.RTPServoConfig
 import org.firstinspires.ftc.teamcode.utils.gyroscopes.RevHubIMU
 import org.firstinspires.ftc.teamcode.utils.gyroscopes.RevHubIMUConfig
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit.normalizeDegrees
+import org.firstinspires.ftc.teamcode.subsystems.turret.AprilTagLocationInDegrees
+import org.firstinspires.ftc.teamcode.subsystems.turret.AxonTurretConstants
 import org.firstinspires.ftc.teamcode.utils.RTPServo.RTPServo
 
 
@@ -34,52 +36,7 @@ import org.firstinspires.ftc.teamcode.utils.RTPServo.RTPServo
  *
  */
 
-object AprilTagLocationInDegrees {
-    val blueAprilTag = Angle.fromDegrees(135.0)
-
-    val redAprilTag = Angle.fromDegrees(45.0)
-}
-
 // Real-time pid configuration
-@Configurable
-class AxonTurretConstants {
-    companion object {
-        @JvmField
-        var rightPIDCoefficients = PIDFCoefficients(0.00725, 0.0, 0.0, 0.000025)
-        @JvmField
-        var leftPIDCoefficients = PIDFCoefficients(0.006, 0.0, 0.0, 0.0)
-    }
-
-    object Limits {
-        val turretAngleLimits = Angle.fromDegrees(-180.0).degrees..Angle.fromDegrees(180.0).degrees
-    }
-}
-
-val rightServoConfig = RTPServoConfig(
-    "rightServo",
-    "rightAbs",
-    Voltage.fromVolts(3.178),
-    RTPServo.Direction.REVERSE,
-    Angle.fromDegrees((-13.76 - 56.77)),
-    1.0,
-    AxonTurretConstants.rightPIDCoefficients
-)
-
-val leftServoConfig = RTPServoConfig(
-    "leftServo",
-    "leftAbs",
-    Voltage.fromVolts(3.205),
-    RTPServo.Direction.REVERSE,
-    Angle.fromDegrees(86.5125 + 7.5),
-    1.0,
-    AxonTurretConstants.leftPIDCoefficients
-)
-
-private val turretConfig = AxonTurretConfig(
-    rightServoConfig,
-    leftServoConfig,
-    AxonTurretConstants.Limits.turretAngleLimits
-)
 
 private val revHubIMUConfig = RevHubIMUConfig(
     "imu",

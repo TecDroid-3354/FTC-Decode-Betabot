@@ -15,26 +15,25 @@ import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit
  */
 @Suppress("JoinDeclarationAndAssignment")
 class Shooter(
-    hw: HardwareMap,
+    val hw: HardwareMap,
     val telemetry: Telemetry
 ): SubsystemBase() {
 
     // This is where the motor intended to control the shooter is declared
-    //val motor: VelocityMotorEx
-    val motor:  DcMotorEx
+    lateinit var firstMotor: DcMotorEx
+    lateinit var secondMotor: DcMotorEx
 
     // Initialization //
 
     // This is the code that will execute when the class is initialized
     init {
-        motor = hw.get(DcMotorEx::class.java, ShooterConstants.Identification.shooterMotorId)
-        motor.setPIDFCoefficients(DcMotor.RunMode.RUN_USING_ENCODERS, ShooterConstants.PIDF.pidfCoefficients)
         motorConfiguration()
     }
 
     // Periodic method //
     override fun periodic() {
-        motor.setPIDFCoefficients(DcMotor.RunMode.RUN_USING_ENCODERS, ShooterConstants.PIDF.pidfCoefficients)
+        firstMotor.setPIDFCoefficients(DcMotor.RunMode.RUN_USING_ENCODERS, ShooterConstants.PIDF.firstMotorPIDCoefficients)
+        secondMotor.setPIDFCoefficients(DcMotor.RunMode.RUN_USING_ENCODERS, ShooterConstants.PIDF.secondMotorPIDCoefficients)
     }
 
     // Functional code //
@@ -45,8 +44,11 @@ class Shooter(
      */
 
      fun shoot() {
-        motor.mode = DcMotor.RunMode.RUN_USING_ENCODERS
-        motor.setVelocity(20000.0, AngleUnit.DEGREES)
+        firstMotor.mode = DcMotor.RunMode.RUN_WITHOUT_ENCODER
+        firstMotor.setVelocity(Angle.fromRotations(100.0).degrees, AngleUnit.DEGREES)
+
+        secondMotor.mode = DcMotor.RunMode.RUN_WITHOUT_ENCODER
+        secondMotor.setVelocity(Angle.fromRotations(100.0).degrees, AngleUnit.DEGREES)
     }
 
     fun shootCMD(): Command {
@@ -59,8 +61,11 @@ class Shooter(
      * Calls the super class method for stopping the motor
       */
     fun stop() {
-        motor.power = 0.0
-        motor.velocity = 0.0
+        firstMotor.power = 0.0
+        firstMotor.velocity = 0.0
+
+        secondMotor.power = 0.0
+        secondMotor.velocity = 0.0
     }
 
     fun stopCMD(): Command {
@@ -76,7 +81,7 @@ class Shooter(
      * @return true if the motor is running
      */
     fun isActive(): Boolean {
-        return motor.power > 0.2 || motor.velocity > 0.2
+        return firstMotor.power > 0.2 || firstMotor.velocity > 0.2
     }
 
     /**
@@ -84,8 +89,16 @@ class Shooter(
      */
     fun motorConfiguration() {
         // The motor's configuration is grabbed from the constant's file
-        motor.mode = ShooterConstants.Configuration.runMode
-        motor.direction = ShooterConstants.Configuration.direction
-        motor.zeroPowerBehavior = ShooterConstants.Configuration.zeroPowerBehavior
+        firstMotor = hw.get(DcMotorEx::class.java, ShooterConstants.Identification.firstMotorId)
+        firstMotor.setPIDFCoefficients(DcMotor.RunMode.RUN_USING_ENCODERS, ShooterConstants.PIDF.firstMotorPIDCoefficients)
+        firstMotor.mode = ShooterConstants.Configuration.FirstMotor.runMode
+        firstMotor.direction = ShooterConstants.Configuration.FirstMotor.direction
+        firstMotor.zeroPowerBehavior = ShooterConstants.Configuration.FirstMotor.zeroPowerBehavior
+
+        secondMotor = hw.get(DcMotorEx::class.java, ShooterConstants.Identification.secondMotorId)
+        secondMotor.setPIDFCoefficients(DcMotor.RunMode.RUN_USING_ENCODERS, ShooterConstants.PIDF.secondMotorPIDCoefficients)
+        secondMotor.mode = ShooterConstants.Configuration.SecondMotor.runMode
+        secondMotor.direction = ShooterConstants.Configuration.SecondMotor.direction
+        secondMotor.zeroPowerBehavior = ShooterConstants.Configuration.SecondMotor.zeroPowerBehavior
     }
 }
