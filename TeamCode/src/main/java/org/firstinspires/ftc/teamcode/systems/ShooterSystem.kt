@@ -9,11 +9,10 @@ import com.seattlesolvers.solverslib.command.InstantCommand
 import com.seattlesolvers.solverslib.command.SequentialCommandGroup
 import com.seattlesolvers.solverslib.command.WaitCommand
 import org.firstinspires.ftc.robotcore.external.Telemetry
-import org.firstinspires.ftc.teamcode.shooter.Shooter
+import org.firstinspires.ftc.teamcode.subsystems.shooter.Shooter
 import org.firstinspires.ftc.teamcode.subsystems.indexer.Indexer
 import org.firstinspires.ftc.teamcode.subsystems.indexer.MotifPatterns
 import org.firstinspires.ftc.teamcode.subsystems.shooter.Hood
-import org.firstinspires.ftc.teamcode.subsystems.shooter.HoodConstants
 
 /**
  * These values need to be measured physically
@@ -82,7 +81,7 @@ class ShooterSystem(hw: HardwareMap, val telemetry: Telemetry, distanceToAprilTa
     }*/
 
     fun stopShooter(): Command {
-        return InstantCommand({ shooter.stop() })
+        return shooter.stopCMD()
     }
 
     fun isFull(): Boolean {

@@ -23,7 +23,7 @@ class Hood(val hardwareMap: HardwareMap, val telemetry: Telemetry): SubsystemBas
     init {
         servo = ServoEx(hardwareMap, HoodConstants.Identification.hoodId)
         servoConfig()
-        setHoodPosition(HoodConstants.Positions.homePosition)
+        setHoodPosition(HoodConstants.Positions.minPosition)
 
         // servo.position returns a value from 0.0 to 1.0, we take it as rotations.
         currentAngle = Angle.fromRotations(servo.servo.position)
@@ -39,13 +39,13 @@ class Hood(val hardwareMap: HardwareMap, val telemetry: Telemetry): SubsystemBas
     // Sets the desired angle to the servo (in radians) and updates the currentAngle variable //
     fun setHoodPosition(position: Angle) {
         val clampedPosition = MathUtils.clamp(position.rotations, HoodConstants.Positions.minPosition.rotations,
-            HoodConstants.Positions.homePosition.rotations)
+            HoodConstants.Positions.maxPosition.rotations)
         servo.set(clampedPosition) // Per documentation, servo.set() requires radians
     }
 
     fun setHoodPosition(position: Double) {
         val clampedPosition = MathUtils.clamp(position, HoodConstants.Positions.minPosition.rotations,
-            HoodConstants.Positions.homePosition.rotations)
+            HoodConstants.Positions.maxPosition.rotations)
         servo.set(clampedPosition) // Per documentation, servo.set() requires radians
     }
 

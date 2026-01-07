@@ -9,15 +9,15 @@ class HoodConstants {
 
     object Configuration {
         // Whether the motor is inverted
-        val hoodServoInverted = false
+        val hoodServoInverted = true
     }
 
     object Positions {
         // This positions must not be modified as they were obtained physically and can't be changed
 
         // The position were there is no clear movement of the servo
-        val homePosition = Angle.fromRotations(0.73)
+        val maxPosition = Angle.fromRotations(0.92)
         // This is the position were the hood is lifted the most
-        val minPosition = Angle.fromRotations(0.53)
+        val minPosition = Angle.fromRotations(0.0)
     }
 }

@@ -21,6 +21,7 @@ import org.firstinspires.ftc.teamcode.utils.gyroscopes.RevHubIMUConfig
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit.normalizeDegrees
 import org.firstinspires.ftc.teamcode.subsystems.turret.AprilTagLocationInDegrees
 import org.firstinspires.ftc.teamcode.subsystems.turret.AxonTurretConstants
+import org.firstinspires.ftc.teamcode.subsystems.turret.turretConfig
 import org.firstinspires.ftc.teamcode.utils.RTPServo.RTPServo
 
 

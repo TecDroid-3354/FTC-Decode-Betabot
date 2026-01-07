@@ -81,7 +81,7 @@ val leftServoConfig = RTPServoConfig(
     AxonTurretConstants.leftPIDCoefficients
 )
 
-private val turretConfig = AxonTurretConfig(
+val turretConfig = AxonTurretConfig(
     rightServoConfig,
     leftServoConfig,
     AxonTurretConstants.Limits.turretAngleLimits

@@ -1,4 +1,4 @@
-package org.firstinspires.ftc.teamcode.shooter
+package org.firstinspires.ftc.teamcode.subsystems.shooter
 
 import com.qualcomm.robotcore.hardware.DcMotor
 import com.qualcomm.robotcore.hardware.DcMotorEx
@@ -8,20 +8,20 @@ import com.seattlesolvers.solverslib.command.InstantCommand
 import com.seattlesolvers.solverslib.command.SubsystemBase
 import org.firstinspires.ftc.robotcore.external.Telemetry
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit
+import org.firstinspires.ftc.teamcode.shooter.ShooterConstants
 
 /**
  * This is the code for controlling the shooter wheels on our robot.
  *
  */
-@Suppress("JoinDeclarationAndAssignment")
 class Shooter(
     val hw: HardwareMap,
     val telemetry: Telemetry
 ): SubsystemBase() {
 
     // This is where the motor intended to control the shooter is declared
-    lateinit var firstMotor: DcMotorEx
-    lateinit var secondMotor: DcMotorEx
+    private lateinit var firstMotor: DcMotorEx
+    private lateinit var secondMotor: DcMotorEx
 
     // Initialization //
 
@@ -43,13 +43,13 @@ class Shooter(
      * Sets the motor's velocity to a desired angular velocity
      */
 
-     fun shoot() {
+     private fun shoot() {
         firstMotor.mode = DcMotor.RunMode.RUN_WITHOUT_ENCODER
-        firstMotor.setVelocity(Angle.fromRotations(100.0).degrees, AngleUnit.DEGREES)
-
         secondMotor.mode = DcMotor.RunMode.RUN_WITHOUT_ENCODER
-        secondMotor.setVelocity(Angle.fromRotations(100.0).degrees, AngleUnit.DEGREES)
-    }
+
+        firstMotor.setVelocity(Angle.fromDegrees(20000.0).degrees, AngleUnit.DEGREES)
+        secondMotor.setVelocity(Angle.fromDegrees(20000.0).degrees, AngleUnit.DEGREES)
+     }
 
     fun shootCMD(): Command {
         return InstantCommand({
@@ -91,14 +91,14 @@ class Shooter(
         // The motor's configuration is grabbed from the constant's file
         firstMotor = hw.get(DcMotorEx::class.java, ShooterConstants.Identification.firstMotorId)
         firstMotor.setPIDFCoefficients(DcMotor.RunMode.RUN_USING_ENCODERS, ShooterConstants.PIDF.firstMotorPIDCoefficients)
-        firstMotor.mode = ShooterConstants.Configuration.FirstMotor.runMode
-        firstMotor.direction = ShooterConstants.Configuration.FirstMotor.direction
-        firstMotor.zeroPowerBehavior = ShooterConstants.Configuration.FirstMotor.zeroPowerBehavior
+        firstMotor.mode = ShooterConstants.Configuration.runMode
+        firstMotor.direction = ShooterConstants.Configuration.direction
+        firstMotor.zeroPowerBehavior = ShooterConstants.Configuration.zeroPowerBehavior
 
         secondMotor = hw.get(DcMotorEx::class.java, ShooterConstants.Identification.secondMotorId)
         secondMotor.setPIDFCoefficients(DcMotor.RunMode.RUN_USING_ENCODERS, ShooterConstants.PIDF.secondMotorPIDCoefficients)
-        secondMotor.mode = ShooterConstants.Configuration.SecondMotor.runMode
-        secondMotor.direction = ShooterConstants.Configuration.SecondMotor.direction
-        secondMotor.zeroPowerBehavior = ShooterConstants.Configuration.SecondMotor.zeroPowerBehavior
+        secondMotor.mode = ShooterConstants.Configuration.runMode
+        secondMotor.direction = ShooterConstants.Configuration.direction
+        secondMotor.zeroPowerBehavior = ShooterConstants.Configuration.zeroPowerBehavior
     }
 }

@@ -11,7 +11,7 @@ import com.seattlesolvers.solverslib.command.WaitCommand;
 import com.seattlesolvers.solverslib.command.button.Trigger;
 import com.seattlesolvers.solverslib.kinematics.wpilibkinematics.ChassisSpeeds;
 
-import org.firstinspires.ftc.teamcode.shooter.Shooter;
+import org.firstinspires.ftc.teamcode.subsystems.shooter.Shooter;
 import org.firstinspires.ftc.teamcode.subsystems.drivetrain.SolversMecanum;
 import org.firstinspires.ftc.teamcode.subsystems.indexer.Indexer;
 import org.firstinspires.ftc.teamcode.subsystems.intake.Intake;
