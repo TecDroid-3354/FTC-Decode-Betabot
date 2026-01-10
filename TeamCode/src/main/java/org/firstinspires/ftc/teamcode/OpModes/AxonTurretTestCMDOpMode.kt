@@ -46,7 +46,6 @@ private val revHubIMUConfig = RevHubIMUConfig(
 )
 
 @TeleOp(name = "AxonTest", group = "Op Mode")
-@Disabled
 class AxonTurretTestCMDOpMode: CommandOpMode() {
 
     /* ! SET UP CODE ! */
@@ -82,7 +81,17 @@ class AxonTurretTestCMDOpMode: CommandOpMode() {
     fun configureButtonBindings() {
         GamepadButton(controller, GamepadKeys.Button.B)
             .whenPressed(InstantCommand({
-                turret.toggleState()
+                turret.setTurretAngle(Angle.fromDegrees(180.0))
+            }))
+
+        GamepadButton(controller, GamepadKeys.Button.A)
+            .whenPressed(InstantCommand({
+                turret.setTurretAngle(Angle.fromDegrees(540.0))
+            }))
+
+        GamepadButton(controller, GamepadKeys.Button.X)
+            .whenPressed(InstantCommand({
+                turret.setTurretAngle(Angle.fromDegrees(-180.0))
             }))
     }
 

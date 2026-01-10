@@ -6,6 +6,7 @@ import com.qualcomm.robotcore.hardware.AnalogInput
 import com.qualcomm.robotcore.hardware.CRServo
 import com.qualcomm.robotcore.hardware.HardwareMap
 import com.qualcomm.robotcore.hardware.PIDFCoefficients
+import com.seattlesolvers.solverslib.controller.PIDFController
 import org.firstinspires.ftc.robotcore.external.Telemetry
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit.normalizeDegrees
 import org.firstinspires.ftc.teamcode.utils.controllers.PIDFAngleController
@@ -19,6 +20,7 @@ data class RTPServoConfig(
     val direction: RTPServo.Direction,
     val encoderOffset: Angle,
     val maxPower: Double = 1.0,
+    val gearRatio: Double = 1.0,
     val pidfCoefficients: PIDFCoefficients
 )
 
@@ -30,9 +32,14 @@ class RTPServo(hw: HardwareMap, val telemetry: Telemetry, val config: RTPServoCo
     }
 
     private var servo: CRServo
-    var servoEncoder: AnalogInput
+    private var servoEncoder: AnalogInput
 
-    private val pidfController = PIDFAngleController(config.pidfCoefficients)
+    private var totalRotation: Angle = Angle.fromDegrees(0.0)
+    private var previousAngle: Angle = Angle.fromDegrees(0.0)
+    private var targetRotation: Angle = Angle.fromDegrees(0.0)
+    private var fullRotations = 0
+
+    private val pidfController = PIDFController(config.pidfCoefficients)
 
     init {
         /* INITIALIZATION CODE */
@@ -41,8 +48,9 @@ class RTPServo(hw: HardwareMap, val telemetry: Telemetry, val config: RTPServoCo
         servo = hw.get(CRServo::class.java, config.servoId)
         servoEncoder = hw.get(AnalogInput::class.java, config.absoluteId)
 
-        pidfController.setTolerance(2.0)
+        previousAngle = getAbsoluteAngle()
 
+        pidfController.setTolerance(2.0)
         setPower(0.0)
     }
 
@@ -55,21 +63,17 @@ class RTPServo(hw: HardwareMap, val telemetry: Telemetry, val config: RTPServoCo
         setPower(0.0)
     }
 
-    // Sets an absolute angle target to the servo, needs to be called in a loop for PIDF Feedback
     fun setTargetAngle(target: Angle) {
-        val normalizedAngle: Angle = Angle.fromDegrees(normalizeDegrees(target.degrees))
-
-        val output = pidfController.calculate(getAbsoluteAngle().degrees, normalizedAngle.degrees)
-
-        setPower(output)
+        targetRotation = target
+        pidfController.clearTotalError()
     }
 
     // Gets the current angle and adds the desired change in it
     fun changeTargetAngle(change: Angle) {
-        setTargetAngle(getAbsoluteAngle() + change)
+        setTargetAngle(totalRotation + change)
     }
 
-    // Gets the absolute position considering gear ratios
+    // Gets the absolute position of the servo, not considering gear ratios
     fun getAbsoluteAngle(): Angle {
         val currentAngle = Angle.fromDegrees(
             (servoEncoder.voltage / config.absoluteMaxVoltage.volts) * (if (config.direction == Direction.REVERSE) -360 else 360)
@@ -79,6 +83,10 @@ class RTPServo(hw: HardwareMap, val telemetry: Telemetry, val config: RTPServoCo
         )
 
         return Angle.fromDegrees(normalizeDegrees(transformedAngle.degrees))
+    }
+
+    fun getTotalRotation(): Angle {
+        return totalRotation
     }
 
     fun isAtSetPoint(): Boolean {
@@ -95,5 +103,32 @@ class RTPServo(hw: HardwareMap, val telemetry: Telemetry, val config: RTPServoCo
             pidfCoefficients.p, pidfCoefficients.i,
             pidfCoefficients.d, pidfCoefficients.f
         )
+    }
+
+    fun update() {
+        val currentAngle = getAbsoluteAngle()
+        val angleDifference = Angle.fromDegrees(currentAngle.degrees - previousAngle.degrees)
+
+        if (angleDifference.degrees > Angle.fromDegrees(180.0).degrees) {
+            fullRotations--
+        } else if (angleDifference.degrees < Angle.fromDegrees(-180.0).degrees) {
+            fullRotations++
+        }
+
+        totalRotation = getAbsoluteAngle() + Angle.fromDegrees(fullRotations * 360.0)
+        previousAngle = currentAngle
+
+        telemetry.addData("Total Rotation", totalRotation.degrees)
+        telemetry.addData("Full rotations", fullRotations)
+        telemetry.addData("Current Angle", currentAngle.degrees)
+        telemetry.addData("Angle Difference", angleDifference.degrees)
+
+        val output = pidfController.calculate(totalRotation.degrees, targetRotation.degrees)
+
+        if (isAtSetPoint().not()) {
+            setPower(output)
+        } else {
+            stop()
+        }
     }
 }

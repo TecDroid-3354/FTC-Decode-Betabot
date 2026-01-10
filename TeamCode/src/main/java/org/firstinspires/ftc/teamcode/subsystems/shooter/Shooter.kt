@@ -1,5 +1,6 @@
 package org.firstinspires.ftc.teamcode.subsystems.shooter
 
+import AngularVelocity
 import com.qualcomm.robotcore.hardware.DcMotor
 import com.qualcomm.robotcore.hardware.DcMotorEx
 import com.qualcomm.robotcore.hardware.HardwareMap
@@ -43,13 +44,13 @@ class Shooter(
      * Sets the motor's velocity to a desired angular velocity
      */
 
-     private fun shoot() {
+    private fun shoot() {
         firstMotor.mode = DcMotor.RunMode.RUN_WITHOUT_ENCODER
         secondMotor.mode = DcMotor.RunMode.RUN_WITHOUT_ENCODER
 
-        firstMotor.setVelocity(Angle.fromDegrees(20000.0).degrees, AngleUnit.DEGREES)
-        secondMotor.setVelocity(Angle.fromDegrees(20000.0).degrees, AngleUnit.DEGREES)
-     }
+        firstMotor.setVelocity(Angle.fromRotations(100.0).degrees, AngleUnit.DEGREES)
+        secondMotor.setVelocity(Angle.fromRotations(100.0).degrees, AngleUnit.DEGREES)
+    }
 
     fun shootCMD(): Command {
         return InstantCommand({
@@ -82,6 +83,10 @@ class Shooter(
      */
     fun isActive(): Boolean {
         return firstMotor.power > 0.2 || firstMotor.velocity > 0.2
+    }
+
+    fun getVelocity(): AngularVelocity {
+        return AngularVelocity(firstMotor.velocity / 28.0)
     }
 
     /**

@@ -28,15 +28,15 @@ class AxonTurret(val hw: HardwareMap, val telemetry: Telemetry, val config: Axon
 
     init {
         servoConfig()
+        rightServo.setPIDFTolerance(Angle.fromDegrees(0.5))
+        leftServo.setPIDFTolerance(Angle.fromDegrees(0.5))
     }
 
     override fun periodic() {
-        telemetry.addData("Absolute reading right", rightServo.getAbsoluteAngle().degrees)
-        telemetry.addData("Absolute reading left", leftServo.getAbsoluteAngle().degrees)
         setPIDFCoefficients(rightServo, AxonTurretConstants.rightPIDCoefficients)
         setPIDFCoefficients(leftServo, AxonTurretConstants.leftPIDCoefficients)
-
-        setTargetTurretAngle(turretTarget.get())
+        rightServo.periodic()
+        leftServo.periodic()
     }
 
     fun stopTurret() {
@@ -45,34 +45,16 @@ class AxonTurret(val hw: HardwareMap, val telemetry: Telemetry, val config: Axon
     }
 
     // Needs to be called inside the opMode loop in order to correctly update target
-    private fun setTurretAngle(target: Angle) {
+    fun setTurretAngle(target: Angle) {
         if (getAbsoluteAngle().degrees in config.limits) {
             rightServo.setTargetAngle(target)
             leftServo.setTargetAngle(target)
         }
     }
 
-    // Must be called within a loop
-    fun setTargetTurretAngle(target: Angle) {
-        when (turretState) {
-
-            TurretState.LockAngle -> {
-                setTurretAngle(target)
-            }
-
-            TurretState.Off-> {
-                setTurretAngle(Angle.fromDegrees(0.0))
-            }
-        }
-    }
-
-    fun toggleState() {
-        turretState = if (turretState == TurretState.Off) TurretState.LockAngle else TurretState.Off
-    }
-
     // Just need one encoder's reading
     fun getAbsoluteAngle(): Angle {
-        return rightServo.getAbsoluteAngle()
+        return rightServo.getTotalRotation()
     }
 
     fun setPIDFCoefficients(servo: RTPServo, pidfCoefficients: PIDFCoefficients) {

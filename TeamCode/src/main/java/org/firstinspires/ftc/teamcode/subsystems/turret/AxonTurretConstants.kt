@@ -32,7 +32,7 @@ class AxonTurretConstants {
             object AbsoluteEncoder {
 
                 val maximumVoltage = Voltage.fromVolts(3.178)
-                val offset = Angle.fromDegrees(86.5125 + 7.5)
+                val offset = Angle.fromDegrees(86.5125 + 7.5 - 164.8117)
             }
         }
 
@@ -53,11 +53,11 @@ class AxonTurretConstants {
         @JvmField
         var rightPIDCoefficients = PIDFCoefficients(0.00725, 0.0, 0.0, 0.000025)
         @JvmField
-        var leftPIDCoefficients = PIDFCoefficients(0.006, 0.0, 0.0, 0.0)
+        var leftPIDCoefficients = PIDFCoefficients(0.006, 0.0, 0.0, 0.000025)
     }
 
     object Limits {
-        val turretAngleLimits = Angle.fromDegrees(-180.0).degrees..Angle.fromDegrees(180.0).degrees
+        val turretAngleLimits = Angle.fromDegrees(-1800.0).degrees..Angle.fromDegrees(1800.0).degrees
     }
 }
 
@@ -68,6 +68,7 @@ val rightServoConfig = RTPServoConfig(
     AxonTurretConstants.Configuration.RightServo.direction,
     AxonTurretConstants.Configuration.RightServo.AbsoluteEncoder.offset,
     1.0,
+    1.0,
     AxonTurretConstants.rightPIDCoefficients
 )
 
@@ -77,6 +78,7 @@ val leftServoConfig = RTPServoConfig(
     AxonTurretConstants.Configuration.LeftServo.AbsoluteEncoder.maximumVoltage,
     AxonTurretConstants.Configuration.LeftServo.direction,
     AxonTurretConstants.Configuration.LeftServo.AbsoluteEncoder.offset,
+    1.0,
     1.0,
     AxonTurretConstants.leftPIDCoefficients
 )
