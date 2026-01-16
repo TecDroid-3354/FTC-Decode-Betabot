@@ -8,6 +8,7 @@ import com.seattlesolvers.solverslib.command.CommandScheduler;
 import com.seattlesolvers.solverslib.command.InstantCommand;
 import com.seattlesolvers.solverslib.command.SequentialCommandGroup;
 import com.seattlesolvers.solverslib.command.WaitCommand;
+import com.seattlesolvers.solverslib.command.WaitUntilCommand;
 
 import org.firstinspires.ftc.teamcode.auto.Visualizer.Draw;
 import org.firstinspires.ftc.teamcode.pedroPathing.Constants;
@@ -35,13 +36,6 @@ public class Red9Plus3 extends CommandOpMode {
     // The following timer allows to set a time limit to each path
     private Timer pathTimer;
 
-    // Declaring all subsystems
-    private Intake intake;
-    private Indexer indexer;
-    private Hood hood;
-    private Turret turret;
-    private Shooter shooter;
-
     @Override
     public void initialize() {
         // The follower is initialized & set to the starting pose
@@ -51,13 +45,6 @@ public class Red9Plus3 extends CommandOpMode {
         follower.setStartingPose(paths.red9Plus3Poses.red9Plus3StartPose);
         // Initializes the timer that accounts for the timeout before a path is considered done
         pathTimer = new Timer();
-
-        // Initializing subsystems
-        intake = new Intake(hardwareMap, telemetry);
-        turret = new Turret(hardwareMap, telemetry);
-        shooter = new Shooter(hardwareMap, telemetry);
-        hood = new Hood(hardwareMap, telemetry);
-        indexer = new Indexer(hardwareMap, telemetry);
     }
 
 
@@ -74,9 +61,6 @@ public class Red9Plus3 extends CommandOpMode {
 
         // The following line sets the first path to be followed to be Path number 0
         setPathState(0);
-
-        //indexer.getFrontSlot().home();
-        //indexer.getBackSlot().home();
 
         // Run the scheduler
         while (!isStopRequested() && opModeIsActive()) {
@@ -113,12 +97,12 @@ public class Red9Plus3 extends CommandOpMode {
                     follower.breakFollowing(); // Stop the previous path
 
                     new SequentialCommandGroup(
-                            shooter.shootCMD(),
-                            // sleep() is the way to go for waiting a period of time
-                            new InstantCommand(() -> sleep(1000)),
-                            indexer.feedAllShooter(),
-                            new InstantCommand(() -> sleep(1000)),
-                            shooter.stopCMD(),
+//                            shooter.shootCMD(),
+//                            // sleep() is the way to go for waiting a period of time
+                              new WaitCommand(3000),
+//                            indexer.feedAllShooter(),
+//                            new InstantCommand(() -> sleep(1000)),
+//                            shooter.stopCMD(),
 
 
                             // todo: probar (#1)
@@ -135,16 +119,15 @@ public class Red9Plus3 extends CommandOpMode {
 
 
                             // todo: esto ya jala (#9)
-                            new InstantCommand(() -> sleep(3000)),
+                           // new InstantCommand(() -> sleep(3000)),
                             new InstantCommand(() -> setPathState(2))
                     ).schedule();
 
-                    // todo: check the validity of this line (#9)
-                    if (
-                        follower.atPose(paths.red9Plus3Poses.red9Plus3ShootingPose, 0.5, 0.5)
-                        && !shooter.isActive()) {
-                        setPathState(25); //todo: verify auto (#9)
-                    }
+//                    // todo: check the validity of this line (#9)
+//                    if (
+//                        follower.atPose(paths.red9Plus3Poses.red9Plus3ShootingPose, 0.5, 0.5)) {
+//                        setPathState(25); //todo: verify auto (#9)
+//                    }
                 }
                 break;
 
@@ -263,7 +246,6 @@ public class Red9Plus3 extends CommandOpMode {
     // todo: test this function whenever it is intaking
     private void feedShooter() {
         new WaitCommand(2000).schedule(); // waits for the route to be perfectly aligned
-        indexer.feedAllShooter().schedule();
     }
 
     // Display in Panels

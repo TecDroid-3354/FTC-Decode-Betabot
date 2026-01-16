@@ -1,6 +1,7 @@
 package org.firstinspires.ftc.teamcode.subsystems.turret
 
 import Angle
+import com.qualcomm.robotcore.hardware.AnalogInput
 import com.qualcomm.robotcore.hardware.HardwareMap
 import com.qualcomm.robotcore.hardware.PIDFCoefficients
 import com.seattlesolvers.solverslib.command.SubsystemBase
@@ -8,6 +9,7 @@ import org.firstinspires.ftc.robotcore.external.Supplier
 import org.firstinspires.ftc.robotcore.external.Telemetry
 import org.firstinspires.ftc.teamcode.utils.RTPServo.RTPServo
 import org.firstinspires.ftc.teamcode.utils.RTPServo.RTPServoConfig
+import kotlin.math.abs
 
 data class AxonTurretConfig(
     val rightServoConfig: RTPServoConfig,
@@ -23,13 +25,14 @@ class AxonTurret(val hw: HardwareMap, val telemetry: Telemetry, val config: Axon
 
     lateinit var rightServo: RTPServo
     lateinit var leftServo: RTPServo
+    lateinit var absoluteEncoder: AnalogInput
 
     var turretState: TurretState = TurretState.Off
 
     init {
         servoConfig()
-        rightServo.setPIDFTolerance(Angle.fromDegrees(0.5))
-        leftServo.setPIDFTolerance(Angle.fromDegrees(0.5))
+        rightServo.setPIDFTolerance(Angle.fromDegrees(0.2))
+        leftServo.setPIDFTolerance(Angle.fromDegrees(0.2))
     }
 
     override fun periodic() {
@@ -62,7 +65,11 @@ class AxonTurret(val hw: HardwareMap, val telemetry: Telemetry, val config: Axon
     }
 
     fun servoConfig() {
-        rightServo = RTPServo(hw, telemetry, config.rightServoConfig)
-        leftServo = RTPServo(hw, telemetry, config.leftServoConfig)
+        // Encoder initialization
+        absoluteEncoder = hw.get(AnalogInput::class.java, rightServo.config.absoluteId)
+
+        /* SERVO INITIALIZATION */
+        rightServo = RTPServo(hw, telemetry, config.rightServoConfig, absoluteEncoder)
+        leftServo = RTPServo(hw, telemetry, config.leftServoConfig, absoluteEncoder)
     }
 }
