@@ -61,7 +61,7 @@ public class Blue3Balls extends CommandOpMode {
                         new WaitCommand(1400),
                         indexer.feedAllShooter(),
                         new WaitCommand(2000),
-                        new InstantCommand(() -> shooter.stop()),
+                        new InstantCommand(() -> shooter.stopCMD().schedule()),
                         new InstantCommand(() -> setPathState(2)),
                         new InstantCommand(() -> readyToShoot = false)
                 ));

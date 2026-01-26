@@ -114,7 +114,7 @@ public class Blue9Plus3 extends CommandOpMode {
                     // Feeds the shooter as the shooter's rollers roll
                     indexer.feedAllShooter().schedule();
                     new WaitCommand(3000); // waits for the shooter to finish shooting
-                    shooter.stop(); // stops the shooter
+                    shooter.stopCMD(); // stops the shooter
                     setPathState(2);
                 }
                 break;
@@ -123,7 +123,7 @@ public class Blue9Plus3 extends CommandOpMode {
             // ! Pick up & shoot the first row of Artifacts ! //
             case 2: // Path from shooting -> intake position & intaking Artifacts
                 if (!follower.isBusy()) {
-                    intake.enableBothIntakes(1.0).schedule();
+                    intake.enableBothIntakes().schedule();
                     follower.followPath(paths.blue9Plus3PickFirstRow, true);
                     new WaitCommand(4000); // waits for it to intake all the Artifacts
                     intake.stopBothIntakes().schedule();
@@ -140,7 +140,7 @@ public class Blue9Plus3 extends CommandOpMode {
                     // Feeds the shooter as the shooter's rollers roll
                     indexer.feedAllShooter().schedule();
                     new WaitCommand(3000); // waits for the shooter to finish shooting
-                    shooter.stop(); // stops the shooter
+                    shooter.stopCMD(); // stops the shooter
                     setPathState(4);
                 }
                 break;
@@ -149,7 +149,7 @@ public class Blue9Plus3 extends CommandOpMode {
             // ! Pick up & shoot the second row of Artifacts ! //
             case 4: // Path from shooting position -> intake position
                 if (!follower.isBusy()) {
-                    intake.enableBothIntakes(1.0).schedule();
+                    intake.enableBothIntakes().schedule();
                     follower.followPath(paths.blue9Plus3PickSecondRow, true);
                     new WaitCommand(4000); // waits for it to intake all the Artifacts
                     intake.stopBothIntakes().schedule();
@@ -166,7 +166,7 @@ public class Blue9Plus3 extends CommandOpMode {
                     // Feeds the shooter as the shooter's rollers roll
                     indexer.feedAllShooter().schedule();
                     new WaitCommand(3000); // waits for the shooter to finish shooting
-                    shooter.stop(); // stops the shooter
+                    shooter.stopCMD(); // stops the shooter
                     setPathState(6);
                 }
                 break;
@@ -175,7 +175,7 @@ public class Blue9Plus3 extends CommandOpMode {
             // ! Pick up & shoot the third row of Artifacts ! //
             case 6: // Path from shooting position -> intake position
                 if (!follower.isBusy()) {
-                    intake.enableBothIntakes(1.0).schedule();
+                    intake.enableBothIntakes().schedule();
                     follower.followPath(paths.blue9Plus3PickThirdRow, true);
                     new WaitCommand(4000); // waits for it to intake all the Artifacts
                     intake.stopBothIntakes().schedule();
@@ -192,7 +192,7 @@ public class Blue9Plus3 extends CommandOpMode {
                     // Feeds the shooter as the shooter's rollers roll
                     indexer.feedAllShooter().schedule();
                     new WaitCommand(3000); // waits for the shooter to finish shooting
-                    shooter.stop(); // stops the shooter
+                    shooter.stopCMD(); // stops the shooter
                     setPathState(8);
                 }
                 break;

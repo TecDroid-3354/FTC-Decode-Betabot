@@ -1,7 +1,6 @@
-package org.firstinspires.ftc.teamcode.systems
+package org.firstinspires.ftc.teamcode.systems.shooterSystem
 
 import Angle
-import Distance
 import androidx.core.util.Supplier
 import com.qualcomm.robotcore.hardware.HardwareMap
 import com.seattlesolvers.solverslib.command.Command
@@ -9,10 +8,10 @@ import com.seattlesolvers.solverslib.command.InstantCommand
 import com.seattlesolvers.solverslib.command.SequentialCommandGroup
 import com.seattlesolvers.solverslib.command.WaitCommand
 import org.firstinspires.ftc.robotcore.external.Telemetry
-import org.firstinspires.ftc.teamcode.subsystems.shooter.Shooter
 import org.firstinspires.ftc.teamcode.subsystems.indexer.Indexer
 import org.firstinspires.ftc.teamcode.subsystems.indexer.MotifPatterns
 import org.firstinspires.ftc.teamcode.subsystems.shooter.Hood
+import org.firstinspires.ftc.teamcode.subsystems.shooter.Shooter
 
 /**
  * These values need to be measured physically

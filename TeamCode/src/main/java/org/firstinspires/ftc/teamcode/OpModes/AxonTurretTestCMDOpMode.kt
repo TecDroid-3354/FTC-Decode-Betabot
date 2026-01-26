@@ -112,8 +112,7 @@ class AxonTurretTestCMDOpMode: CommandOpMode() {
             // SUPER IMPORTANT calling this line for the servo to update the PID feedback
 
             // Updating the target in relation to the robot's heading
-            turretTarget = targetAprilTagLocation - Angle.fromDegrees(imu.getYaw().degrees)
-
+            turretTarget = Angle.fromDegrees(normalizeDegrees(targetAprilTagLocation.degrees - imu.getYaw().degrees))
             // Useful data
             telemetry.addData("imu reading", imu.getYaw().degrees)
             telemetry.addData("Turret Target", normalizeDegrees(turretTarget.degrees))

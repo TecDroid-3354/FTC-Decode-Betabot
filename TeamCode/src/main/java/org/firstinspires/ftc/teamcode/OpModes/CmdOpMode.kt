@@ -1,5 +1,6 @@
 package org.firstinspires.ftc.teamcode.OpModes
 
+import Angle
 import com.qualcomm.hardware.sparkfun.SparkFunOTOS
 import com.qualcomm.robotcore.eventloop.opmode.Disabled
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp
@@ -14,8 +15,13 @@ import com.seattlesolvers.solverslib.gamepad.GamepadKeys
 import org.firstinspires.ftc.teamcode.commands.JoystickCmd
 import org.firstinspires.ftc.teamcode.subsystems.drivetrain.SolversMecanum
 import org.firstinspires.ftc.teamcode.subsystems.intake.Intake
+import org.firstinspires.ftc.teamcode.subsystems.turret.AprilTagLocationInDegrees
+import org.firstinspires.ftc.teamcode.subsystems.turret.AxonTurret
 import org.firstinspires.ftc.teamcode.subsystems.turret.Turret
-import org.firstinspires.ftc.teamcode.systems.ShooterSystem
+import org.firstinspires.ftc.teamcode.subsystems.turret.turretConfig
+import org.firstinspires.ftc.teamcode.systems.ledSystem.LedSystem
+import org.firstinspires.ftc.teamcode.systems.shooterSystem.ShooterSystem
+import org.firstinspires.ftc.teamcode.utils.Alliance
 import org.firstinspires.ftc.teamcode.vision.Limelight
 
 
@@ -35,24 +41,41 @@ class CMDOpMode : CommandOpMode() {
 
     /* ! SET UP CODE ! */
 
-    // Declaring subsystems
+    // Declaring subsystems //
+
     lateinit var mecanum: SolversMecanum
+
     lateinit var intake: Intake
-    lateinit var turret: Turret
-    lateinit var limelight: Limelight
+
+    lateinit var turret: AxonTurret
+    var turretTarget: Angle = Angle.fromDegrees(0.0)
 
     lateinit var shooterSystem: ShooterSystem
 
-    // Declaring useful components
+    // Declaring useful components //
     lateinit var controller: GamepadEx
+
+    lateinit var limelight: Limelight
+
     lateinit var otos: SparkFunOTOS
+
+    lateinit var leds: LedSystem
+
     val limelightIdFilter: IntArray = intArrayOf(20, 21, 22, 23, 24)
+
+    // Change this line if the RED April tag location is needed
+    val alliance = Alliance.BLUE
+    var targetAprilTagLocation: Angle = Angle.fromDegrees(0.0)
 
     // Here, declare code to be executed right after pressing the INIT button
     override fun initialize() {
         /* Subsystem initialization */
 
+        // Initializing the OTOS
         otos = hardwareMap.get(SparkFunOTOS::class.java, "otos")
+        // Required for a correct IMU reading
+        otos.calibrateImu()
+
         // Initializing the mecanum & its default command
         mecanum = SolversMecanum(hardwareMap, telemetry, otos)
         mecanum.defaultCommand = JoystickCmd(
@@ -62,19 +85,30 @@ class CMDOpMode : CommandOpMode() {
             mecanum
         )
 
+        // Intake initialization
         intake = Intake(hardwareMap, telemetry)
 
-        turret = Turret(hardwareMap, telemetry)
-
+        // Limelight initialization
         limelight = Limelight(hardwareMap, telemetry, otos)
         limelight.start()
 
+        turret = AxonTurret(hardwareMap, telemetry, turretConfig) { turretTarget }
+
+        // Shooter system initialization
         shooterSystem = ShooterSystem(hardwareMap, telemetry,
             { limelight.getDistanceToGoal(limelightIdFilter).inches },
             { limelight.llResult != null && limelight.llResult!!.isValid }
         )
+
+        // LEDs initialization
+        leds = LedSystem(hardwareMap, telemetry)
         // Initializing controller & button bindings
         controller = GamepadEx(gamepad1)
+
+        targetAprilTagLocation =
+            if (alliance == Alliance.BLUE) AprilTagLocationInDegrees.blueAprilTag
+            else AprilTagLocationInDegrees.redAprilTag
+
         configureButtonBindings()
     }
 
@@ -87,7 +121,7 @@ class CMDOpMode : CommandOpMode() {
 
         GamepadButton(controller, GamepadKeys.Button.LEFT_BUMPER)
             .whenPressed(
-                intake.enableBothIntakes(-1.0)
+                intake.enableBothOuttakes()
             ).whenReleased (
                 intake.stopBothIntakes()
             )
@@ -128,8 +162,6 @@ class CMDOpMode : CommandOpMode() {
     override fun runOpMode() {
         // Code executed at the very beginning, right after hitting the INIT Button
         initialize()
-
-        WaitUntilCommand { otos.calibrateImu() }
         // Pauses OpMode until the START button is pressed on the Driver Hub
         waitForStart()
 
@@ -138,7 +170,8 @@ class CMDOpMode : CommandOpMode() {
 
             // Command for actually running the scheduler
             CommandScheduler.getInstance().run()
-            //periodic()
+
+            turretTarget = targetAprilTagLocation - Angle.fromDegrees(otos.position.h)
 
             controller.readButtons()
 

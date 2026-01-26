@@ -31,8 +31,6 @@ class AxonTurret(val hw: HardwareMap, val telemetry: Telemetry, val config: Axon
 
     init {
         servoConfig()
-        rightServo.setPIDFTolerance(Angle.fromDegrees(0.2))
-        leftServo.setPIDFTolerance(Angle.fromDegrees(0.2))
     }
 
     override fun periodic() {
@@ -40,6 +38,8 @@ class AxonTurret(val hw: HardwareMap, val telemetry: Telemetry, val config: Axon
         setPIDFCoefficients(leftServo, AxonTurretConstants.leftPIDCoefficients)
         rightServo.periodic()
         leftServo.periodic()
+
+        setTurretAngle(turretTarget.get())
     }
 
     fun stopTurret() {
@@ -47,7 +47,7 @@ class AxonTurret(val hw: HardwareMap, val telemetry: Telemetry, val config: Axon
         leftServo.stop()
     }
 
-    // Needs to be called inside the opMode loop in order to correctly update target
+    // Needs to be called inside a loop in order to correctly update target
     fun setTurretAngle(target: Angle) {
         if (getAbsoluteAngle().degrees in config.limits) {
             rightServo.setTargetAngle(target)
@@ -70,6 +70,9 @@ class AxonTurret(val hw: HardwareMap, val telemetry: Telemetry, val config: Axon
 
         /* SERVO INITIALIZATION */
         rightServo = RTPServo(hw, telemetry, config.rightServoConfig, absoluteEncoder)
+        rightServo.setPIDFTolerance(Angle.fromDegrees(0.2))
+
         leftServo = RTPServo(hw, telemetry, config.leftServoConfig, absoluteEncoder)
+        leftServo.setPIDFTolerance(Angle.fromDegrees(0.2))
     }
 }

@@ -59,6 +59,10 @@ class AxonTurretConstants {
     object Limits {
         val turretAngleLimits = Angle.fromDegrees(-1800.0).degrees..Angle.fromDegrees(1800.0).degrees
     }
+
+    object PhysicalDescription {
+        const val gearRatio = 1.0 / 5.5
+    }
 }
 
 val rightServoConfig = RTPServoConfig(
@@ -68,7 +72,7 @@ val rightServoConfig = RTPServoConfig(
     AxonTurretConstants.Configuration.RightServo.direction,
     AxonTurretConstants.Configuration.RightServo.AbsoluteEncoder.offset,
     1.0,
-    1.0,
+    AxonTurretConstants.PhysicalDescription.gearRatio,
     AxonTurretConstants.rightPIDCoefficients
 )
 
@@ -79,7 +83,7 @@ val leftServoConfig = RTPServoConfig(
     AxonTurretConstants.Configuration.LeftServo.direction,
     AxonTurretConstants.Configuration.LeftServo.AbsoluteEncoder.offset,
     1.0,
-    1.0,
+    AxonTurretConstants.PhysicalDescription.gearRatio,
     AxonTurretConstants.leftPIDCoefficients
 )
 

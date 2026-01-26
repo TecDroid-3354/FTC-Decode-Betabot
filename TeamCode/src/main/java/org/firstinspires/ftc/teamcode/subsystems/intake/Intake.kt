@@ -13,8 +13,7 @@ import org.firstinspires.ftc.teamcode.utils.velocityMotorEx.VelocityMotorEx
 
 // Intake sides in our robot
 enum class IntakeDirection {
-    RIGHT,
-    LEFT
+    FRONT, BACK
 }
 
 class Intake(
@@ -22,8 +21,8 @@ class Intake(
     val telemetry: Telemetry
 ) : SubsystemBase() {
     // Consider that right & left motors refer to the motors as seen from the turret
-    lateinit var rightMotor: VelocityMotorEx
-    lateinit var leftMotor: VelocityMotorEx
+    lateinit var frontMotor: VelocityMotorEx
+    lateinit var backMotor: VelocityMotorEx
 
     init {
         motorConfig()
@@ -38,18 +37,25 @@ class Intake(
      */
     fun enableIntake(direction: IntakeDirection, output: Double = 1.0) {
         when (direction) {
-            IntakeDirection.RIGHT -> rightMotor.setPower(output)
-            IntakeDirection.LEFT -> leftMotor.setPower(output)
+            IntakeDirection.FRONT -> frontMotor.setPower(output)
+            IntakeDirection.BACK -> backMotor.setPower(output)
         }
     }
 
     /**
      * This is the method called in the [CMDOpMode]. It calls [enableIntake] twice and turns on both intakes
      */
-    fun enableBothIntakes(output: Double = 1.0): Command {
+    fun enableBothIntakes(): Command {
         return InstantCommand({
-            enableIntake(IntakeDirection.RIGHT, output)
-            enableIntake(IntakeDirection.LEFT, output)
+            enableIntake(IntakeDirection.FRONT)
+            enableIntake(IntakeDirection.BACK)
+        })
+    }
+
+    fun enableBothOuttakes(): Command {
+        return InstantCommand({
+            enableIntake(IntakeDirection.FRONT, -1.0)
+            enableIntake(IntakeDirection.BACK, -1.0)
         })
     }
 
@@ -59,8 +65,8 @@ class Intake(
      */
     private fun stopIntake(direction: IntakeDirection) {
         when (direction) {
-            IntakeDirection.RIGHT -> rightMotor.setPower(0.0) // Check
-            IntakeDirection.LEFT -> leftMotor.setPower(0.0) // Check
+            IntakeDirection.FRONT -> frontMotor.setPower(0.0) // Check
+            IntakeDirection.BACK -> backMotor.setPower(0.0) // Check
         }
     }
 
@@ -69,26 +75,23 @@ class Intake(
      */
     fun stopBothIntakes(): Command {
         return InstantCommand({
-            stopIntake(IntakeDirection.RIGHT)
-            stopIntake(IntakeDirection.LEFT)
+            stopIntake(IntakeDirection.FRONT)
+            stopIntake(IntakeDirection.BACK)
         })
-    }
-
-    fun isActive(): Boolean {
-        return rightMotor.motor.motor.power > 0.1 || leftMotor.motor.motor.power > 0.1
     }
 
     // This code executes indefinitely during our robot's program
     override fun periodic() {
-        rightMotor.setPIDFCoefficients(IntakeConstants.PIDF.pidfCoefficients)
-        leftMotor.setPIDFCoefficients(IntakeConstants.PIDF.pidfCoefficients)
+        // Uncomment these lines for real-time PID tuning
+//        frontMotor.setPIDFCoefficients(IntakeConstants.PIDF.pidfCoefficients)
+//        backMotor.setPIDFCoefficients(IntakeConstants.PIDF.pidfCoefficients)
     }
 
     // Setup code //
 
     // Configuring motors with the custom VelocityEx class
     private fun motorConfig() {
-        rightMotor = VelocityMotorEx(
+        frontMotor = VelocityMotorEx(
             MotorEx(hardwareMap, IntakeConstants.Identification.rightIntakeMotorId,
                 IntakeConstants.Configuration.ticksPerRevolution, IntakeConstants.Configuration.rpm),
             VelocityMotorConfig(
@@ -97,7 +100,7 @@ class Intake(
                 pidfCoefficients = IntakeConstants.PIDF.pidfCoefficients)
         )
 
-        leftMotor = VelocityMotorEx(
+        backMotor = VelocityMotorEx(
             MotorEx(hardwareMap, IntakeConstants.Identification.leftIntakeMotorId,
                 IntakeConstants.Configuration.ticksPerRevolution, IntakeConstants.Configuration.rpm),
             VelocityMotorConfig(

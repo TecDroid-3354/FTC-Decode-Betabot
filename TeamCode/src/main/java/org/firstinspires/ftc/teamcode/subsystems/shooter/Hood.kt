@@ -23,7 +23,7 @@ class Hood(val hardwareMap: HardwareMap, val telemetry: Telemetry): SubsystemBas
     init {
         servo = ServoEx(hardwareMap, HoodConstants.Identification.hoodId)
         servoConfig()
-        setHoodPosition(HoodConstants.Positions.minPosition)
+        setHoodPosition(HoodConstants.Positions.minPosition + Angle.fromRotations(0.0001))
 
         // servo.position returns a value from 0.0 to 1.0, we take it as rotations.
         currentAngle = Angle.fromRotations(servo.servo.position)

@@ -20,9 +20,10 @@ class Limelight(
     var otos: SparkFunOTOS
 ) : SubsystemBase() {
 
-    var limelight: Limelight3A? = null
-    private var obeliskId = 0
+    private var limelight: Limelight3A? = null
     var llResult: LLResult? = null
+
+    private var obeliskId = 0
 
     private var ty = 0.0
     private var tx = 0.0
@@ -41,8 +42,6 @@ class Limelight(
         // How many times per second the limelight receives data in seconds
         limelight!!.setPollRateHz(VisionConstants.LimelightConfiguration.PollRateHz)
 
-        // Initialize otos
-        otos = hardwareMap.get<SparkFunOTOS?>(SparkFunOTOS::class.java, "otos")
         // Setting an angular unit so the readings it returns are in that unit
         otos.setAngularUnit(AngleUnit.DEGREES)
         // Setting a linear unit so the readings it returns are in that unit
@@ -61,29 +60,6 @@ class Limelight(
     fun getTx(): Double = tx
     fun getTy(): Double = ty
     fun getTa(): Double = ta
-
-    /**
-     *  Receives an array of Ids that the limelight can track and ignores the other ones, returns the offset angle from te limelight
-     *  lenses the filtered april tag
-     *  @param filterArray the desired ids for the limelight to follow
-     *  @return the offset angle from the limelight lenses to the filtered april tag
-     */
-    fun getAngleToGoal(filterArray: IntArray): Double {
-
-        if (llResult!!.isValid && llResult != null) {
-            val fiducialResult = llResult!!.fiducialResults
-
-            for (detectedId in fiducialResult) {
-                for (id in filterArray) {
-                    if (detectedId.fiducialId == id) {
-                        return tx
-                    }
-                }
-            }
-        }
-
-        return 0.0
-    }
 
     /**
      * Gets the distance from the limelight lenses to a filtered id and returns the distance in any unit desired
@@ -107,27 +83,6 @@ class Limelight(
     }
 
     /**
-     * Checks if the limelight detects any obelisk april tag and assigns that value to [obeliskId] so it can be retrieved from
-     * [getMotifPattern]
-     */
-    private fun getObeliskId() {
-
-        if (llResult!!.isValid && llResult != null) {
-            val fiducialResult = llResult!!.fiducialResults
-
-            outerLoop@ for (detectedId in fiducialResult) {
-                for (aprilTagId in VisionConstants.AprilTagsIdentification.ObeliskIds) {
-                    if (detectedId.fiducialId == aprilTagId) {
-                        obeliskId = detectedId.fiducialId
-                        break@outerLoop
-                        break
-                    }
-                }
-            }
-        }
-    }
-
-    /**
      * Gets the obelisk april tag id and relates it to a [MotifPatterns] depending on the actual pattern of the match
      * @return the current motif pattern
      */
@@ -143,17 +98,31 @@ class Limelight(
     override fun periodic() {
 
         // Updating limelights' robot orientation with the Yaw
-        limelight!!.updateRobotOrientation(otos.getPosition().h)
+        limelight!!.updateRobotOrientation(otos.position.h)
 
         // LLResult is like a container full of information about what Limelight sees
         llResult = limelight!!.getLatestResult()
 
-        getObeliskId()
+        val fiducialResult = llResult!!.fiducialResults
+
         // Math to calculate distance was taken from documentation:
         // https://docs.limelightvision.io/docs/docs-limelight/tutorials/tutorial-estimating-distance#using-area-to-estimate-distance
         // The condition verifies whether the LimeLight Result is a valid statement
         if (llResult != null && llResult!!.isValid()) {
 
+            // Obelisk ID detection
+            outerLoop@ for (detectedId in fiducialResult) {
+                for (aprilTagId in VisionConstants.AprilTagsIdentification.ObeliskIds) {
+                    if (detectedId.fiducialId == aprilTagId && getMotifPattern() == MotifPatterns.NO_PATTERN_DETECTED) {
+                        obeliskId = detectedId.fiducialId
+                        break@outerLoop
+                        break
+                    }
+                }
+            }
+
+
+            val botPose = llResult!!.botpose_MT2
             // Offset to target in degrees (from crosshair)
             val targetOffsetAngle_Vertical = Angle.fromDegrees(llResult!!.getTy())
             // Needs to be in radians for tan() method
@@ -170,25 +139,15 @@ class Limelight(
                 distanceFromLimelightToGoalInches.inches
             )
 
-            // We will first get a (MetaTag2) Pose3D. From here, we will extract its Tx, Ty & Ta components
-            tx = llResult!!.getTx()
-            ty = llResult!!.getTy()
-            ta = llResult!!.getTa()
+            telemetry.addData(
+                "MT2 distance to goal",
+                Distance.fromMeters(botPose.position.z).inches
+            )
 
-            val botPose = llResult!!.getBotpose_MT2()
-//            telemetry.addData(
-//                "Tx",
-//                tx
-//            ) // Represents how far left/right the target is (in degrees)
-//            telemetry.addData(
-//                "Ty",
-//                ty
-//            ) // Represents how far up/down the target is (in degrees)
-//            telemetry.addData("Ta", ta) // Represents how big the AprilTag looks
-//
-//            // according to the camera field of view (0-100%)
-//            telemetry.addData("BotPose", botPose.toString())
-//            telemetry.addData("Yaw", botPose.getOrientation().getYaw())
+            // We will first get a (MetaTag2) Pose3D. From here, we will extract its Tx, Ty & Ta components
+            tx = llResult!!.tx
+            ty = llResult!!.ty
+            ta = llResult!!.ta
 
             /*
              * It is important to notice that the Full3D option should be enabled

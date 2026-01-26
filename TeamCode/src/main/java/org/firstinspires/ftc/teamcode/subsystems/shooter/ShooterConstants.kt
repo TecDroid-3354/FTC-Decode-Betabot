@@ -30,9 +30,17 @@ class ShooterConstants {
         companion object {
             @JvmField
             // The PID controller used for the subsytem's motor
-            var firstMotorPIDCoefficients = PIDFCoefficients(15.0, 0.0, 0.0, 15.0)
+            var firstMotorPIDCoefficients = PIDFCoefficients(1.0, 0.0, 0.0, 0.0)
             @JvmField
-            var secondMotorPIDCoefficients = PIDFCoefficients(15.0, 0.0, 0.0, 15.0)
+            var secondMotorPIDCoefficients = PIDFCoefficients(1.0, 0.0, 0.0, 0.0)
+        }
+    }
+
+    @Configurable
+    class Velocity {
+        companion object {
+            @JvmField
+            var shooterDesiredVelocity = AngularVelocity.fromRpm(0.0).rpm
         }
     }
 }

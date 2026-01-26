@@ -13,7 +13,7 @@ import com.seattlesolvers.solverslib.gamepad.whenInactive
 import org.firstinspires.ftc.teamcode.subsystems.shooter.Hood
 import org.firstinspires.ftc.teamcode.subsystems.shooter.Shooter
 
-@TeleOp(name = "Shooter", group = "Op Mode")
+@TeleOp(name = "ShooterTest", group = "Op Mode")
 class ShooterTestOpMode: CommandOpMode() {
 
     /* ! SET UP CODE ! */
@@ -38,7 +38,7 @@ class ShooterTestOpMode: CommandOpMode() {
     fun configureButtonBindings() {
         GamepadButton(controller, GamepadKeys.Button.RIGHT_BUMPER)
             .whenActive(
-                shooter.shootCMD()
+                InstantCommand({ shooter.setFlyWheelVelocity() })
             ).whenInactive(
                 shooter.stopCMD()
             )

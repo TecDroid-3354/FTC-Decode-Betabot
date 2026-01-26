@@ -61,7 +61,7 @@ public class Linear3Balls extends CommandOpMode {
                         new WaitCommand(1400),
                         indexer.feedAllShooter(),
                         new WaitCommand(2000),
-                        new InstantCommand(() -> shooter.stop()),
+                        new InstantCommand(() -> shooter.stopCMD()),
                         new InstantCommand(() -> readyToShoot = false)
                 ));
     }
