@@ -9,12 +9,10 @@ import org.firstinspires.ftc.robotcore.external.Supplier
 import org.firstinspires.ftc.robotcore.external.Telemetry
 import org.firstinspires.ftc.teamcode.utils.RTPServo.RTPServo
 import org.firstinspires.ftc.teamcode.utils.RTPServo.RTPServoConfig
-import kotlin.math.abs
 
 data class AxonTurretConfig(
     val rightServoConfig: RTPServoConfig,
     val leftServoConfig: RTPServoConfig,
-    val limits: ClosedFloatingPointRange<Double>
 )
 
 enum class TurretState {
@@ -34,8 +32,8 @@ class AxonTurret(val hw: HardwareMap, val telemetry: Telemetry, val config: Axon
     }
 
     override fun periodic() {
-        setPIDFCoefficients(rightServo, AxonTurretConstants.rightPIDCoefficients)
-        setPIDFCoefficients(leftServo, AxonTurretConstants.leftPIDCoefficients)
+        setPIDFCoefficients(rightServo, AxonTurretConstants.turretControllerCoefficients)
+        setPIDFCoefficients(leftServo, AxonTurretConstants.turretControllerCoefficients)
         rightServo.periodic()
         leftServo.periodic()
 
@@ -49,10 +47,8 @@ class AxonTurret(val hw: HardwareMap, val telemetry: Telemetry, val config: Axon
 
     // Needs to be called inside a loop in order to correctly update target
     fun setTurretAngle(target: Angle) {
-        if (getAbsoluteAngle().degrees in config.limits) {
-            rightServo.setTargetAngle(target)
-            leftServo.setTargetAngle(target)
-        }
+        rightServo.setTargetAngle(target)
+        leftServo.setTargetAngle(target)
     }
 
     // Just need one encoder's reading
@@ -66,11 +62,12 @@ class AxonTurret(val hw: HardwareMap, val telemetry: Telemetry, val config: Axon
 
     fun servoConfig() {
         // Encoder initialization
-        absoluteEncoder = hw.get(AnalogInput::class.java, rightServo.config.absoluteId)
+        absoluteEncoder = hw.get(AnalogInput::class.java, "abs")
 
         /* SERVO INITIALIZATION */
         rightServo = RTPServo(hw, telemetry, config.rightServoConfig, absoluteEncoder)
         rightServo.setPIDFTolerance(Angle.fromDegrees(0.2))
+
 
         leftServo = RTPServo(hw, telemetry, config.leftServoConfig, absoluteEncoder)
         leftServo.setPIDFTolerance(Angle.fromDegrees(0.2))

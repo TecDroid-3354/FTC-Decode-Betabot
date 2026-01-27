@@ -47,8 +47,8 @@ class Intake(
      */
     fun enableBothIntakes(): Command {
         return InstantCommand({
-            enableIntake(IntakeDirection.FRONT)
-            enableIntake(IntakeDirection.BACK)
+            enableIntake(IntakeDirection.FRONT, 1.0)
+            enableIntake(IntakeDirection.BACK, 1.0)
         })
     }
 

@@ -3,12 +3,14 @@ package org.firstinspires.ftc.teamcode.OpModes
 import Angle
 import com.bylazar.configurables.annotations.Configurable
 import com.qualcomm.hardware.rev.RevHubOrientationOnRobot
+import com.qualcomm.hardware.sparkfun.SparkFunOTOS
 import com.qualcomm.robotcore.eventloop.opmode.Disabled
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp
 import com.qualcomm.robotcore.hardware.PIDFCoefficients
 import com.seattlesolvers.solverslib.command.CommandOpMode
 import com.seattlesolvers.solverslib.command.CommandScheduler
 import com.seattlesolvers.solverslib.command.InstantCommand
+import com.seattlesolvers.solverslib.command.WaitUntilCommand
 import com.seattlesolvers.solverslib.command.button.GamepadButton
 import com.seattlesolvers.solverslib.gamepad.GamepadEx
 import com.seattlesolvers.solverslib.gamepad.GamepadKeys
@@ -51,14 +53,14 @@ class AxonTurretTestCMDOpMode: CommandOpMode() {
     /* ! SET UP CODE ! */
     lateinit var turret: AxonTurret
 
-    lateinit var imu: RevHubIMU
+    lateinit var otos: SparkFunOTOS
 
     lateinit var controller: GamepadEx
 
     var turretTarget: Angle = Angle.fromDegrees(0.0)
 
     // Change this line if the RED April tag location is needed
-    val alliance = Alliance.BLUE
+    val alliance = Alliance.RED
     var targetAprilTagLocation: Angle = Angle.fromDegrees(0.0)
 
     // Here, declare code to be executed right after pressing the INIT button
@@ -66,7 +68,9 @@ class AxonTurretTestCMDOpMode: CommandOpMode() {
 
         turret = AxonTurret(hardwareMap, telemetry, turretConfig) { turretTarget }
 
-        imu = RevHubIMU(hardwareMap, revHubIMUConfig)
+        otos = hardwareMap.get(SparkFunOTOS::class.java, "otos")
+        otos.resetTracking()
+        otos.calibrateImu()
 
         controller = GamepadEx(gamepad1)
 
@@ -101,6 +105,7 @@ class AxonTurretTestCMDOpMode: CommandOpMode() {
         initialize()
 
         // Pauses OpMode until the START button is pressed on the Driver Hub
+
         waitForStart()
 
         // Run the scheduler
@@ -112,9 +117,9 @@ class AxonTurretTestCMDOpMode: CommandOpMode() {
             // SUPER IMPORTANT calling this line for the servo to update the PID feedback
 
             // Updating the target in relation to the robot's heading
-            turretTarget = Angle.fromDegrees(normalizeDegrees(targetAprilTagLocation.degrees - imu.getYaw().degrees))
+            turretTarget = Angle.fromDegrees(normalizeDegrees(targetAprilTagLocation.degrees - otos.position.h))
             // Useful data
-            telemetry.addData("imu reading", imu.getYaw().degrees)
+            telemetry.addData("otos heading", otos.position.h)
             telemetry.addData("Turret Target", normalizeDegrees(turretTarget.degrees))
             telemetry.update()
         }

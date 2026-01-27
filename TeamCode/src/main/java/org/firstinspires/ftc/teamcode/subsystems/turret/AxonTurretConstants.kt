@@ -25,39 +25,18 @@ class AxonTurretConstants {
 
     object Configuration {
 
-        object RightServo {
+        val direction = RTPServo.Direction.FORWARD
 
-            val direction = RTPServo.Direction.REVERSE
+        object AbsoluteEncoder {
 
-            object AbsoluteEncoder {
-
-                val maximumVoltage = Voltage.fromVolts(3.178)
-                val offset = Angle.fromDegrees(86.5125 + 7.5 - 164.8117)
-            }
-        }
-
-
-        object LeftServo {
-
-            val direction = RTPServo.Direction.REVERSE
-
-            object AbsoluteEncoder {
-
-                val maximumVoltage = Voltage.fromVolts(3.205)
-                val offset = Angle.fromDegrees(86.5125 + 7.5)
-            }
+            val maximumVoltage = Voltage.fromVolts(3.23)
+            val offset = Angle.fromDegrees(175.68 - 177.24)
         }
     }
 
     companion object {
         @JvmField
-        var rightPIDCoefficients = PIDFCoefficients(0.00725, 0.0, 0.0, 0.000025)
-        @JvmField
-        var leftPIDCoefficients = PIDFCoefficients(0.006, 0.0, 0.0, 0.000025)
-    }
-
-    object Limits {
-        val turretAngleLimits = Angle.fromDegrees(-1800.0).degrees..Angle.fromDegrees(1800.0).degrees
+        var turretControllerCoefficients = PIDFCoefficients(0.006, 0.0, 0.0, 0.000025)
     }
 
     object PhysicalDescription {
@@ -68,27 +47,26 @@ class AxonTurretConstants {
 val rightServoConfig = RTPServoConfig(
     AxonTurretConstants.Identification.RightServo.servoId,
     AxonTurretConstants.Identification.RightServo.absoluteId,
-    AxonTurretConstants.Configuration.RightServo.AbsoluteEncoder.maximumVoltage,
-    AxonTurretConstants.Configuration.RightServo.direction,
-    AxonTurretConstants.Configuration.RightServo.AbsoluteEncoder.offset,
+    AxonTurretConstants.Configuration.AbsoluteEncoder.maximumVoltage,
+    AxonTurretConstants.Configuration.direction,
+    AxonTurretConstants.Configuration.AbsoluteEncoder.offset,
     1.0,
     AxonTurretConstants.PhysicalDescription.gearRatio,
-    AxonTurretConstants.rightPIDCoefficients
+    AxonTurretConstants.turretControllerCoefficients
 )
 
 val leftServoConfig = RTPServoConfig(
     AxonTurretConstants.Identification.LeftServo.servoId,
     AxonTurretConstants.Identification.LeftServo.absoluteId,
-    AxonTurretConstants.Configuration.LeftServo.AbsoluteEncoder.maximumVoltage,
-    AxonTurretConstants.Configuration.LeftServo.direction,
-    AxonTurretConstants.Configuration.LeftServo.AbsoluteEncoder.offset,
+    AxonTurretConstants.Configuration.AbsoluteEncoder.maximumVoltage,
+    AxonTurretConstants.Configuration.direction,
+    AxonTurretConstants.Configuration.AbsoluteEncoder.offset,
     1.0,
     AxonTurretConstants.PhysicalDescription.gearRatio,
-    AxonTurretConstants.leftPIDCoefficients
+    AxonTurretConstants.turretControllerCoefficients
 )
 
 val turretConfig = AxonTurretConfig(
     rightServoConfig,
     leftServoConfig,
-    AxonTurretConstants.Limits.turretAngleLimits
 )
