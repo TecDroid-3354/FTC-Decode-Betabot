@@ -56,7 +56,7 @@ class AxonTurret(val hw: HardwareMap, val telemetry: Telemetry, val config: Axon
 
     // Just need one encoder's reading
     fun getAbsoluteAngle(): Angle {
-        return rightServo.getTotalRotation()
+        return rightServo.getTransformedAngle()
     }
 
     fun setPIDFCoefficients(servo: RTPServo, pidfCoefficients: PIDFCoefficients) {

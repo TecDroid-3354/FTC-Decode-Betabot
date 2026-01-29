@@ -35,6 +35,9 @@ class Shooter(
 
     // Periodic method //
     override fun periodic() {
+        // Try tuning the F value first to a low velocity, not 0, cause it will ruin the use of feed forward
+        // After you've tuned that, you can start tuning the p value by transitioning from a hiw velocity to a low one
+        // Try to reach to the minimum error possible and a high output when ramping down when a ball passes through.
         setPIDCoefficients(ShooterConstants.PIDF.pidfCoefficients)
 
         desiredVelocity = AngularVelocity.fromRpm(ShooterConstants.Velocity.shooterDesiredVelocity)
@@ -69,6 +72,7 @@ class Shooter(
     fun shootCMD(): Command {
         return InstantCommand({
 //            setFlyWheelVelocity(AngularVelocity.fromRpm(ShooterConstants.Velocity.shooterDesiredVelocity))
+            setFlyWheelPower(1.0)
         })
     }
 

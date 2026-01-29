@@ -68,6 +68,9 @@ class RTPServo(hw: HardwareMap, val telemetry: Telemetry, val config: RTPServoCo
         setPower(0.0)
     }
 
+    constructor(hw: HardwareMap, telemetry: Telemetry, config: RTPServoConfig):
+            this(hw, telemetry, config, hw.get(AnalogInput::class.java, config.absoluteId))
+
     /**
      * Sets an output considering the maximum power set in the servo's configuration
      * @param output the desired output from - 1 to 1
@@ -125,7 +128,7 @@ class RTPServo(hw: HardwareMap, val telemetry: Telemetry, val config: RTPServoCo
     /**
      * Gets the absolute position of the servo, not considering gear ratios
      */
-    fun getServoAbsoluteAngle(): Angle {
+    private fun getServoAbsoluteAngle(): Angle {
         val currentAngle = Angle.fromDegrees(
             (servoEncoder!!.voltage / config.absoluteMaxVoltage.volts) * (if (config.direction == Direction.REVERSE) -360 else 360)
         )
@@ -140,7 +143,7 @@ class RTPServo(hw: HardwareMap, val telemetry: Telemetry, val config: RTPServoCo
      * Based on how many full rotations the servo has achieved, it returns an absolute angle
      * @return the total rotation the servo has achieved while considering gear ratios.
      */
-    fun getTotalRotation(): Angle {
+    fun getTransformedAngle(): Angle {
         return Angle.fromDegrees(normalizeDegrees(totalRotation.degrees * config.gearRatio))
     }
 
@@ -166,7 +169,7 @@ class RTPServo(hw: HardwareMap, val telemetry: Telemetry, val config: RTPServoCo
         // If the servo is at set point
         telemetry.addData("Is at set point", isAtSetPoint())
         // System's angle (considering gear ratios)
-        telemetry.addData("Absolute Angle (considering gear ratios)", getTotalRotation().degrees)
+        telemetry.addData("Absolute Angle (considering gear ratios)", getTransformedAngle().degrees)
     }
 
     /**

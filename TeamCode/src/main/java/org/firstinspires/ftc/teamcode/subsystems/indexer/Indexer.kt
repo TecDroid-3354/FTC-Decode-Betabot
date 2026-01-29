@@ -119,11 +119,11 @@ class Indexer(
     }
 
     /**
-     * [feedShooterWithDetectedColor] returns a [SequentialCommandGroup] that feeds each slot if the color the color sensors detection
+     * [feedShooterWhenRejected] returns a [SequentialCommandGroup] that feeds each slot if the color the color sensors detection
      * is not [DetectedColor.UNKNOWN]
      * @return a [SequentialCommandGroup] that feeds every slot that has a ball
      */
-    private fun feedShooterWithDetectedColor(): SequentialCommandGroup {
+    private fun feedShooterWhenRejected(): SequentialCommandGroup {
         val cmdGroup = SequentialCommandGroup()
         var slotTracker: MutableList<String> = MutableList(3) { "" }
 
@@ -149,7 +149,7 @@ class Indexer(
         var slotTracker: MutableList<String> = MutableList(3) {""}
 
         if (rejectEvaluation() || motifPatterns == MotifPatterns.NO_PATTERN_DETECTED) {
-            return feedShooterWithDetectedColor()
+            return feedShooterWhenRejected()
         }
 
         for ((index, color) in motifPatterns.pattern.withIndex()) {
@@ -160,6 +160,11 @@ class Indexer(
                     break
                 }
             }
+        }
+
+        if (slotTracker[0].equals(middleSlot.config.archiveExtension)) {
+            cmdGroup.addCommands(WaitCommand(1000))
+            cmdGroup.addCommands(feedCMD(middleSlot))
         }
 
         return cmdGroup

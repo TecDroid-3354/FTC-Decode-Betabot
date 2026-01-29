@@ -3,7 +3,6 @@ package org.firstinspires.ftc.teamcode.utils.controllers;
 import com.qualcomm.robotcore.hardware.PIDFCoefficients;
 
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
-import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit.*;
 
 /**
  * This is a PID controller (https://en.wikipedia.org/wiki/PID_controller)
@@ -17,7 +16,7 @@ import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit.*;
  * measured value. If we consider e(t) the positional error, then
  * int(0,t)[e(t')dt'] is the total error and e'(t) is the velocity error.
  */
-public class PIDFAngleController {
+public class PIDFCircularController {
 
     private double kP, kI, kD, kF;
     private double setPoint;
@@ -39,14 +38,14 @@ public class PIDFAngleController {
     /**
      * The base constructor for the PIDF controller
      */
-    public PIDFAngleController(double kp, double ki, double kd, double kf) {
+    public PIDFCircularController(double kp, double ki, double kd, double kf) {
         this(kp, ki, kd, kf, 0, 0);
     }
 
     /**
      * Constructor for the PIDF controller with PIDFCoefficients
      */
-    public PIDFAngleController(PIDFCoefficients coefficients) {
+    public PIDFCircularController(PIDFCoefficients coefficients) {
         this(coefficients.p, coefficients.i, coefficients.d, coefficients.f);
     }
 
@@ -59,7 +58,7 @@ public class PIDFAngleController {
      * @param pv The measured value of he pid control loop. We want sp = pv, or to the degree
      *           such that sp - pv, or e(t) < tolerance.
      */
-    public PIDFAngleController(double kp, double ki, double kd, double kf, double sp, double pv) {
+    public PIDFCircularController(double kp, double ki, double kd, double kf, double sp, double pv) {
         kP = kp;
         kI = ki;
         kD = kd;

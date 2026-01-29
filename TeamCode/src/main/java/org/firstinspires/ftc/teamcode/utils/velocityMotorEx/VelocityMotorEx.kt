@@ -33,6 +33,7 @@ class VelocityMotorEx(
         // Setting up the motor & encoder default behavior
         motor.setZeroPowerBehavior(config.zeroPowerBehavior)
         motor.inverted = config.isInverted
+        motor.setRunMode(Motor.RunMode.VelocityControl)
 
         // Arranging velocity PIDs
         val coefficients = config.pidfCoefficients
@@ -61,7 +62,7 @@ class VelocityMotorEx(
     // The following three methods declare a velocity according to the given params
     override fun setVelocity(angularVelocity: AngularVelocity) {
         // with FTCLib: motor.velocity = angularVelocity.rps * config.ticksPerRevolution * gearRatio
-        motor.set(angularVelocity.rps * config.ticksPerRevolution * config.gearRatio)
+        motor.setVelocity(angularVelocity.rps * config.ticksPerRevolution * config.gearRatio)
     }
 
     override fun setVelocity(linearVelocity: LinearVelocity) {
