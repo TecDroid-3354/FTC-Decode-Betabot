@@ -8,9 +8,9 @@ class IntakeConstants {
 
     object Identification {
         // This is the right motor's Id, it needs to be called in the Driver Hub's configuration
-        const val rightIntakeMotorId = "rightIntakeMotor"
+        const val frontMotorId = "frontIntakeMotor"
         // This is the left motor's Id, it needs to be called in the Driver Hub's configuration
-        const val leftIntakeMotorId = "leftIntakeMotor"
+        const val backMotorId = "backIntakeMotor"
     }
 
     object Configuration {

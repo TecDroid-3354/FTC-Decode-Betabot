@@ -13,6 +13,7 @@ import org.firstinspires.ftc.teamcode.utils.RTPServo.RTPServoConfig
 data class AxonTurretConfig(
     val rightServoConfig: RTPServoConfig,
     val leftServoConfig: RTPServoConfig,
+    val limits: ClosedFloatingPointRange<Double>
 )
 
 enum class TurretState {
@@ -34,10 +35,10 @@ class AxonTurret(val hw: HardwareMap, val telemetry: Telemetry, val config: Axon
     override fun periodic() {
         setPIDFCoefficients(rightServo, AxonTurretConstants.turretControllerCoefficients)
         setPIDFCoefficients(leftServo, AxonTurretConstants.turretControllerCoefficients)
-        rightServo.periodic()
-        leftServo.periodic()
+        //rightServo.periodic()
+        //leftServo.periodic()
 
-        setTurretAngle(turretTarget.get())
+//        setTurretAngle(turretTarget.get())
     }
 
     fun stopTurret() {
@@ -47,8 +48,10 @@ class AxonTurret(val hw: HardwareMap, val telemetry: Telemetry, val config: Axon
 
     // Needs to be called inside a loop in order to correctly update target
     fun setTurretAngle(target: Angle) {
-        rightServo.setTargetAngle(target)
-        leftServo.setTargetAngle(target)
+        if (getAbsoluteAngle().degrees in config.limits) {
+            rightServo.setTargetAngle(target)
+            leftServo.setTargetAngle(target)
+        }
     }
 
     // Just need one encoder's reading

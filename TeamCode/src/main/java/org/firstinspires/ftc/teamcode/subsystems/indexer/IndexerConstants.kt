@@ -18,26 +18,26 @@ class IndexerConstants {
 
             const val frontServoId: String = "frontServo"
 
-            const val frontSlotRightSensor: String = "fRCS"
+            const val frontSlotRightSensorId: String = "fRCS"
 
-            const val frontSlotLeftSensor: String = "fLCS"
+            const val frontSlotLeftSensorId: String = "fLCS"
         }
 
         object MiddleSlot {
 
-            const val middleServoId: String = "leftServo"
+            const val middleServoId: String = "middleServo"
 
-            const val middleSlotRightSensor: String = "mRCS"
+            const val middleSlotRightSensorId: String = "mRCS"
 
-            const val middleSlotLeftSensor: String = "mLCS"
+            const val middleSlotLeftSensorId: String = "mLCS"
         }
         object BackSlot {
 
-            const val backServoId: String = "rightServo"
+            const val backServoId: String = "backServo"
 
-            const val backSlotRightSensor: String = "bRCS"
+            const val backSlotRightSensorId: String = "bRCS"
 
-            const val backSlotLeftSensor: String = "bLCS"
+            const val backSlotLeftSensorId: String = "bLCS"
         }
 
     }
@@ -55,19 +55,23 @@ class IndexerConstants {
     object Positions {
         // The HOME, and FEED positions for each servo, these are passed through the slot Config and grabbed by
         // the Slot class
-        object FrontBackPositions {
+        object FrontPositions {
             const val FEED: Double = 0.3
 
             const val HOME: Double = 0.01
         }
 
         object MiddlePositions {
+            const val FEED: Double = 0.3
 
-            const val FEED: Double = 0.4
-
-            const val HOME: Double = 0.05
+            const val HOME: Double = 0.0
         }
 
+        object BackPositions {
+            const val FEED: Double = 0.3
+
+            const val HOME: Double = 0.0
+        }
     }
 
     object ColorRanges{

@@ -12,12 +12,13 @@ import org.firstinspires.ftc.teamcode.vision.VisionConstants.AprilTagsPhysicalDe
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit
 import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit
 import org.firstinspires.ftc.teamcode.subsystems.indexer.MotifPatterns
+import org.firstinspires.ftc.teamcode.utils.gyroscopes.Otos
 import kotlin.math.tan
 
 class Limelight(
     hardwareMap: HardwareMap,
     val telemetry: Telemetry,
-    var otos: SparkFunOTOS
+    var otos: Otos
 ) : SubsystemBase() {
 
     private var limelight: Limelight3A? = null
@@ -41,11 +42,6 @@ class Limelight(
         limelight!!.pipelineSwitch(VisionConstants.LimelightConfiguration.PipelineIndex) // Gets the limelight pipeline
         // How many times per second the limelight receives data in seconds
         limelight!!.setPollRateHz(VisionConstants.LimelightConfiguration.PollRateHz)
-
-        // Setting an angular unit so the readings it returns are in that unit
-        otos.setAngularUnit(AngleUnit.DEGREES)
-        // Setting a linear unit so the readings it returns are in that unit
-        otos.setLinearUnit(DistanceUnit.INCH)
         // Reset's the otos readings to set the front of the robot when
         otos.resetTracking()
 
@@ -98,7 +94,7 @@ class Limelight(
     override fun periodic() {
 
         // Updating limelights' robot orientation with the Yaw
-        limelight!!.updateRobotOrientation(otos.position.h)
+        limelight!!.updateRobotOrientation(otos.getHeading().degrees)
 
         // LLResult is like a container full of information about what Limelight sees
         llResult = limelight!!.getLatestResult()

@@ -2,26 +2,25 @@ package org.firstinspires.ftc.teamcode.OpModes
 
 import Angle
 import com.qualcomm.hardware.sparkfun.SparkFunOTOS
-import com.qualcomm.robotcore.eventloop.opmode.Disabled
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp
 import com.seattlesolvers.solverslib.command.CommandOpMode
 import com.seattlesolvers.solverslib.command.CommandScheduler
 import com.seattlesolvers.solverslib.command.InstantCommand
-import com.seattlesolvers.solverslib.command.WaitUntilCommand
 import com.seattlesolvers.solverslib.command.button.GamepadButton
 import com.seattlesolvers.solverslib.command.button.Trigger
 import com.seattlesolvers.solverslib.gamepad.GamepadEx
 import com.seattlesolvers.solverslib.gamepad.GamepadKeys
+import com.seattlesolvers.solverslib.geometry.Vector2d
 import org.firstinspires.ftc.teamcode.commands.JoystickCmd
 import org.firstinspires.ftc.teamcode.subsystems.drivetrain.SolversMecanum
 import org.firstinspires.ftc.teamcode.subsystems.intake.Intake
-import org.firstinspires.ftc.teamcode.subsystems.turret.AprilTagLocationInDegrees
+import org.firstinspires.ftc.teamcode.subsystems.turret.AprilTagVectorLocations
 import org.firstinspires.ftc.teamcode.subsystems.turret.AxonTurret
-import org.firstinspires.ftc.teamcode.subsystems.turret.Turret
 import org.firstinspires.ftc.teamcode.subsystems.turret.turretConfig
 import org.firstinspires.ftc.teamcode.systems.ledSystem.LedSystem
 import org.firstinspires.ftc.teamcode.systems.shooterSystem.ShooterSystem
 import org.firstinspires.ftc.teamcode.utils.Alliance
+import org.firstinspires.ftc.teamcode.utils.gyroscopes.Otos
 import org.firstinspires.ftc.teamcode.vision.Limelight
 
 
@@ -57,7 +56,7 @@ class CMDOpMode : CommandOpMode() {
 
     lateinit var limelight: Limelight
 
-    lateinit var otos: SparkFunOTOS
+    lateinit var otos: Otos
 
     lateinit var leds: LedSystem
 
@@ -65,16 +64,14 @@ class CMDOpMode : CommandOpMode() {
 
     // Change this line if the RED April tag location is needed
     val alliance = Alliance.BLUE
-    var targetAprilTagLocation: Angle = Angle.fromDegrees(0.0)
+    var targetAprilTagLocation: Vector2d = Vector2d(0.0, 0.0)
 
     // Here, declare code to be executed right after pressing the INIT button
     override fun initialize() {
         /* Subsystem initialization */
 
         // Initializing the OTOS
-        otos = hardwareMap.get(SparkFunOTOS::class.java, "otos")
-        // Required for a correct IMU reading
-        otos.calibrateImu()
+        otos = Otos(hardwareMap, telemetry, otosConfig)
 
         // Initializing the mecanum & its default command
         mecanum = SolversMecanum(hardwareMap, telemetry, otos)
@@ -106,8 +103,8 @@ class CMDOpMode : CommandOpMode() {
         controller = GamepadEx(gamepad1)
 
         targetAprilTagLocation =
-            if (alliance == Alliance.BLUE) AprilTagLocationInDegrees.blueAprilTag
-            else AprilTagLocationInDegrees.redAprilTag
+            if (alliance == Alliance.BLUE) AprilTagVectorLocations.blueAprilTag
+            else AprilTagVectorLocations.redAprilTag
 
         configureButtonBindings()
     }
@@ -150,7 +147,7 @@ class CMDOpMode : CommandOpMode() {
 
         GamepadButton(controller, GamepadKeys.Button.Y)
             .whenPressed(
-                InstantCommand({ shooterSystem.indexer.feedShooter(limelight.getMotifPattern()).schedule() })
+                InstantCommand({ shooterSystem.indexer.feedShooterCMD(limelight.getMotifPattern()).schedule() })
             )
 
         Trigger { controller.gamepad.right_trigger > 0.2 }
@@ -171,7 +168,7 @@ class CMDOpMode : CommandOpMode() {
             // Command for actually running the scheduler
             CommandScheduler.getInstance().run()
 
-            turretTarget = targetAprilTagLocation - Angle.fromDegrees(otos.position.h)
+            //turretTarget = targetAprilTagLocation - Angle.fromDegrees(otos.position.h)
 
             controller.readButtons()
 

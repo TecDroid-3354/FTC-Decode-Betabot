@@ -19,44 +19,38 @@ class ShooterTestOpMode: CommandOpMode() {
     /* ! SET UP CODE ! */
 
     lateinit var shooter: Shooter
-    lateinit var hood: Hood
-    lateinit var controller: GamepadEx
-
     // Here, declare code to be executed right after pressing the INIT button
     override fun initialize() {
 
         shooter = Shooter(hardwareMap, telemetry)
 
-        hood = Hood(hardwareMap, telemetry)
+        //hood = Hood(hardwareMap, telemetry)
 
         controller = GamepadEx(gamepad1)
 
         configureButtonBindings()
     }
 
+    //lateinit var hood: Hood
+    lateinit var controller: GamepadEx
+
     // All control bindings that involve command execution are declared here
     fun configureButtonBindings() {
-        GamepadButton(controller, GamepadKeys.Button.RIGHT_BUMPER)
-            .whenActive(
-                InstantCommand({ shooter.setFlyWheelVelocity() })
-            ).whenInactive(
-                shooter.stopCMD()
-            )
+//        GamepadButton(controller, GamepadKeys.Button.A)
+//            .whenPressed(
+//                InstantCommand({ hood.modifyCurrentPositionBy(Angle.fromRotations(0.01)) })
+//            )
+//
+//        GamepadButton(controller, GamepadKeys.Button.B)
+//            .whenPressed(
+//                InstantCommand({ hood.modifyCurrentPositionBy(Angle.fromRotations(-0.01)) })
+//            )
+//
+//        GamepadButton(controller, GamepadKeys.Button.X)
+//                InstantCommand({ hood.setHoodPosition(Angle.fromRotations(0.0)) })
+//            )
+//            .whenPressed(
 
-        GamepadButton(controller, GamepadKeys.Button.A)
-            .whenPressed(
-                InstantCommand({ hood.modifyCurrentPositionBy(Angle.fromRotations(0.01)) })
-            )
-
-        GamepadButton(controller, GamepadKeys.Button.B)
-            .whenPressed(
-                InstantCommand({ hood.modifyCurrentPositionBy(Angle.fromRotations(-0.01)) })
-            )
-
-        GamepadButton(controller, GamepadKeys.Button.X)
-            .whenPressed(
-                InstantCommand({ hood.setHoodPosition(Angle.fromRotations(0.0)) })
-            )
     }
 
     // Main code body

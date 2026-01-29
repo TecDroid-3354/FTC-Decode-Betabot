@@ -41,6 +41,8 @@ class AxonTurretConstants {
 
     object PhysicalDescription {
         const val gearRatio = 1.0 / 5.5
+
+        val limits = Angle.fromDegrees(-180.0).degrees..Angle.fromDegrees(180.0).degrees
     }
 }
 
@@ -69,4 +71,5 @@ val leftServoConfig = RTPServoConfig(
 val turretConfig = AxonTurretConfig(
     rightServoConfig,
     leftServoConfig,
+    AxonTurretConstants.PhysicalDescription.limits
 )

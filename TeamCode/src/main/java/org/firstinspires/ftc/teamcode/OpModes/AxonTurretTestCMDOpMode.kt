@@ -1,30 +1,29 @@
 package org.firstinspires.ftc.teamcode.OpModes
 
 import Angle
-import com.bylazar.configurables.annotations.Configurable
 import com.qualcomm.hardware.rev.RevHubOrientationOnRobot
 import com.qualcomm.hardware.sparkfun.SparkFunOTOS
-import com.qualcomm.robotcore.eventloop.opmode.Disabled
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp
-import com.qualcomm.robotcore.hardware.PIDFCoefficients
 import com.seattlesolvers.solverslib.command.CommandOpMode
 import com.seattlesolvers.solverslib.command.CommandScheduler
 import com.seattlesolvers.solverslib.command.InstantCommand
-import com.seattlesolvers.solverslib.command.WaitUntilCommand
 import com.seattlesolvers.solverslib.command.button.GamepadButton
 import com.seattlesolvers.solverslib.gamepad.GamepadEx
 import com.seattlesolvers.solverslib.gamepad.GamepadKeys
+import com.seattlesolvers.solverslib.geometry.Vector2d
+import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit
 import org.firstinspires.ftc.teamcode.subsystems.turret.AxonTurret
-import org.firstinspires.ftc.teamcode.subsystems.turret.AxonTurretConfig
 import org.firstinspires.ftc.teamcode.utils.Alliance
-import org.firstinspires.ftc.teamcode.utils.RTPServo.RTPServoConfig
-import org.firstinspires.ftc.teamcode.utils.gyroscopes.RevHubIMU
 import org.firstinspires.ftc.teamcode.utils.gyroscopes.RevHubIMUConfig
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit.normalizeDegrees
-import org.firstinspires.ftc.teamcode.subsystems.turret.AprilTagLocationInDegrees
-import org.firstinspires.ftc.teamcode.subsystems.turret.AxonTurretConstants
+import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit
+import org.firstinspires.ftc.teamcode.commands.JoystickCmd
+import org.firstinspires.ftc.teamcode.subsystems.drivetrain.SolversMecanum
+import org.firstinspires.ftc.teamcode.subsystems.turret.AprilTagVectorLocations
 import org.firstinspires.ftc.teamcode.subsystems.turret.turretConfig
-import org.firstinspires.ftc.teamcode.utils.RTPServo.RTPServo
+import org.firstinspires.ftc.teamcode.utils.gyroscopes.Otos
+import org.firstinspires.ftc.teamcode.utils.gyroscopes.OtosConfig
+import kotlin.math.atan2
 
 
 // Personally, I chose to run my code using a command-based Op Mode since it works better for me
@@ -47,55 +46,60 @@ private val revHubIMUConfig = RevHubIMUConfig(
     RevHubOrientationOnRobot.UsbFacingDirection.BACKWARD
 )
 
-@TeleOp(name = "AxonTest", group = "Op Mode")
+val otosConfig = OtosConfig(
+    "otos",
+    AngleUnit.DEGREES,
+    DistanceUnit.INCH
+)
+
+@TeleOp(name = "Turret + Mecanum Test", group = "Op Mode")
 class AxonTurretTestCMDOpMode: CommandOpMode() {
 
     /* ! SET UP CODE ! */
     lateinit var turret: AxonTurret
 
-    lateinit var otos: SparkFunOTOS
+    lateinit var mecanum: SolversMecanum
+
+    lateinit var otos: Otos
 
     lateinit var controller: GamepadEx
 
     var turretTarget: Angle = Angle.fromDegrees(0.0)
 
     // Change this line if the RED April tag location is needed
-    val alliance = Alliance.RED
-    var targetAprilTagLocation: Angle = Angle.fromDegrees(0.0)
+    val alliance = Alliance.BLUE
+    var targetAprilTagLocation: Vector2d = Vector2d(0.0, 0.0)
 
     // Here, declare code to be executed right after pressing the INIT button
     override fun initialize() {
 
+        otos = Otos(hardwareMap, telemetry, otosConfig)
+        otos.setOffset(SparkFunOTOS.Pose2D(0.0, 0.0, Math.PI / 2))
+
         turret = AxonTurret(hardwareMap, telemetry, turretConfig) { turretTarget }
 
-        otos = hardwareMap.get(SparkFunOTOS::class.java, "otos")
-        otos.resetTracking()
-        otos.calibrateImu()
+        mecanum = SolversMecanum(hardwareMap, telemetry, otos)
+        mecanum.defaultCommand = JoystickCmd(
+            { controller.leftX },
+            { controller.leftY },
+            { controller.rightX },
+            mecanum
+        )
 
         controller = GamepadEx(gamepad1)
 
         targetAprilTagLocation =
-            if (alliance == Alliance.BLUE) AprilTagLocationInDegrees.blueAprilTag
-            else AprilTagLocationInDegrees.redAprilTag
+            if (alliance == Alliance.BLUE) AprilTagVectorLocations.blueAprilTag
+            else AprilTagVectorLocations.redAprilTag
 
         configureButtonBindings()
     }
 
     // All control bindings that involve command execution are declared here
     fun configureButtonBindings() {
-        GamepadButton(controller, GamepadKeys.Button.B)
+        GamepadButton(controller, GamepadKeys.Button.START)
             .whenPressed(InstantCommand({
-                turret.setTurretAngle(Angle.fromDegrees(180.0))
-            }))
-
-        GamepadButton(controller, GamepadKeys.Button.A)
-            .whenPressed(InstantCommand({
-                turret.setTurretAngle(Angle.fromDegrees(540.0))
-            }))
-
-        GamepadButton(controller, GamepadKeys.Button.X)
-            .whenPressed(InstantCommand({
-                turret.setTurretAngle(Angle.fromDegrees(-180.0))
+                otos.resetTracking()
             }))
     }
 
@@ -105,7 +109,6 @@ class AxonTurretTestCMDOpMode: CommandOpMode() {
         initialize()
 
         // Pauses OpMode until the START button is pressed on the Driver Hub
-
         waitForStart()
 
         // Run the scheduler
@@ -114,13 +117,29 @@ class AxonTurretTestCMDOpMode: CommandOpMode() {
             // Command for actually running the scheduler
             CommandScheduler.getInstance().run()
 
-            // SUPER IMPORTANT calling this line for the servo to update the PID feedback
+            // Get robot's location in a vector
+            val robotLocation = otos.getPositionVector()
+            // Get the robot's heading
+            val robotHeading = otos.getHeading()
 
-            // Updating the target in relation to the robot's heading
-            turretTarget = Angle.fromDegrees(normalizeDegrees(targetAprilTagLocation.degrees - otos.position.h))
-            // Useful data
-            telemetry.addData("otos heading", otos.position.h)
-            telemetry.addData("Turret Target", normalizeDegrees(turretTarget.degrees))
+            // Get the x difference from subtracting the x component of the april tag vector to the robot location
+            val xVector = targetAprilTagLocation.x - robotLocation.x
+            // Get the y difference from subtracting the y component of the april tag vector to the robot location
+            val yVector = targetAprilTagLocation.y - robotLocation.y
+
+            // Obtaining the robot relative angle by applying arc tangent2 to the obtained vector
+            val fieldTargetAngle = Angle.fromRadians(atan2(yVector, xVector))
+            // Getting the turret angle by subtracting the robot's rotation to the field target angle
+            turretTarget = Angle.fromDegrees(
+                normalizeDegrees(fieldTargetAngle.degrees - robotHeading.degrees)
+            )
+
+            telemetry.addData("x vector difference", xVector)
+            telemetry.addData("y vector difference", yVector)
+            telemetry.addData("Field target Angle", fieldTargetAngle.degrees)
+            telemetry.addData("Turret Target", turretTarget.degrees)
+            telemetry.addData("Turret Angle", turret.getAbsoluteAngle().degrees)
+            otos.log()
             telemetry.update()
         }
 

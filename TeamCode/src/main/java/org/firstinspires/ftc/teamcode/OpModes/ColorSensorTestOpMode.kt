@@ -20,7 +20,7 @@ class ColorSensorTestOpMode : CommandOpMode() {
 
     override fun initialize() {
         /* Subsystem initialization */
-        colorSensor = hardwareMap.get(ColorSensor::class.java, IndexerConstants.Identification.FrontSlot.frontSlotLeftSensor)
+        colorSensor = hardwareMap.get(ColorSensor::class.java, IndexerConstants.Identification.FrontSlot.frontSlotLeftSensorId)
 
         configureButtonBindings()
     }

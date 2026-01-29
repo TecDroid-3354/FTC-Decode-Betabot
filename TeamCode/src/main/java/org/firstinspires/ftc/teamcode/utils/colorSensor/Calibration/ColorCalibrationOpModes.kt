@@ -14,9 +14,9 @@ class ColorCalibrationOpModes : LinearOpMode() {
     private lateinit var BackSlot: ColorCalibrationJSON
 
     override fun runOpMode() {
-        FrontSlot = ColorCalibrationJSON(IndexerConstants.Identification.FrontSlot.frontSlotLeftSensor, Extensions.frontSlotExtension, telemetry, hardwareMap, gamepad1)
-        MiddleSlot = ColorCalibrationJSON(IndexerConstants.Identification.MiddleSlot.middleSlotLeftSensor, Extensions.middleSlotExtension, telemetry, hardwareMap, gamepad1)
-        BackSlot = ColorCalibrationJSON(IndexerConstants.Identification.BackSlot.backSlotLeftSensor, Extensions.backSlotExtension, telemetry, hardwareMap, gamepad1)
+        FrontSlot = ColorCalibrationJSON(IndexerConstants.Identification.FrontSlot.frontSlotLeftSensorId, Extensions.frontSlotExtension, telemetry, hardwareMap, gamepad1)
+        MiddleSlot = ColorCalibrationJSON(IndexerConstants.Identification.MiddleSlot.middleSlotLeftSensorId, Extensions.middleSlotExtension, telemetry, hardwareMap, gamepad1)
+        BackSlot = ColorCalibrationJSON(IndexerConstants.Identification.BackSlot.backSlotLeftSensorId, Extensions.backSlotExtension, telemetry, hardwareMap, gamepad1)
 
         val opciones = listOf("FrontSlot", "MiddleSlot", "BackSlot")
         var indice = 0

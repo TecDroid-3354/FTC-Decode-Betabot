@@ -1,6 +1,7 @@
 
 package org.firstinspires.ftc.teamcode.subsystems.drivetrain
 
+import Angle
 import com.qualcomm.hardware.sparkfun.SparkFunOTOS
 import com.qualcomm.robotcore.hardware.HardwareMap
 import com.seattlesolvers.solverslib.command.SubsystemBase
@@ -10,6 +11,7 @@ import com.seattlesolvers.solverslib.kinematics.wpilibkinematics.ChassisSpeeds
 import org.firstinspires.ftc.robotcore.external.Telemetry
 import org.firstinspires.ftc.teamcode.subsystems.drivetrain.MecanumConstants.Ids
 import org.firstinspires.ftc.teamcode.subsystems.drivetrain.MecanumConstants.Physics
+import org.firstinspires.ftc.teamcode.utils.gyroscopes.Otos
 import java.util.function.DoubleSupplier
 
 
@@ -39,6 +41,7 @@ class SolversMecanum(
         )
     }
 
+    constructor(hardwareMap: HardwareMap, telemetry: Telemetry, otos: Otos): this(hardwareMap, telemetry, otos.getSensorInstance())
 
     override fun periodic() {
         // Telemetry to retrieve useful data
@@ -65,14 +68,14 @@ class SolversMecanum(
             chassisSpeeds.vyMetersPerSecond,
             chassisSpeeds.vxMetersPerSecond,
             chassisSpeeds.omegaRadiansPerSecond,
-            getRobotYaw())
+            getRobotYaw().degrees)
     }
 
     /*fun getRobotPosition(): DoubleSupplier {
 
     }*/
 
-    fun getRobotYaw(): Double = otos.position.h
+    fun getRobotYaw(): Angle = Angle.fromDegrees(otos.position.h)
     fun resetOtosYaw(): Unit = otos.resetTracking()
 //    fun getRobotYaw(angleUnit: AngleUnit): Double = imu.robotYawPitchRollAngles.getYaw(angleUnit)
 //    fun resetRobotYaw(): Unit = imu.resetYaw()

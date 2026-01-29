@@ -37,21 +37,25 @@ class Indexer(
     // Initialization code //
     init {
 
-        // Giving each slot its corresponding servo, absolute, color sensors and positions
+        // Giving each slot its corresponding servo, color sensors and positions
         frontSlot = Slot(
-            SlotConfig(Identification.FrontSlot.frontServoId, Configuration.isFrontServoInverted,
-                Identification.FrontSlot.frontSlotRightSensor,
-                Identification.FrontSlot.frontSlotLeftSensor,
-                Positions.FrontBackPositions.FEED,
-                Positions.FrontBackPositions.HOME,
+            SlotConfig(
+                Identification.FrontSlot.frontServoId,
+                Configuration.isFrontServoInverted,
+                Identification.FrontSlot.frontSlotRightSensorId,
+                Identification.FrontSlot.frontSlotLeftSensorId,
+                Positions.FrontPositions.FEED,
+                Positions.FrontPositions.HOME,
                 Extensions.frontSlotExtension),
             hw,
             telemetry)
 
         middleSlot = Slot(
-            SlotConfig(Identification.MiddleSlot.middleServoId, Configuration.isMiddleServoInverted,
-                Identification.MiddleSlot.middleSlotRightSensor,
-                Identification.MiddleSlot.middleSlotLeftSensor,
+            SlotConfig(
+                Identification.MiddleSlot.middleServoId,
+                Configuration.isMiddleServoInverted,
+                Identification.MiddleSlot.middleSlotRightSensorId,
+                Identification.MiddleSlot.middleSlotLeftSensorId,
                 Positions.MiddlePositions.FEED,
                 Positions.MiddlePositions.HOME,
                 Extensions.middleSlotExtension),
@@ -59,11 +63,13 @@ class Indexer(
             telemetry)
 
         backSlot = Slot(
-            SlotConfig(Identification.BackSlot.backServoId, Configuration.isBackServoInverted,
-                Identification.BackSlot.backSlotRightSensor,
-                Identification.BackSlot.backSlotLeftSensor,
-                Positions.FrontBackPositions.FEED,
-                Positions.FrontBackPositions.HOME,
+            SlotConfig(
+                Identification.BackSlot.backServoId,
+                Configuration.isBackServoInverted,
+                Identification.BackSlot.backSlotRightSensorId,
+                Identification.BackSlot.backSlotLeftSensorId,
+                Positions.BackPositions.FEED,
+                Positions.BackPositions.HOME,
                 Extensions.backSlotExtension),
             hw,
             telemetry)
@@ -73,9 +79,9 @@ class Indexer(
 
     // This code will execute indefinably during your operation
     override fun periodic() {
-//        telemetry.addData("FrontSlotColor", frontSlot.getDetectedColor())
-//        telemetry.addData("MiddleSlotColor", middleSlot.getDetectedColor())
-//        telemetry.addData("BackSlotColor", backSlot.getDetectedColor())
+        telemetry.addData("FrontSlotColor", frontSlot.getDetectedColor())
+        telemetry.addData("MiddleSlotColor", middleSlot.getDetectedColor())
+        telemetry.addData("BackSlotColor", backSlot.getDetectedColor())
 
     }
 
@@ -113,11 +119,11 @@ class Indexer(
     }
 
     /**
-     * [feedShooter] returns a [SequentialCommandGroup] that feeds each slot if the color the color sensors detection
+     * [feedShooterWithDetectedColor] returns a [SequentialCommandGroup] that feeds each slot if the color the color sensors detection
      * is not [DetectedColor.UNKNOWN]
      * @return a [SequentialCommandGroup] that feeds every slot that has a ball
      */
-    fun feedShooter(): SequentialCommandGroup {
+    private fun feedShooterWithDetectedColor(): SequentialCommandGroup {
         val cmdGroup = SequentialCommandGroup()
         var slotTracker: MutableList<String> = MutableList(3) { "" }
 
@@ -132,18 +138,18 @@ class Indexer(
     }
 
     /**
-     * [feedShooter] receives a [MotifPatterns] and determines if the bal configuration inside the [Indexer]
+     * [feedShooterWithDetectedColor] receives a [MotifPatterns] and determines if the bal configuration inside the [Indexer]
      * is valid for completing the [MotifPatterns], and then sets the slot order if the ccolors inside each [Slot]
      * satisfy the [MotifPatterns]
      * @param motifPatterns The current Pattern, it must be received from Limelight readings
      * @return a [SequentialCommandGroup] that executes the feed sequence on each valid slot
      */
-    fun feedShooter(motifPatterns: MotifPatterns): SequentialCommandGroup {
+     private fun feedShooterWithDetectedColor(motifPatterns: MotifPatterns): SequentialCommandGroup {
         val cmdGroup = SequentialCommandGroup()
         var slotTracker: MutableList<String> = MutableList(3) {""}
 
         if (rejectEvaluation() || motifPatterns == MotifPatterns.NO_PATTERN_DETECTED) {
-            return feedShooter()
+            return feedShooterWithDetectedColor()
         }
 
         for ((index, color) in motifPatterns.pattern.withIndex()) {
@@ -157,6 +163,10 @@ class Indexer(
         }
 
         return cmdGroup
+    }
+
+    fun feedShooterCMD(motifPatterns: MotifPatterns): InstantCommand {
+        return InstantCommand({ feedShooterWithDetectedColor(motifPatterns).schedule() })
     }
 
     /**
@@ -230,7 +240,7 @@ class Indexer(
      */
     private fun feedCMD(slot: Slot): Command {
         return SequentialCommandGroup(
-            WaitCommand(450),
+            WaitCommand(300),
             InstantCommand({ slot.feed() }),
             WaitCommand(200),
             InstantCommand({ slot.home() })

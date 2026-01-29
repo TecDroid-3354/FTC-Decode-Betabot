@@ -21,7 +21,9 @@ class ShooterConstants {
         val zeroPowerBehavior = DcMotor.ZeroPowerBehavior.FLOAT
         // The motor's run mode, in this case as the shooter does not need any encoder position, is set to
         // run without encoder
-        val runMode = DcMotor.RunMode.RUN_WITHOUT_ENCODER
+        val runMode = DcMotor.RunMode.RUN_USING_ENCODER
+
+        const val ticksPerRotation = 28.0
     }
 
     // It will be used to give the motor the correct velocity to be set to
@@ -30,9 +32,7 @@ class ShooterConstants {
         companion object {
             @JvmField
             // The PID controller used for the subsytem's motor
-            var firstMotorPIDCoefficients = PIDFCoefficients(1.0, 0.0, 0.0, 0.0)
-            @JvmField
-            var secondMotorPIDCoefficients = PIDFCoefficients(1.0, 0.0, 0.0, 0.0)
+            var pidfCoefficients = PIDFCoefficients(1.0, 0.0, 0.0, 0.0)
         }
     }
 
@@ -40,7 +40,7 @@ class ShooterConstants {
     class Velocity {
         companion object {
             @JvmField
-            var shooterDesiredVelocity = AngularVelocity.fromRpm(0.0).rpm
+            var shooterDesiredVelocity = 0.0
         }
     }
 }

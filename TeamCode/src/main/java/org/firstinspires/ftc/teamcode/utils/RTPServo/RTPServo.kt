@@ -152,7 +152,26 @@ class RTPServo(hw: HardwareMap, val telemetry: Telemetry, val config: RTPServoCo
     }
 
     /**
+     * Logs the servo's useful data
+     */
+    fun log() {
+        // Total servo rotation in servo terms
+        telemetry.addData("Total Servo Rotation", totalRotation.degrees)
+        // Servo absolute angle -180° to 180°
+        telemetry.addData("Current Servo Absolute Angle", getServoAbsoluteAngle().degrees)
+        // Total of rotations the servo has achieved
+        telemetry.addData("Full rotations", fullRotations)
+        // Encoder's voltage (useful when debugging)
+        telemetry.addData("Encoder Voltage", servoEncoder?.voltage)
+        // If the servo is at set point
+        telemetry.addData("Is at set point", isAtSetPoint())
+        // System's angle (considering gear ratios)
+        telemetry.addData("Absolute Angle (considering gear ratios)", getTotalRotation().degrees)
+    }
+
+    /**
      * Updates the servo's PID, and calculates the achieved full rotations
+     * Necessary for the servo's correct functioning
      */
     fun periodic() {
         // Retrieves the current servo angle
@@ -173,12 +192,6 @@ class RTPServo(hw: HardwareMap, val telemetry: Telemetry, val config: RTPServoCo
         // keeps track of the previous servo angle
         previousAngle = currentAngle
 
-//        telemetry.addData("Total Servo Rotation", totalRotation.degrees)
-//        telemetry.addData("Full rotations", fullRotations)
-//        telemetry.addData("Current Servo Angle", currentAngle.degrees)
-//        telemetry.addData("Encoder voltage", servoEncoder?.voltage)
-//        telemetry.addData("Angle Difference", angleDifference.degrees)
-        telemetry.addData("Absolute angle (reduction)", getTotalRotation().degrees)
         // PID control
         val output = pidfController.calculate(totalRotation.degrees, targetRotation.degrees)
 

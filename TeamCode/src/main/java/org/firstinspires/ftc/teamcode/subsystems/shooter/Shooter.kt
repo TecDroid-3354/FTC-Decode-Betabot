@@ -4,15 +4,11 @@ import AngularVelocity
 import com.qualcomm.robotcore.hardware.DcMotor
 import com.qualcomm.robotcore.hardware.DcMotorEx
 import com.qualcomm.robotcore.hardware.HardwareMap
-import com.qualcomm.robotcore.hardware.PIDCoefficients
 import com.qualcomm.robotcore.hardware.PIDFCoefficients
 import com.seattlesolvers.solverslib.command.Command
 import com.seattlesolvers.solverslib.command.InstantCommand
 import com.seattlesolvers.solverslib.command.SubsystemBase
-import com.seattlesolvers.solverslib.controller.PIDController
-import com.seattlesolvers.solverslib.controller.PIDFController
 import org.firstinspires.ftc.robotcore.external.Telemetry
-import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit
 import org.firstinspires.ftc.teamcode.shooter.ShooterConstants
 
 /**
@@ -28,47 +24,46 @@ class Shooter(
     private lateinit var firstMotor: DcMotorEx
     private lateinit var secondMotor: DcMotorEx
 
-    private var pidController = PIDFController(10.0, 0.0, 0.0, 0.0)
     private var desiredVelocity = AngularVelocity.fromRpm(0.0)
 
     // Initialization //
 
     // This is the code that will execute when the class is initialized
     init {
-        pidController.setTolerance(AngularVelocity.fromRpm(2.0).rpm)
         motorConfiguration()
     }
 
     // Periodic method //
     override fun periodic() {
-        setPIDCoefficients(ShooterConstants.PIDF.firstMotorPIDCoefficients)
-        telemetry.addData("Shooter velocity", getVelocity().rpm)
-        telemetry.addData("Shooter desired velocity", desiredVelocity.rpm)
+        setPIDCoefficients(ShooterConstants.PIDF.pidfCoefficients)
 
         desiredVelocity = AngularVelocity.fromRpm(ShooterConstants.Velocity.shooterDesiredVelocity)
 
-//        val output = pidController.calculate(getVelocity().rpm, desiredVelocity.rpm)
-//
-//        firstMotor.power = output
-//        secondMotor.power = output
+//        setFlyWheelVelocity(desiredVelocity)
+
+        telemetry.addData("Shooter velocity", getVelocity().rpm)
+        telemetry.addData("Shooter desired velocity", desiredVelocity.rpm)
+        telemetry.addData("Error", desiredVelocity.rpm - getVelocity().rpm)
     }
 
     // Functional code //
     // Setters //
 
+
+    private fun setVelocity(motor: DcMotorEx, velocity: AngularVelocity) {
+        motor.setVelocity(velocity.rotPerSec * ShooterConstants.Configuration.ticksPerRotation)
+    }
     /**
      * Sets the motor's velocity to a desired angular velocity
      */
+    fun setFlyWheelVelocity(velocity: AngularVelocity) {
+        setVelocity(firstMotor, velocity)
+        setVelocity(secondMotor, velocity)
+    }
 
-//    private fun setFlyWheelVelocity(velocity: AngularVelocity) {
-//        firstMotor.setVelocity(velocity.degPerSec, AngleUnit.DEGREES)
-//        secondMotor.setVelocity(velocity.degPerSec, AngleUnit.DEGREES)
-//    }
-
-    fun setFlyWheelVelocity() {
-//        desiredVelocity = velocity
-        firstMotor.power = 1.0
-        secondMotor.power = 1.0
+    fun setFlyWheelPower(outPut: Double) {
+        firstMotor.power = outPut
+        secondMotor.power = outPut
     }
 
     fun shootCMD(): Command {
@@ -92,7 +87,8 @@ class Shooter(
     }
 
     private fun setPIDCoefficients(pidfCoefficients: PIDFCoefficients) {
-        pidController.setPIDF(pidfCoefficients.p, pidfCoefficients.i, pidfCoefficients.d, pidfCoefficients.f)
+        firstMotor.setPIDFCoefficients(DcMotor.RunMode.RUN_USING_ENCODER, pidfCoefficients)
+        secondMotor.setPIDFCoefficients(DcMotor.RunMode.RUN_USING_ENCODER, pidfCoefficients)
     }
 
     // Getters //
@@ -106,7 +102,7 @@ class Shooter(
     }
 
     fun getVelocity(): AngularVelocity {
-        return AngularVelocity(firstMotor.velocity / 28.0)
+        return AngularVelocity(firstMotor.velocity / ShooterConstants.Configuration.ticksPerRotation)
     }
 
     /**
@@ -123,5 +119,7 @@ class Shooter(
         secondMotor.mode = ShooterConstants.Configuration.runMode
         secondMotor.direction = ShooterConstants.Configuration.direction
         secondMotor.zeroPowerBehavior = ShooterConstants.Configuration.zeroPowerBehavior
+
+        setPIDCoefficients(ShooterConstants.PIDF.pidfCoefficients)
     }
 }

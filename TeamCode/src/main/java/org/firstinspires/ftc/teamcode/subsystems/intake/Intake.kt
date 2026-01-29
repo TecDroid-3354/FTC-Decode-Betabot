@@ -83,6 +83,7 @@ class Intake(
     // This code executes indefinitely during our robot's program
     override fun periodic() {
         // Uncomment these lines for real-time PID tuning
+
 //        frontMotor.setPIDFCoefficients(IntakeConstants.PIDF.pidfCoefficients)
 //        backMotor.setPIDFCoefficients(IntakeConstants.PIDF.pidfCoefficients)
     }
@@ -92,7 +93,7 @@ class Intake(
     // Configuring motors with the custom VelocityEx class
     private fun motorConfig() {
         frontMotor = VelocityMotorEx(
-            MotorEx(hardwareMap, IntakeConstants.Identification.rightIntakeMotorId,
+            MotorEx(hardwareMap, IntakeConstants.Identification.frontMotorId,
                 IntakeConstants.Configuration.ticksPerRevolution, IntakeConstants.Configuration.rpm),
             VelocityMotorConfig(
                 IntakeConstants.Configuration.zeroPowerBehavior,
@@ -101,7 +102,7 @@ class Intake(
         )
 
         backMotor = VelocityMotorEx(
-            MotorEx(hardwareMap, IntakeConstants.Identification.leftIntakeMotorId,
+            MotorEx(hardwareMap, IntakeConstants.Identification.backMotorId,
                 IntakeConstants.Configuration.ticksPerRevolution, IntakeConstants.Configuration.rpm),
             VelocityMotorConfig(
                 IntakeConstants.Configuration.zeroPowerBehavior,
