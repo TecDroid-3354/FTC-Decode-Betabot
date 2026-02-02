@@ -5,8 +5,7 @@ package org.firstinspires.ftc.teamcode.utils.interpolation;
  * third query key, an InverseInterpolable object can calculate the interpolation parameter of the query key on the
  * interval [0, 1].
  *
- * @param <T>
- *            The Type of InverseInterpolable
+ * @param <T> The Type of InverseInterpolable
  * @see InterpolatingTreeMap
  */
 public interface InverseInterpolable<T> {

@@ -61,6 +61,7 @@ private val otosConfig = OtosConfig(
 *
 * */
 
+// adb connect 192.168.43.1:5555 (connects to Control Hub)
 @TeleOp(name = "Integration Test", group = "Op Mode")
 class IntegrationTestOpMode: CommandOpMode() {
 
