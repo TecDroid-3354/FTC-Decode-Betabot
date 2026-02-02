@@ -71,7 +71,7 @@ class ShooterSystem(hw: HardwareMap, val telemetry: Telemetry, distanceToAprilTa
             InstantCommand({ indexer.feedShooterCMD(motifPatterns).schedule() }),
             WaitCommand(2000),
             stopShooter()
-        )
+        );
     }
 
     //todo: missing
@@ -85,5 +85,9 @@ class ShooterSystem(hw: HardwareMap, val telemetry: Telemetry, distanceToAprilTa
 
     fun isFull(): Boolean {
         return indexer.isFull()
+    }
+
+    fun isShooterActive():Boolean{
+        return shooter.isActive()
     }
 }
