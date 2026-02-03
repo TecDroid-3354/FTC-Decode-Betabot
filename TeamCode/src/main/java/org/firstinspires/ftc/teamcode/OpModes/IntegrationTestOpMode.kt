@@ -51,12 +51,6 @@ private val revHubIMUConfig = RevHubIMUConfig(
     RevHubOrientationOnRobot.UsbFacingDirection.BACKWARD
 )
 
-private val otosConfig = OtosConfig(
-    "otos",
-    AngleUnit.DEGREES,
-    DistanceUnit.INCH
-)
-
 /*
 *
 * */

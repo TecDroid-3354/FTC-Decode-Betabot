@@ -1,19 +1,25 @@
 package org.firstinspires.ftc.teamcode.vision
 
+import Angle
 import Distance
 import com.qualcomm.hardware.limelightvision.LLResult
 import com.qualcomm.hardware.limelightvision.Limelight3A
-import com.qualcomm.hardware.sparkfun.SparkFunOTOS
 import com.qualcomm.robotcore.hardware.HardwareMap
 import com.seattlesolvers.solverslib.command.SubsystemBase
 import org.firstinspires.ftc.robotcore.external.Telemetry
-import org.firstinspires.ftc.teamcode.vision.VisionConstants.LimelightPhysicalDescription
-import org.firstinspires.ftc.teamcode.vision.VisionConstants.AprilTagsPhysicalDescription
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit
 import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit
+import org.firstinspires.ftc.robotcore.external.navigation.Pose3D
+import org.firstinspires.ftc.robotcore.external.navigation.Position
+import org.firstinspires.ftc.robotcore.external.navigation.YawPitchRollAngles
 import org.firstinspires.ftc.teamcode.subsystems.indexer.MotifPatterns
 import org.firstinspires.ftc.teamcode.utils.gyroscopes.Otos
+import org.firstinspires.ftc.teamcode.vision.VisionConstants.AprilTagsPhysicalDescription
+import org.firstinspires.ftc.teamcode.vision.VisionConstants.LimelightPhysicalDescription
+import kotlin.math.cos
+import kotlin.math.sin
 import kotlin.math.tan
+
 
 class Limelight(
     hardwareMap: HardwareMap,
@@ -78,6 +84,80 @@ class Limelight(
         return Distance.fromInches(0.0)
     }
 
+    fun getCameraMT2Position(): Pose3D? {
+        // First, tell Limelight which way your robot is facing
+        val robotYaw: Double = getRobotHeadingDegrees()
+        limelight!!.updateRobotOrientation(robotYaw)
+        if (llResult != null && llResult!!.isValid()) {
+            val botPoseMT2: Pose3D? = llResult!!.botpose_MT2
+            if (botPoseMT2 != null) {
+                val x = botPoseMT2.getPosition().x
+                val y = botPoseMT2.getPosition().y
+                telemetry.addData("MT2 Location:", "(" + x + ", " + y + ")")
+                return botPoseMT2
+            }
+        }
+
+        return null
+    }
+
+    fun getRobotPoseFromMegaTag2(turretAngle: Angle): Pose3D? {
+        val cameraPose = getCameraMT2Position()
+
+        if (cameraPose != null) {
+            // 1. OFFSET FÍSICO ROBOT → CÁMARA (cuando torreta = 0)
+
+            val dx = LimelightPhysicalDescription.LLXOffsetToLens.meters // metros hacia adelante
+            val dy = LimelightPhysicalDescription.LLYOffsetToLens.meters // metros hacia la izquierda
+            val dz = 0.0
+
+            // 2. Rotar offset por la torreta
+            val xOff = dx * cos(turretAngle.radians) - dy * sin(turretAngle.radians)
+            val yOff = dx * sin(turretAngle.radians) + dy * cos(turretAngle.radians)
+
+            // 3. Extraer pose de la cámara
+            val camPos: Position = cameraPose.getPosition()
+            val camAngles = cameraPose.getOrientation()
+
+            val xCam: Double = camPos.x
+            val yCam: Double = camPos.y
+            val zCam: Double = camPos.z
+
+            val yawCam = camAngles.getYaw(AngleUnit.RADIANS)
+
+            // 4. Heading REAL del robot
+            val yawRobot = yawCam - turretAngle.radians
+
+            // 5. Restar offset en el frame del campo
+            val xRobot = xCam - (xOff * cos(yawRobot) - yOff * sin(yawRobot))
+            val yRobot = yCam - (xOff * sin(yawRobot) + yOff * cos(yawRobot))
+            val zRobot = zCam - dz
+
+            val time = System.nanoTime()
+
+            // 6. Construir Pose3D del robot
+            val robotPosition = Position(
+                DistanceUnit.METER,
+                xRobot,
+                yRobot,
+                zRobot,
+                time
+            )
+
+            val robotOrientation = YawPitchRollAngles(
+                AngleUnit.RADIANS,
+                yawRobot,  // yaw
+                0.0,  // pitch (robot plano)
+                0.0,  // roll
+                time
+            )
+
+            return Pose3D(robotPosition, robotOrientation)
+        }
+
+        return null
+    }
+
     /**
      * Gets the obelisk april tag id and relates it to a [MotifPatterns] depending on the actual pattern of the match
      * @return the current motif pattern
@@ -91,10 +171,14 @@ class Limelight(
         }
     }
 
+    fun getRobotHeadingDegrees(): Double {
+        return otos.getHeading().degrees
+    }
+
     override fun periodic() {
 
         // Updating limelights' robot orientation with the Yaw
-        limelight!!.updateRobotOrientation(otos.getHeading().degrees)
+        limelight!!.updateRobotOrientation(getRobotHeadingDegrees())
 
         // LLResult is like a container full of information about what Limelight sees
         llResult = limelight!!.getLatestResult()
@@ -117,9 +201,6 @@ class Limelight(
                 }
             }
 
-
-            val botPose = llResult!!.botpose_MT2
-            // Offset to target in degrees (from crosshair)
             val targetOffsetAngle_Vertical = Angle.fromDegrees(llResult!!.getTy())
             // Needs to be in radians for tan() method
             val angleToGoalRadians =
@@ -130,14 +211,10 @@ class Limelight(
                 (AprilTagsPhysicalDescription.GoalHeightFromGround - LimelightPhysicalDescription.LLHeightFromGroundToLens) / tan(
                     angleToGoalRadians
                 )
+
             telemetry.addData(
                 "Limelight TargetDistanceInches",
                 distanceFromLimelightToGoalInches.inches
-            )
-
-            telemetry.addData(
-                "MT2 distance to goal",
-                Distance.fromMeters(botPose.position.z).inches
             )
 
             // We will first get a (MetaTag2) Pose3D. From here, we will extract its Tx, Ty & Ta components
