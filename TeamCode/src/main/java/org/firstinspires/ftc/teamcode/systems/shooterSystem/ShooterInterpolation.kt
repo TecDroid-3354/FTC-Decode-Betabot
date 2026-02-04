@@ -22,12 +22,12 @@ class ShooterInterpolationConstructor(private var distanceToGoal: Supplier<Dista
     private val points = listOf(
         // todo: finish adding all points
         Point(Distance.fromInches(0.0), Angle.fromDegrees(0.0)),
-        Point(Distance.fromInches(50.0), Angle.fromDegrees(20.0)),
-        Point(Distance.fromInches(55.0), Angle.fromDegrees(100.0)),
-        Point(Distance.fromInches(60.0), Angle.fromDegrees(360.0)),
-        Point(Distance.fromInches(65.0), Angle.fromDegrees(320.0)),
-        Point(Distance.fromInches(70.0), Angle.fromDegrees(163.0)),
-        Point(Distance.fromInches(85.0), Angle.fromDegrees(2.0)),
+        Point(Distance.fromInches(0.0), Angle.fromDegrees(0.0)),
+        Point(Distance.fromInches(0.0), Angle.fromDegrees(0.0)),
+        Point(Distance.fromInches(0.0), Angle.fromDegrees(0.0)),
+        Point(Distance.fromInches(0.0), Angle.fromDegrees(0.0)),
+        Point(Distance.fromInches(0.0), Angle.fromDegrees(0.0)),
+        Point(Distance.fromInches(0.0), Angle.fromDegrees(0.0))
     )
 
     init {

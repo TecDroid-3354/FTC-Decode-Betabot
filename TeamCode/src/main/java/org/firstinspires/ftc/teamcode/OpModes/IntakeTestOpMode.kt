@@ -48,17 +48,16 @@ class IntakeTestOpMode: CommandOpMode() {
 
     // All control bindings that involve command execution are declared here
     fun configureButtonBindings() {
-
-        GamepadButton(controller, GamepadKeys.Button.LEFT_BUMPER)
+        GamepadButton(controller, GamepadKeys.Button.RIGHT_BUMPER)
             .whenPressed(
-                intake.enableBothOuttakes()
+                intake.enableBothIntakes()
             ).whenReleased (
                 intake.stopBothIntakes()
             )
 
-        GamepadButton(controller, GamepadKeys.Button.RIGHT_BUMPER)
+        GamepadButton(controller, GamepadKeys.Button.LEFT_BUMPER)
             .whenPressed(
-                intake.enableBothIntakes()
+                intake.enableBothOuttakes()
             ).whenReleased (
                 intake.stopBothIntakes()
             )

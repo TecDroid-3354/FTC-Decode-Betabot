@@ -12,10 +12,10 @@ object AprilTagVectorLocations {
     /**
      * Blue april tag location vector in inches
      */
-    val blueAprilTag = Vector2d(-58.361, -55.652)
+    val blueAprilTag = Vector2d(72.0, 72.0)
 
     /**
      * Red april tag location vector in inches
      */
-    val redAprilTag = Vector2d(-58.361, 55.652)
+    val redAprilTag = Vector2d(-72.0, 72.0)
 }

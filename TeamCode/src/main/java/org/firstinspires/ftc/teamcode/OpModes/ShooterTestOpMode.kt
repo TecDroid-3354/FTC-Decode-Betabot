@@ -19,12 +19,14 @@ class ShooterTestOpMode: CommandOpMode() {
     /* ! SET UP CODE ! */
 
     lateinit var shooter: Shooter
+
+    lateinit var hood: Hood
     // Here, declare code to be executed right after pressing the INIT button
     override fun initialize() {
 
         shooter = Shooter(hardwareMap, telemetry)
 
-        //hood = Hood(hardwareMap, telemetry)
+        hood = Hood(hardwareMap, telemetry)
 
         controller = GamepadEx(gamepad1)
 
@@ -36,15 +38,15 @@ class ShooterTestOpMode: CommandOpMode() {
 
     // All control bindings that involve command execution are declared here
     fun configureButtonBindings() {
-//        GamepadButton(controller, GamepadKeys.Button.A)
-//            .whenPressed(
-//                InstantCommand({ hood.modifyCurrentPositionBy(Angle.fromRotations(0.01)) })
-//            )
-//
-//        GamepadButton(controller, GamepadKeys.Button.B)
-//            .whenPressed(
-//                InstantCommand({ hood.modifyCurrentPositionBy(Angle.fromRotations(-0.01)) })
-//            )
+        GamepadButton(controller, GamepadKeys.Button.A)
+            .whenPressed(
+                InstantCommand({ hood.modifyCurrentPositionBy(Angle.fromRotations(0.01)) })
+            )
+
+        GamepadButton(controller, GamepadKeys.Button.B)
+            .whenPressed(
+                InstantCommand({ hood.modifyCurrentPositionBy(Angle.fromRotations(-0.01)) })
+            )
 //
 //        GamepadButton(controller, GamepadKeys.Button.X)
 //                InstantCommand({ hood.setHoodPosition(Angle.fromRotations(0.0)) })
@@ -66,6 +68,9 @@ class ShooterTestOpMode: CommandOpMode() {
 
             // Command for actually running the scheduler
             CommandScheduler.getInstance().run()
+
+            // Read the controller's buttons states
+            controller.readButtons()
 
             telemetry.update()
         }

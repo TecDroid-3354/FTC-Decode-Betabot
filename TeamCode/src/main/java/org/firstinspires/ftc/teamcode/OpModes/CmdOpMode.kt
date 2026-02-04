@@ -74,7 +74,7 @@ class CMDOpMode : CommandOpMode() {
         otos = Otos(hardwareMap, telemetry, otosConfig)
 
         // Initializing the mecanum & its default command
-        mecanum = SolversMecanum(hardwareMap, telemetry, otos)
+        mecanum = SolversMecanum(hardwareMap, telemetry, otos.getSensorInstance())
         mecanum.defaultCommand = JoystickCmd(
             { controller.leftX },
             { controller.leftY },

@@ -62,7 +62,7 @@ public class Constants {
             // translated 1/4 in to the left, which would be a translation in the y axis since OTOS
             // axes are flipped.
 //            .offset(new SparkFunOTOS.Pose2D(0.0,-0.25,-Math.PI / 2.0))
-            .offset(new SparkFunOTOS.Pose2D(0.0, -0.25, Math.PI / 2))
+            .offset(new SparkFunOTOS.Pose2D(0.0, -0.25, -Math.PI / 2.0))
             .linearScalar(0.9484) // Done 👍
             .angularScalar(0.9939); // Done 👍
 

@@ -130,15 +130,17 @@ class Limelight(
                 (AprilTagsPhysicalDescription.GoalHeightFromGround - LimelightPhysicalDescription.LLHeightFromGroundToLens) / tan(
                     angleToGoalRadians
                 )
+
+            telemetry.addLine("// Limelight //")
             telemetry.addData(
                 "Limelight TargetDistanceInches",
                 distanceFromLimelightToGoalInches.inches
             )
 
-            telemetry.addData(
-                "MT2 distance to goal",
-                Distance.fromMeters(botPose.position.z).inches
-            )
+//            telemetry.addData(
+//                "MT2 distance to goal",
+//                Distance.fromMeters(botPose.position.z).inches
+//            )
 
             // We will first get a (MetaTag2) Pose3D. From here, we will extract its Tx, Ty & Ta components
             tx = llResult!!.tx

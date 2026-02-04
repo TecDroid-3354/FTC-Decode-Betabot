@@ -84,8 +84,8 @@ class Intake(
     override fun periodic() {
         // Uncomment these lines for real-time PID tuning
 
-//        frontMotor.setPIDFCoefficients(IntakeConstants.PIDF.pidfCoefficients)
-//        backMotor.setPIDFCoefficients(IntakeConstants.PIDF.pidfCoefficients)
+        frontMotor.setPIDFCoefficients(IntakeConstants.PIDF.pidfCoefficients)
+        backMotor.setPIDFCoefficients(IntakeConstants.PIDF.pidfCoefficients)
     }
 
     // Setup code //

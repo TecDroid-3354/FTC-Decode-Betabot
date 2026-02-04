@@ -143,8 +143,10 @@ class RTPServo(hw: HardwareMap, val telemetry: Telemetry, val config: RTPServoCo
      * Based on how many full rotations the servo has achieved, it returns an absolute angle
      * @return the total rotation the servo has achieved while considering gear ratios.
      */
-    fun getTransformedAngle(): Angle {
-        return Angle.fromDegrees(normalizeDegrees(totalRotation.degrees * config.gearRatio))
+    fun getAngle(): Angle {
+        val transformedAngle = totalRotation.degrees * config.gearRatio
+        val normalizedAngle = normalizeDegrees(transformedAngle)
+        return Angle.fromDegrees(normalizedAngle)
     }
 
     /**
@@ -158,8 +160,6 @@ class RTPServo(hw: HardwareMap, val telemetry: Telemetry, val config: RTPServoCo
      * Logs the servo's useful data
      */
     fun log() {
-        // Total servo rotation in servo terms
-        telemetry.addData("Total Servo Rotation", totalRotation.degrees)
         // Servo absolute angle -180° to 180°
         telemetry.addData("Current Servo Absolute Angle", getServoAbsoluteAngle().degrees)
         // Total of rotations the servo has achieved
@@ -169,7 +169,7 @@ class RTPServo(hw: HardwareMap, val telemetry: Telemetry, val config: RTPServoCo
         // If the servo is at set point
         telemetry.addData("Is at set point", isAtSetPoint())
         // System's angle (considering gear ratios)
-        telemetry.addData("Absolute Angle (considering gear ratios)", getTransformedAngle().degrees)
+        telemetry.addData("Absolute Angle (considering gear ratios)", getAngle().degrees)
     }
 
     /**
@@ -191,7 +191,8 @@ class RTPServo(hw: HardwareMap, val telemetry: Telemetry, val config: RTPServoCo
         }
 
         // Calculates the total rotation considering the absolute angle and the achieved rotations
-        totalRotation = (getServoAbsoluteAngle() + Angle.fromDegrees(fullRotations * 360.0))
+        totalRotation = currentAngle + Angle.fromDegrees(fullRotations * 360.0)
+
         // keeps track of the previous servo angle
         previousAngle = currentAngle
 

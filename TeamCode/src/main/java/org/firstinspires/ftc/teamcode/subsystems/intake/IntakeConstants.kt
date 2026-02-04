@@ -22,9 +22,9 @@ class IntakeConstants {
         // The motor's behavior when is not given any output
         val zeroPowerBehavior = Motor.ZeroPowerBehavior.FLOAT
         // If the right motor is inverted
-        val rightIsInverted = true
+        val rightIsInverted = false
         // If the left motor is inverted
-        val leftIsInverted = false
+        val leftIsInverted = true
     }
 
     // It will be used to give the motor the correct velocity to be set to, it can be configured through panels

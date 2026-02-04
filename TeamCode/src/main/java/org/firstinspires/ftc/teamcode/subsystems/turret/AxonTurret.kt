@@ -35,10 +35,10 @@ class AxonTurret(val hw: HardwareMap, val telemetry: Telemetry, val config: Axon
     override fun periodic() {
         setPIDFCoefficients(rightServo, AxonTurretConstants.turretControllerCoefficients)
         setPIDFCoefficients(leftServo, AxonTurretConstants.turretControllerCoefficients)
-        //rightServo.periodic()
-        //leftServo.periodic()
+        rightServo.periodic()
+        leftServo.periodic()
 
-//        setTurretAngle(turretTarget.get())
+        setTurretAngle(turretTarget.get())
     }
 
     fun stopTurret() {
@@ -56,7 +56,7 @@ class AxonTurret(val hw: HardwareMap, val telemetry: Telemetry, val config: Axon
 
     // Just need one encoder's reading
     fun getAbsoluteAngle(): Angle {
-        return rightServo.getTransformedAngle()
+        return rightServo.getAngle()
     }
 
     fun setPIDFCoefficients(servo: RTPServo, pidfCoefficients: PIDFCoefficients) {

@@ -8,6 +8,7 @@ import com.qualcomm.robotcore.hardware.PIDFCoefficients
 import com.seattlesolvers.solverslib.command.Command
 import com.seattlesolvers.solverslib.command.InstantCommand
 import com.seattlesolvers.solverslib.command.SubsystemBase
+import com.seattlesolvers.solverslib.util.MathUtils
 import org.firstinspires.ftc.robotcore.external.Telemetry
 import org.firstinspires.ftc.teamcode.shooter.ShooterConstants
 
@@ -21,10 +22,10 @@ class Shooter(
 ): SubsystemBase() {
 
     // This is where the motor intended to control the shooter is declared
-    private lateinit var firstMotor: DcMotorEx
-    private lateinit var secondMotor: DcMotorEx
+    lateinit var firstMotor: DcMotorEx
+    lateinit var secondMotor: DcMotorEx
 
-    private var desiredVelocity = AngularVelocity.fromRpm(0.0)
+    private var flyWheelVelocity = AngularVelocity.fromRpm(0.0)
 
     // Initialization //
 
@@ -40,13 +41,21 @@ class Shooter(
         // Try to reach to the minimum error possible and a high output when ramping down when a ball passes through.
         setPIDCoefficients(ShooterConstants.PIDF.pidfCoefficients)
 
-        desiredVelocity = AngularVelocity.fromRpm(ShooterConstants.Velocity.shooterDesiredVelocity)
+        flyWheelVelocity = AngularVelocity.fromRpm(ShooterConstants.Velocity.shooterDesiredVelocity)
 
-//        setFlyWheelVelocity(desiredVelocity)
+        setFlyWheelVelocity(flyWheelVelocity)
 
+        telemetry.addLine("// SHOOTER //")
         telemetry.addData("Shooter velocity", getVelocity().rpm)
-        telemetry.addData("Shooter desired velocity", desiredVelocity.rpm)
-        telemetry.addData("Error", desiredVelocity.rpm - getVelocity().rpm)
+        telemetry.addData("Target Velocity", flyWheelVelocity.rpm)
+        telemetry.addData("Error", flyWheelVelocity.rpm - getVelocity().rpm)
+    }
+
+    fun log() {
+        telemetry.addLine("// SHOOTER //")
+        telemetry.addData("Shooter velocity", getVelocity().rpm)
+        telemetry.addData("Target Velocity", flyWheelVelocity.rpm)
+        telemetry.addData("Error", flyWheelVelocity.rpm - getVelocity().rpm)
     }
 
     // Functional code //
@@ -54,7 +63,16 @@ class Shooter(
 
 
     private fun setVelocity(motor: DcMotorEx, velocity: AngularVelocity) {
-        motor.setVelocity(velocity.rotPerSec * ShooterConstants.Configuration.ticksPerRotation)
+
+        val clampedVelocity = MathUtils.clamp(
+            velocity.rpm,
+            ShooterConstants.Velocity.Limits.minimumVel.rpm,
+            ShooterConstants.Velocity.Limits.maximumVel.rpm
+        )
+
+        val transformedVelocity = (clampedVelocity / 60) * ShooterConstants.Configuration.ticksPerRotation
+
+        motor.velocity = transformedVelocity
     }
     /**
      * Sets the motor's velocity to a desired angular velocity

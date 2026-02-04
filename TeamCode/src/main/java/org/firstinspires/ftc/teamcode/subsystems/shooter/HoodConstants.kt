@@ -18,6 +18,6 @@ class HoodConstants {
         // The position were there is no clear movement of the servo
         val maxPosition = Angle.fromRotations(0.9)
         // This is the position were the hood is lifted the most
-        val minPosition = Angle.fromRotations(0.0)
+        val minPosition = Angle.fromRotations(0.11)
     }
 }

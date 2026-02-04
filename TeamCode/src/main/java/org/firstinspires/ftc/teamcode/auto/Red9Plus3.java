@@ -98,7 +98,6 @@ public class Red9Plus3 extends CommandOpMode {
 
                     new SequentialCommandGroup(
 //                            shooter.shootCMD(),
-//                            // sleep() is the way to go for waiting a period of time
                               new WaitCommand(3000),
 //                            indexer.feedAllShooter(),
 //                            new InstantCommand(() -> sleep(1000)),

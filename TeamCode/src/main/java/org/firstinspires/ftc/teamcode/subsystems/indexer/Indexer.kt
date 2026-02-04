@@ -78,11 +78,12 @@ class Indexer(
     }
 
     // This code will execute indefinably during your operation
-    override fun periodic() {
+    override fun periodic() {}
+
+    fun log(){
         telemetry.addData("FrontSlotColor", frontSlot.getDetectedColor())
         telemetry.addData("MiddleSlotColor", middleSlot.getDetectedColor())
         telemetry.addData("BackSlotColor", backSlot.getDetectedColor())
-
     }
 
     /**

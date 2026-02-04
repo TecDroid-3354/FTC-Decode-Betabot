@@ -1,6 +1,7 @@
 package org.firstinspires.ftc.teamcode.OpModes
 
 import Angle
+import com.pedropathing.Drivetrain
 import com.qualcomm.hardware.rev.RevHubOrientationOnRobot
 import com.qualcomm.hardware.sparkfun.SparkFunOTOS
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp
@@ -20,9 +21,11 @@ import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit
 import org.firstinspires.ftc.teamcode.commands.JoystickCmd
 import org.firstinspires.ftc.teamcode.subsystems.drivetrain.SolversMecanum
 import org.firstinspires.ftc.teamcode.subsystems.turret.AprilTagVectorLocations
+import org.firstinspires.ftc.teamcode.subsystems.turret.AxonTurretConstants
 import org.firstinspires.ftc.teamcode.subsystems.turret.turretConfig
 import org.firstinspires.ftc.teamcode.utils.gyroscopes.Otos
 import org.firstinspires.ftc.teamcode.utils.gyroscopes.OtosConfig
+import java.util.Vector
 import kotlin.math.atan2
 
 
@@ -67,14 +70,13 @@ class AxonTurretTestCMDOpMode: CommandOpMode() {
     var turretTarget: Angle = Angle.fromDegrees(0.0)
 
     // Change this line if the RED April tag location is needed
-    val alliance = Alliance.BLUE
+    val alliance = Alliance.RED
     var targetAprilTagLocation: Vector2d = Vector2d(0.0, 0.0)
 
     // Here, declare code to be executed right after pressing the INIT button
     override fun initialize() {
 
         otos = Otos(hardwareMap, telemetry, otosConfig)
-        otos.setOffset(SparkFunOTOS.Pose2D(0.0, 0.0, Math.PI / 2))
 
         turret = AxonTurret(hardwareMap, telemetry, turretConfig) { turretTarget }
 
@@ -118,28 +120,27 @@ class AxonTurretTestCMDOpMode: CommandOpMode() {
             CommandScheduler.getInstance().run()
 
             // Get robot's location in a vector
-            val robotLocation = otos.getPositionVector()
+            val robotLocationX = -otos.getPositionVector().x
+
+            val robotLocationY = -otos.getPositionVector().y
             // Get the robot's heading
             val robotHeading = otos.getHeading()
-
-            // Get the x difference from subtracting the x component of the april tag vector to the robot location
-            val xVector = targetAprilTagLocation.x - robotLocation.x
-            // Get the y difference from subtracting the y component of the april tag vector to the robot location
-            val yVector = targetAprilTagLocation.y - robotLocation.y
-
-            // Obtaining the robot relative angle by applying arc tangent2 to the obtained vector
-            val fieldTargetAngle = Angle.fromRadians(atan2(yVector, xVector))
+            // Get the vector difference from the goal's and robot position
+            val newVector = targetAprilTagLocation - Vector2d(robotLocationX, robotLocationY)
+            // The angle to the positive x axis of the vector difference
+            val angleToGoal = Angle.fromRadians(newVector.angle())
             // Getting the turret angle by subtracting the robot's rotation to the field target angle
             turretTarget = Angle.fromDegrees(
-                normalizeDegrees(fieldTargetAngle.degrees - robotHeading.degrees)
+                normalizeDegrees(angleToGoal.degrees - robotHeading.degrees)
             )
 
-            telemetry.addData("x vector difference", xVector)
-            telemetry.addData("y vector difference", yVector)
-            telemetry.addData("Field target Angle", fieldTargetAngle.degrees)
+            telemetry.addData("Field target Angle", angleToGoal.degrees)
             telemetry.addData("Turret Target", turretTarget.degrees)
             telemetry.addData("Turret Angle", turret.getAbsoluteAngle().degrees)
-            otos.log()
+            telemetry.addData("otos x", robotLocationX)
+            telemetry.addData("otos y", robotLocationY)
+            telemetry.addData("heading", otos.getHeading().degrees)
+            telemetry.addData("otos offset", otos.otos.offset)
             telemetry.update()
         }
 

@@ -45,9 +45,6 @@ class SolversMecanum(
 
     override fun periodic() {
         // Telemetry to retrieve useful data
-//        telemetry.addData("RobotYaw", getRobotYaw())
-//        telemetry.addData("X", otos.position.x)
-//        telemetry.addData("Y", otos.position.y)
     }
 
     // Functional code //
@@ -70,10 +67,6 @@ class SolversMecanum(
             chassisSpeeds.omegaRadiansPerSecond,
             getRobotYaw().degrees)
     }
-
-    /*fun getRobotPosition(): DoubleSupplier {
-
-    }*/
 
     fun getRobotYaw(): Angle = Angle.fromDegrees(otos.position.h)
     fun resetOtosYaw(): Unit = otos.resetTracking()

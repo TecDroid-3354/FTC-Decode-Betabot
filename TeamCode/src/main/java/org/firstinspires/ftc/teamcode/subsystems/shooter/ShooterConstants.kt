@@ -1,5 +1,6 @@
 package org.firstinspires.ftc.teamcode.shooter
 
+import AngularVelocity
 import com.bylazar.configurables.annotations.Configurable
 import com.qualcomm.robotcore.hardware.DcMotor
 import com.qualcomm.robotcore.hardware.DcMotorSimple
@@ -17,11 +18,11 @@ class ShooterConstants {
 
         // Whether the motor is inverted
         val direction = DcMotorSimple.Direction.REVERSE
-        // The motor's behavior when is not given any output
-        val zeroPowerBehavior = DcMotor.ZeroPowerBehavior.FLOAT
         // The motor's run mode, in this case as the shooter does not need any encoder position, is set to
         // run without encoder
         val runMode = DcMotor.RunMode.RUN_USING_ENCODER
+        // The motor's behavior when is not given any output
+        val zeroPowerBehavior = DcMotor.ZeroPowerBehavior.FLOAT
 
         const val ticksPerRotation = 28.0
     }
@@ -32,15 +33,21 @@ class ShooterConstants {
         companion object {
             @JvmField
             // The PID controller used for the subsytem's motor
-            var pidfCoefficients = PIDFCoefficients(1.0, 0.0, 0.0, 20.0)
+            var pidfCoefficients = PIDFCoefficients(1.5, 0.0, 0.0, 14.24)
         }
     }
 
     @Configurable
     class Velocity {
+
+        object Limits {
+            val minimumVel: AngularVelocity = AngularVelocity.fromRpm(2000.0)
+            val maximumVel: AngularVelocity = AngularVelocity.fromRpm(5000.0)
+        }
+
         companion object {
             @JvmField
-            var shooterDesiredVelocity = 0.0
+            var shooterDesiredVelocity = Limits.minimumVel.rpm
         }
     }
 }
