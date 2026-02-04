@@ -1,7 +1,6 @@
 package org.firstinspires.ftc.teamcode.OpModes
 
 import Angle
-import com.qualcomm.hardware.sparkfun.SparkFunOTOS
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp
 import com.seattlesolvers.solverslib.command.CommandOpMode
 import com.seattlesolvers.solverslib.command.CommandScheduler
@@ -103,8 +102,8 @@ class CMDOpMode : CommandOpMode() {
         controller = GamepadEx(gamepad1)
 
         targetAprilTagLocation =
-            if (alliance == Alliance.BLUE) AprilTagVectorLocations.blueAprilTag
-            else AprilTagVectorLocations.redAprilTag
+            if (alliance == Alliance.BLUE) AprilTagVectorLocations.blueGoalCornerVector
+            else AprilTagVectorLocations.redGoalCornerVector
 
         configureButtonBindings()
     }

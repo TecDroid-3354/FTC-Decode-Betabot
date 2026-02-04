@@ -1,9 +1,7 @@
 package org.firstinspires.ftc.teamcode.OpModes
 
 import Angle
-import com.pedropathing.Drivetrain
 import com.qualcomm.hardware.rev.RevHubOrientationOnRobot
-import com.qualcomm.hardware.sparkfun.SparkFunOTOS
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp
 import com.seattlesolvers.solverslib.command.CommandOpMode
 import com.seattlesolvers.solverslib.command.CommandScheduler
@@ -21,12 +19,9 @@ import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit
 import org.firstinspires.ftc.teamcode.commands.JoystickCmd
 import org.firstinspires.ftc.teamcode.subsystems.drivetrain.SolversMecanum
 import org.firstinspires.ftc.teamcode.subsystems.turret.AprilTagVectorLocations
-import org.firstinspires.ftc.teamcode.subsystems.turret.AxonTurretConstants
 import org.firstinspires.ftc.teamcode.subsystems.turret.turretConfig
 import org.firstinspires.ftc.teamcode.utils.gyroscopes.Otos
 import org.firstinspires.ftc.teamcode.utils.gyroscopes.OtosConfig
-import java.util.Vector
-import kotlin.math.atan2
 
 
 // Personally, I chose to run my code using a command-based Op Mode since it works better for me
@@ -91,8 +86,8 @@ class AxonTurretTestCMDOpMode: CommandOpMode() {
         controller = GamepadEx(gamepad1)
 
         targetAprilTagLocation =
-            if (alliance == Alliance.BLUE) AprilTagVectorLocations.blueAprilTag
-            else AprilTagVectorLocations.redAprilTag
+            if (alliance == Alliance.BLUE) AprilTagVectorLocations.blueGoalCornerVector
+            else AprilTagVectorLocations.redGoalCornerVector
 
         configureButtonBindings()
     }

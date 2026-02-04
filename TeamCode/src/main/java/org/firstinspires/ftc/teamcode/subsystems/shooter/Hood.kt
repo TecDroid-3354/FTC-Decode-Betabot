@@ -40,7 +40,6 @@ class Hood(val hardwareMap: HardwareMap, val telemetry: Telemetry, val interpola
     // Code called every robot loop //
     override fun periodic() {
         // Telemetry to retrieve useful data
-        telemetry.addData("HoodPositionRotations", currentAngle.rotations)
         currentAngle = Angle.fromRotations(servo.servo.position)
 
         // We interpolate the angle and therefore set the target angle
@@ -48,6 +47,12 @@ class Hood(val hardwareMap: HardwareMap, val telemetry: Telemetry, val interpola
 
         // We set what we want to reach to the target angle
         setHoodPosition(targetAngle)
+    }
+
+    fun log() {
+        telemetry.addLine("// HOOD //")
+        telemetry.addLine()
+        telemetry.addData("Hood position in rotations", currentAngle.rotations)
     }
 
     // Our public method to change the target angle

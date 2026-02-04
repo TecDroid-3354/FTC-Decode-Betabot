@@ -1,5 +1,6 @@
 package org.firstinspires.ftc.teamcode.subsystems.turret
 
+import com.seattlesolvers.solverslib.geometry.Pose2d
 import com.seattlesolvers.solverslib.geometry.Vector2d
 
 object AprilTagVectorLocations {
@@ -12,10 +13,14 @@ object AprilTagVectorLocations {
     /**
      * Blue april tag location vector in inches
      */
-    val blueAprilTag = Vector2d(72.0, 72.0)
+    val blueGoalCornerVector = Vector2d(72.0, 72.0)
 
     /**
      * Red april tag location vector in inches
      */
-    val redAprilTag = Vector2d(-72.0, 72.0)
+    val redGoalCornerVector = Vector2d(-72.0, 72.0)
+
+    val blueAprilTagLocationVector = Vector2d(-59.138 , 56.67)
+
+    val redAprilTagLocationVector = Vector2d(59.138 , 56.67)
 }

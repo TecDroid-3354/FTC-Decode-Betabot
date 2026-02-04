@@ -15,6 +15,9 @@ import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
  * where e(t) = r(t) - y(t) and r(t) is the setpoint and y(t) is the
  * measured value. If we consider e(t) the positional error, then
  * int(0,t)[e(t')dt'] is the total error and e'(t) is the velocity error.
+ *
+ * THIS CODE WAS OBTAINED FROM SEATTLE SOLVERS 23511.
+ * Refer to https://github.com/FTC-23511/SolversLib-Quickstart if you desire to install their library
  */
 public class PIDFCircularController {
 

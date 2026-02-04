@@ -21,6 +21,8 @@ import org.firstinspires.ftc.teamcode.subsystems.turret.turretConfig
 import org.firstinspires.ftc.teamcode.utils.Alliance
 import org.firstinspires.ftc.teamcode.utils.gyroscopes.Otos
 import org.firstinspires.ftc.teamcode.vision.Limelight
+import kotlin.math.pow
+import kotlin.math.sqrt
 
 @TeleOp(name = "Integrated", group = "Op Mode")
 class IntegrationTestOpMode: CommandOpMode() {
@@ -47,7 +49,10 @@ class IntegrationTestOpMode: CommandOpMode() {
     // Change this line if the RED April tag location is needed
     val alliance = Alliance.RED
 
-    var targetAprilTagLocation: Vector2d = Vector2d(0.0, 0.0)
+    var targetGoalPosition: Vector2d = Vector2d(0.0, 0.0)
+    var targetAprilTagPosition: Vector2d = Vector2d(0.0, 0.0)
+
+    var distanceToAprilTag: Distance = Distance.fromInches(0.0)
 
     // Here, declare code to be executed right after pressing the INIT button
     override fun initialize() {
@@ -75,9 +80,15 @@ class IntegrationTestOpMode: CommandOpMode() {
 
         controller = GamepadEx(gamepad1)
 
-        targetAprilTagLocation =
-            if (alliance == Alliance.BLUE) AprilTagVectorLocations.blueAprilTag
-            else AprilTagVectorLocations.redAprilTag
+        // Desired goal corner position, used to calculate turret target
+        targetGoalPosition =
+            if (alliance == Alliance.BLUE) AprilTagVectorLocations.blueGoalCornerVector
+            else AprilTagVectorLocations.redGoalCornerVector
+
+        // Desired april tag position, used for calculating inches to april tag
+        targetAprilTagPosition =
+            if (alliance == Alliance.BLUE) AprilTagVectorLocations.blueAprilTagLocationVector
+            else AprilTagVectorLocations.redAprilTagLocationVector
 
         configureButtonBindings()
     }
@@ -125,12 +136,26 @@ class IntegrationTestOpMode: CommandOpMode() {
         // Get the robot's heading
         val robotHeading = otos.getHeading()
         // Get the vector difference from the goal's and robot position
-        val newVector = targetAprilTagLocation - Vector2d(robotLocationX, robotLocationY)
+        val newVector = targetGoalPosition - Vector2d(robotLocationX, robotLocationY)
         // The angle to the positive x axis of the vector difference
         val angleToGoal = Angle.fromRadians(newVector.angle())
         // Getting the turret angle by subtracting the robot's rotation to the field target angle
         turretTarget = Angle.fromDegrees(
             normalizeDegrees(angleToGoal.degrees - robotHeading.degrees)
+        )
+    }
+
+    private fun distanceToAprilTagOdometry() {
+        // Get robot's location in a vector
+        val robotLocationX = -otos.getPositionVector().x
+
+        val robotLocationY = -otos.getPositionVector().y
+
+        distanceToAprilTag = Distance.fromInches(
+            sqrt(
+            (targetAprilTagPosition.x - robotLocationX).pow(2.0) +
+                    (targetAprilTagPosition.y - robotLocationY).pow(2)
+            )
         )
     }
 
@@ -148,6 +173,7 @@ class IntegrationTestOpMode: CommandOpMode() {
             // Command for actually running the scheduler
             CommandScheduler.getInstance().run()
             calculateTurretTarget()
+            distanceToAprilTagOdometry()
             controller.readButtons()
 
             telemetry.addData("Turret target", turretTarget.degrees)
