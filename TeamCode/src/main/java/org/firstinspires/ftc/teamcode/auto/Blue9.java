@@ -70,7 +70,7 @@ public class Blue9 extends CommandOpMode {
         switch (pathState){
             case 0:
                 follower.followPath(paths.blue9Plus3ShootPrecharged,true);
-                new InstantCommand(() -> setPathState(1));
+                setPathState(1);
                 break;
 
             case 1:
@@ -79,7 +79,7 @@ public class Blue9 extends CommandOpMode {
 
                     shootOut();
 
-                    new InstantCommand(() -> setPathState(2));
+                    setPathState(2);
 
                 }
                 break;
@@ -88,7 +88,7 @@ public class Blue9 extends CommandOpMode {
                     intake.enableBothIntakes().schedule();
                     follower.followPath(paths.blue9Plus3PickFirstRow,true);
 
-                    new InstantCommand(() -> setPathState(3));
+                    setPathState(3);
                 }
                 break;
 
@@ -98,8 +98,8 @@ public class Blue9 extends CommandOpMode {
 
                     follower.followPath(paths.blue9Plus3ShootFirstRow, true);
 
-                    new InstantCommand(() -> setPathState(4));
-                }
+                    setPathState(4);
+                    }
 
                 break;
 
@@ -107,7 +107,7 @@ public class Blue9 extends CommandOpMode {
                 if(!follower.isBusy()){
                     follower.breakFollowing();
                     shootOut();
-                    new InstantCommand(() -> setPathState(5));
+                    setPathState(5);
                 }
                 break;
             case 5:
@@ -116,7 +116,7 @@ public class Blue9 extends CommandOpMode {
 
                     follower.followPath(paths.blue9Plus3PickSecondRow, true);
 
-                    new InstantCommand(() -> setPathState(6));
+                    setPathState(6);
                 }
                 break;
             case 6:
@@ -125,21 +125,21 @@ public class Blue9 extends CommandOpMode {
 
                     follower.followPath(paths.blue9Plus3ShootSecondRow, true);
 
-                    new InstantCommand(() -> setPathState(7));
+                    setPathState(7);
                 }
                 break;
             case 7:
                 if(!follower.isBusy()){
                     follower.breakFollowing();
                     shootOut();
-                    new InstantCommand(() -> setPathState(8));
+                    setPathState(8);
                 }
                 break;
             case 8:
                 if(!follower.isBusy()){
                     intake.enableBothIntakes().schedule();
                     follower.followPath(paths.blue9Plus3PickThirdRow, true);
-                    new InstantCommand(() -> setPathState(9));
+                    setPathState(9);
                 }
                 break;
             case 9:
@@ -148,14 +148,14 @@ public class Blue9 extends CommandOpMode {
 
                     follower.followPath(paths.blue9Plus3ShootThirdRow,true);
 
-                    new InstantCommand(() -> setPathState(10));
+                    setPathState(10);
                 }
                 break;
             case 10:
                 follower.breakFollowing();
 
                 shootOut();
-                new InstantCommand(() -> setPathState(11));
+                setPathState(11);
                 break;
             case 11:
                 // follower.followPath(paths.blue9plus3End); // In the visualizer it shows that this is the final path.
