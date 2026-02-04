@@ -13,7 +13,6 @@ import org.firstinspires.ftc.teamcode.subsystems.intake.Intake;
 import org.firstinspires.ftc.teamcode.systems.shooterSystem.ShooterSystem;
 import org.firstinspires.ftc.teamcode.vision.Limelight;
 
-//TODO : Separate Intake on and off in different cases, shoot from their respective path following and checl the path visualizer.
 @Autonomous (name="Red 9", group = "Red")
 public class Red9 extends CommandOpMode {
 
@@ -70,27 +69,27 @@ public class Red9 extends CommandOpMode {
         switch (pathState){
             case 0:
                 follower.followPath(paths.red9Plus3ShootPrecharged,true);
-                new InstantCommand(() -> setPathState(1));
+                setPathState(1);
                 break;
 
             case 1:
-            if(!follower.isBusy()){
-                follower.breakFollowing();
+                if(!follower.isBusy()){
+                    follower.breakFollowing();
 
-                shootOut();
+                    shootOut();
 
-                new InstantCommand(() -> setPathState(2));
+                    setPathState(2);
 
-            }
-            break;
+                }
+                break;
             case 2:
-            if (!follower.isBusy()) {
-                intake.enableBothIntakes().schedule();
-                follower.followPath(paths.red9Plus3PickFirstRow,true);
+                if (!follower.isBusy()) {
+                    intake.enableBothIntakes().schedule();
+                    follower.followPath(paths.red9Plus3PickFirstRow,true);
 
-                new InstantCommand(() -> setPathState(3));
-            }
-            break;
+                    setPathState(3);
+                }
+                break;
 
             case 3:
                 if (!follower.isBusy()){
@@ -98,68 +97,68 @@ public class Red9 extends CommandOpMode {
 
                     follower.followPath(paths.red9Plus3ShootFirstRow, true);
 
-                    new InstantCommand(() -> setPathState(4));
+                    setPathState(4);
                 }
 
-            break;
+                break;
 
             case 4:
                 if(!follower.isBusy()){
                     follower.breakFollowing();
                     shootOut();
-                    new InstantCommand(() -> setPathState(5));
+                    setPathState(5);
                 }
-            break;
+                break;
             case 5:
                 if(!follower.isBusy()){
                     intake.enableBothIntakes().schedule();
 
                     follower.followPath(paths.red9Plus3PickSecondRow, true);
 
-                    new InstantCommand(() -> setPathState(6));
+                    setPathState(6);
                 }
-            break;
+                break;
             case 6:
                 if(!follower.isBusy()){
                     intake.stopBothIntakes().schedule();
 
                     follower.followPath(paths.red9Plus3ShootSecondRow, true);
 
-                    new InstantCommand(() -> setPathState(7));
+                    setPathState(7);
                 }
                 break;
             case 7:
                 if(!follower.isBusy()){
                     follower.breakFollowing();
                     shootOut();
-                    new InstantCommand(() -> setPathState(8));
+                    setPathState(8);
                 }
                 break;
             case 8:
                 if(!follower.isBusy()){
-                   intake.enableBothIntakes().schedule();
-                   follower.followPath(paths.red9Plus3PickThirdRow, true);
-                    new InstantCommand(() -> setPathState(9));
+                    intake.enableBothIntakes().schedule();
+                    follower.followPath(paths.red9Plus3PickThirdRow, true);
+                    setPathState(9);
                 }
-            break;
+                break;
             case 9:
                 if(!follower.isBusy()){
                     intake.stopBothIntakes().schedule();
 
                     follower.followPath(paths.red9Plus3ShootThirdRow,true);
 
-                    new InstantCommand(() -> setPathState(10));
+                    setPathState(10);
                 }
-            break;
+                break;
             case 10:
                 follower.breakFollowing();
 
                 shootOut();
-                new InstantCommand(() -> setPathState(11));
-            break;
+                setPathState(11);
+                break;
             case 11:
-               // follower.followPath(paths.red9plus3End); // The blue visualizer mentions this path, so i am gonna suppose it goes here.
-            break;
+                // follower.followPath(paths.red9plus3End); // The blue visualizer mentions this path, so i am gonna suppose it goes here.
+                break;
         }
     }
 

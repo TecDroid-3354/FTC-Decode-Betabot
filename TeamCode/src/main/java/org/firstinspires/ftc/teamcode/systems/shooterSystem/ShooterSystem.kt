@@ -12,6 +12,8 @@ import org.firstinspires.ftc.teamcode.subsystems.indexer.Indexer
 import org.firstinspires.ftc.teamcode.subsystems.indexer.MotifPatterns
 import org.firstinspires.ftc.teamcode.subsystems.shooter.Hood
 import org.firstinspires.ftc.teamcode.subsystems.shooter.Shooter
+import org.firstinspires.ftc.teamcode.utils.interpolation.InterpolatingDouble
+import org.firstinspires.ftc.teamcode.utils.interpolation.InterpolatingTreeMap
 
 /**
  * These values need to be measured physically
@@ -36,20 +38,39 @@ import org.firstinspires.ftc.teamcode.subsystems.shooter.Shooter
 
 
 @Suppress("JoinDeclarationAndAssignment")
-class ShooterSystem(hw: HardwareMap, val telemetry: Telemetry, distanceToAprilTagInches: Supplier<Double>, val isLLResultValid: Supplier<Boolean>) {
+class ShooterSystem(
+    hardwareMap: HardwareMap,
+    val telemetry: Telemetry,
+    distanceToAprilTagInches: Supplier<Double>,
+    val isLLResultValid: Supplier<Boolean>
+) {
 
+    // Declaring subsystems
     val indexer: Indexer
-    private val distanceToAprilTag = { Distance.fromInches(distanceToAprilTagInches.get()) }
     val shooter: Shooter
     val hood: Hood
 
-    private val interpolator = ShooterInterpolationConstructor(distanceToAprilTag)
+    // Setting the interpolation & its supplier
+    private val distanceToAprilTag = { Distance.fromInches(distanceToAprilTagInches.get()) }
+    private val hoodInterpolator: InterpolationConstructor
+    private val shooterInterpolator: InterpolationConstructor
 
     init {
-        shooter = Shooter(hw, telemetry)
-        indexer = Indexer(hw, telemetry)
-        hood = Hood(hw, telemetry)
+        // Starting interpolators
+        hoodInterpolator = InterpolationConstructor(distanceToAprilTag, "hood")
+        shooterInterpolator = InterpolationConstructor(distanceToAprilTag, "shooter")
+
+        // Assigning subsystems
+        shooter = Shooter(hardwareMap, telemetry)
+        indexer = Indexer(hardwareMap, telemetry)
+        hood = Hood(hardwareMap, telemetry, hoodInterpolator)
     }
+
+    // todo: fallback in case interpolation doesn't work
+    // Uses interpolation to get desired hood values
+    /*fun getHoodTarget(): Angle {
+        return Angle.fromDegrees(interpolator.getDesiredPoint())
+    }*/
 
     // todo: test
     /*fun getObtainedSetPointForHood(): Angle {
@@ -60,10 +81,7 @@ class ShooterSystem(hw: HardwareMap, val telemetry: Telemetry, distanceToAprilTa
         }
     }*/
 
-    fun getObtainedSetPointForHood(): Angle {
-        return Angle.fromDegrees(interpolator.getDesiredPoint())
-    }
-
+    // Command to shoot the Artifacts according to pattern
     fun shoot(motifPatterns: MotifPatterns) : Command {
         return SequentialCommandGroup(
             shooter.shootCMD(),
@@ -74,15 +92,12 @@ class ShooterSystem(hw: HardwareMap, val telemetry: Telemetry, distanceToAprilTa
         );
     }
 
-    //todo: missing
-    /*fun ajustHood(): Command {
-        return InstantCommand({ hood.setHoodPosition(getObtainedSetPointForHood()) })
-    }*/
-
+    // Command to stop the shooter
     fun stopShooter(): Command {
         return shooter.stopCMD()
     }
 
+    // Returns whether the indexer is full or not
     fun isFull(): Boolean {
         return indexer.isFull()
     }

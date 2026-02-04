@@ -18,11 +18,11 @@ public class InterpolatingDouble implements Interpolable<InterpolatingDouble>, I
     }
 
     /**
-    * Linearly interpolates between this Value (lower bound) and another Value (upper bound)
-    * @param other  the upper bound Value
-    * @param x  the interpolation factor
-    * @return a new InterpolatingDouble representing the interpolated value
-    * */
+     * Linearly interpolates between this Value (lower bound) and another Value (upper bound)
+     * @param other  the upper bound Value
+     * @param x  the interpolation factor
+     * @return a new InterpolatingDouble representing the interpolated value
+     * */
     @Override
     public InterpolatingDouble interpolate(InterpolatingDouble other, double x) {
         // Difference between upper and lower values

@@ -87,15 +87,15 @@ public class InterpolatingTreeMap<K extends InverseInterpolable<K> & Comparable<
 }
 
 /*
-* FTC Usage example in Kotlin:
-*
-*      // Declaring Tree Map
-*       val map: InterpolatingTreeMap<InterpolatingDouble, InterpolatingDouble>
-*           = InterpolatingMapTree(maximumSize = 10)
-*
-*      // Adding data to the tree
-*       map.put(
-*           InterpolatingDouble(1.0.inches),
-*           InterpolatingDouble(36.0.degrees)
-*       )
-* */
+ * FTC Usage example in Kotlin:
+ *
+ *      // Declaring Tree Map
+ *       val map: InterpolatingTreeMap<InterpolatingDouble, InterpolatingDouble>
+ *           = InterpolatingMapTree(maximumSize = 10)
+ *
+ *      // Adding data to the tree
+ *       map.put(
+ *           InterpolatingDouble(1.0.inches),
+ *           InterpolatingDouble(36.0.degrees)
+ *       )
+ * */
