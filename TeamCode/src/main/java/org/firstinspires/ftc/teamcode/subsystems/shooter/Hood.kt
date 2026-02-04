@@ -6,6 +6,8 @@ import com.seattlesolvers.solverslib.command.SubsystemBase
 import com.seattlesolvers.solverslib.hardware.ServoEx
 import com.seattlesolvers.solverslib.util.MathUtils
 import org.firstinspires.ftc.robotcore.external.Telemetry
+import org.firstinspires.ftc.teamcode.systems.shooterSystem.InterpolationConstructor
+
 
 /**
  * Class intended to control the Hood Subsystem, which is mounted in the shooter.
@@ -13,20 +15,26 @@ import org.firstinspires.ftc.robotcore.external.Telemetry
  * @param telemetry to print important data in real-time through Driver Hub.
  */
 @Suppress("JoinDeclarationAndAssignment")
-class Hood(val hardwareMap: HardwareMap, val telemetry: Telemetry): SubsystemBase() {
+class Hood(val hardwareMap: HardwareMap, val telemetry: Telemetry, val interpolator: InterpolationConstructor): SubsystemBase() {
     // Servo controlling the hood. Is a SWYFT servo, check config with SWYFT servo programmer.
     private val servo: ServoEx
     // As SWYFT servos do not store their position, we store the commanded angle (Telemetry purposes)
     var currentAngle: Angle
+    // Our target angle we want to reach periodically
+    var targetAngle: Angle
 
     // Initialization code //
     init {
         servo = ServoEx(hardwareMap, HoodConstants.Identification.hoodId)
         servoConfig()
-        setHoodPosition(HoodConstants.Positions.minPosition + Angle.fromRotations(0.0001))
+        //setHoodPosition(HoodConstants.Positions.minPosition + Angle.fromRotations(0.0001))
 
         // servo.position returns a value from 0.0 to 1.0, we take it as rotations.
         currentAngle = Angle.fromRotations(servo.servo.position)
+
+        // Give a starting value to the angle
+        //targetAngle = Angle.fromRotations(0.0) //todo give an initial value
+        targetAngle = HoodConstants.Positions.minPosition + Angle.fromRotations(0.0001)
     }
 
     // Code called every robot loop //
@@ -34,16 +42,27 @@ class Hood(val hardwareMap: HardwareMap, val telemetry: Telemetry): SubsystemBas
         // Telemetry to retrieve useful data
         telemetry.addData("HoodPositionRotations", currentAngle.rotations)
         currentAngle = Angle.fromRotations(servo.servo.position)
+
+        // We interpolate the angle and therefore set the target angle
+        setTargetAngle(Angle.fromDegrees(interpolator.getDesiredPoint()))
+
+        // We set what we want to reach to the target angle
+        setHoodPosition(targetAngle)
     }
 
+    // Our public method to change the target angle
+     fun setTargetAngle(angle : Angle){
+         targetAngle = angle
+     }
+
     // Sets the desired angle to the servo (in radians) and updates the currentAngle variable //
-    fun setHoodPosition(position: Angle) {
+    private fun setHoodPosition(position: Angle) {
         val clampedPosition = MathUtils.clamp(position.rotations, HoodConstants.Positions.minPosition.rotations,
             HoodConstants.Positions.maxPosition.rotations)
         servo.set(clampedPosition) // Per documentation, servo.set() requires radians
     }
 
-    fun setHoodPosition(position: Double) {
+    private fun setHoodPosition(position: Double) {
         val clampedPosition = MathUtils.clamp(position, HoodConstants.Positions.minPosition.rotations,
             HoodConstants.Positions.maxPosition.rotations)
         servo.set(clampedPosition) // Per documentation, servo.set() requires radians

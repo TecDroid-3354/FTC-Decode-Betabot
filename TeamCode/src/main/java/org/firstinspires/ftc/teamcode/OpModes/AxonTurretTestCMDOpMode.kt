@@ -74,7 +74,7 @@ class AxonTurretTestCMDOpMode: CommandOpMode() {
     override fun initialize() {
 
         otos = Otos(hardwareMap, telemetry, otosConfig)
-        otos.setOffset(SparkFunOTOS.Pose2D(0.0, 0.0, Math.PI / 2))
+        otos.setOffset(SparkFunOTOS.Pose2D(0.0, 0.0, Math.PI / 2.0))
 
         turret = AxonTurret(hardwareMap, telemetry, turretConfig) { turretTarget }
 

@@ -34,6 +34,11 @@ public class Blue9 extends CommandOpMode {
 
     @Override
     public void initialize(){
+        // Initializing subsystems
+        limelight = new Limelight(hardwareMap, telemetry, follower.)
+        intake = new Intake(hardwareMap,telemetry);
+        shooterSystem = new ShooterSystem(hardwareMap,telemetry,limelight.);
+
         follower = Constants.createFollower(hardwareMap);
         paths = new Paths(follower);
 
