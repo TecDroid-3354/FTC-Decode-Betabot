@@ -51,6 +51,8 @@ class AxonTurret(val hw: HardwareMap, val telemetry: Telemetry, val config: Axon
         if (getAbsoluteAngle().degrees in config.limits) {
             rightServo.setTargetAngle(target)
             leftServo.setTargetAngle(target)
+        } else {
+            stopTurret()
         }
     }
 

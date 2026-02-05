@@ -3,6 +3,8 @@ import com.qualcomm.robotcore.eventloop.opmode.TeleOp
 import com.seattlesolvers.solverslib.command.CommandOpMode
 import com.seattlesolvers.solverslib.command.CommandScheduler
 import com.seattlesolvers.solverslib.command.InstantCommand
+import com.seattlesolvers.solverslib.command.WaitCommand
+import com.seattlesolvers.solverslib.command.WaitUntilCommand
 import com.seattlesolvers.solverslib.command.button.GamepadButton
 import com.seattlesolvers.solverslib.gamepad.GamepadEx
 import com.seattlesolvers.solverslib.gamepad.GamepadKeys
@@ -56,7 +58,7 @@ class IntegrationTestRed: CommandOpMode() {
     override fun initialize() {
 
         otos = Otos(hardwareMap, telemetry, otosConfig)
-        otos.setPosition(SparkFunOTOS.Pose2D(64.0, 0.0, 0.0))
+        otos.setPosition(SparkFunOTOS.Pose2D(64.0, 16.0, Math.PI))
 
         mecanum = SolversMecanum(hardwareMap, telemetry, otos)
         mecanum.defaultCommand = JoystickCmd(
@@ -130,13 +132,11 @@ class IntegrationTestRed: CommandOpMode() {
 
     private fun calculateTurretTarget() {
         // Get robot's location in a vector
-        val robotLocationX = -otos.getPositionVector().x
-
-        val robotLocationY = -otos.getPositionVector().y
+        val robotLocation = otos.getPositionVector()
         // Get the robot's heading
         val robotHeading = otos.getHeading()
         // Get the vector difference from the goal's and robot position
-        val newVector = targetGoalPosition - Vector2d(robotLocationX, robotLocationY)
+        val newVector = targetGoalPosition - Vector2d(-robotLocation.x, robotLocation.y)
         // The angle to the positive x axis of the vector difference
         val angleToGoal = Angle.fromRadians(newVector.angle())
         // Getting the turret angle by subtracting the robot's rotation to the field target angle
@@ -179,6 +179,7 @@ class IntegrationTestRed: CommandOpMode() {
 
             shooterSystem.shooter.log()
             shooterSystem.hood.log()
+            otos.log()
             telemetry.addData("Turret target", turretTarget.degrees)
             telemetry.addData("Distance inches from otos", distanceToAprilTag.inches)
             telemetry.update()

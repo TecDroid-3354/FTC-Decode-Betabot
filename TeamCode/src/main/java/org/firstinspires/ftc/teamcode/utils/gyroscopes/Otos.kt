@@ -8,6 +8,8 @@ import org.firstinspires.ftc.robotcore.external.Telemetry
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit
 import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit
 import com.qualcomm.hardware.sparkfun.SparkFunOTOS.Pose2D
+import com.seattlesolvers.solverslib.command.WaitCommand
+import com.seattlesolvers.solverslib.command.WaitUntilCommand
 import org.firstinspires.ftc.teamcode.pedroPathing.Constants
 
 data class OtosConfig(
@@ -22,7 +24,6 @@ class Otos(hardwareMap: HardwareMap, val telemetry: Telemetry, val config: OtosC
 
     init {
         sensorConfiguration()
-        setOffset(SparkFunOTOS.Pose2D(0.0, 0.0, Math.PI / 2))
     }
 
     fun setOffset(offset: Pose2D) {
@@ -52,9 +53,13 @@ class Otos(hardwareMap: HardwareMap, val telemetry: Telemetry, val config: OtosC
     }
 
     fun sensorConfiguration() {
-        otos.resetTracking()
-        otos.calibrateImu()
         otos.angularUnit = config.angleUnit
         otos.linearUnit = config.linearUnit
+
+        WaitCommand(50)
+        otos.calibrateImu()
+        setOffset(Pose2D(0.0, 0.0, Math.PI / 2))
+        otos.resetTracking()
+        WaitCommand(50)
     }
 }

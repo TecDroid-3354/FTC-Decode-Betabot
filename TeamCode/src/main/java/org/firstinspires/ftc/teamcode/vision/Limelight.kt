@@ -43,7 +43,6 @@ class Limelight(
         // How many times per second the limelight receives data in seconds
         limelight!!.setPollRateHz(VisionConstants.LimelightConfiguration.PollRateHz)
         // Reset's the otos readings to set the front of the robot when
-        otos.resetTracking()
 
         // Starts the limelight's readings
         limelight!!.start()

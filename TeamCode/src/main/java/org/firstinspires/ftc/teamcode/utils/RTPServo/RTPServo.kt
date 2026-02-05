@@ -52,7 +52,7 @@ class RTPServo(hw: HardwareMap, val telemetry: Telemetry, val config: RTPServoCo
     private var transformedAngle = Angle.fromDegrees(0.0)
 
     // The turret controller
-    private val pidfController = PIDFCircularController(config.pidfCoefficients)
+    private val pidfController = PIDFController(config.pidfCoefficients)
 
     init {
         /* INITIALIZATION CODE */

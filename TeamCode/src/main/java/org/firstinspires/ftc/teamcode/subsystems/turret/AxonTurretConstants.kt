@@ -43,8 +43,6 @@ class AxonTurretConstants {
         const val gearRatio = 1.0 / 5.5
 
         val limits = Angle.fromDegrees(-180.0).degrees..Angle.fromDegrees(180.0).degrees
-
-        val turretOffset = Angle.fromDegrees(90.0)
     }
 }
 
