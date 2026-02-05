@@ -21,7 +21,7 @@ class Hood(val hardwareMap: HardwareMap, val telemetry: Telemetry, val interpola
     // As SWYFT servos do not store their position, we store the commanded angle (Telemetry purposes)
     var currentAngle: Angle
     // Our target angle we want to reach periodically
-    var targetAngle: Angle
+    private var targetAngle: Angle
 
     // Initialization code //
     init {
@@ -46,7 +46,7 @@ class Hood(val hardwareMap: HardwareMap, val telemetry: Telemetry, val interpola
         setTargetAngle(Angle.fromDegrees(interpolator.getDesiredPoint()))
 
         // We set what we want to reach to the target angle
-        setHoodPosition(targetAngle)
+        //setHoodPosition(targetAngle)
     }
 
     fun log() {
@@ -61,7 +61,7 @@ class Hood(val hardwareMap: HardwareMap, val telemetry: Telemetry, val interpola
      }
 
     // Sets the desired angle to the servo (in radians) and updates the currentAngle variable //
-    private fun setHoodPosition(position: Angle) {
+    fun setHoodPosition(position: Angle) {
         val clampedPosition = MathUtils.clamp(position.rotations, HoodConstants.Positions.minPosition.rotations,
             HoodConstants.Positions.maxPosition.rotations)
         servo.set(clampedPosition) // Per documentation, servo.set() requires radians

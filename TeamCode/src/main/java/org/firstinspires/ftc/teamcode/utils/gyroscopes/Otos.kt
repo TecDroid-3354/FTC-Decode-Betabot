@@ -25,8 +25,12 @@ class Otos(hardwareMap: HardwareMap, val telemetry: Telemetry, val config: OtosC
         setOffset(SparkFunOTOS.Pose2D(0.0, 0.0, Math.PI / 2))
     }
 
-    private fun setOffset(offset: Pose2D) {
+    fun setOffset(offset: Pose2D) {
         otos.setOffset(offset)
+    }
+
+    fun setPosition(pose: Pose2D) {
+        otos.position = pose
     }
 
     fun resetTracking() {

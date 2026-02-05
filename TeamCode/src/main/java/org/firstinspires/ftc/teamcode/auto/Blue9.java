@@ -8,10 +8,14 @@ import com.seattlesolvers.solverslib.command.CommandOpMode;
 import com.seattlesolvers.solverslib.command.CommandScheduler;
 import com.seattlesolvers.solverslib.command.InstantCommand;
 
+import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
+import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 import org.firstinspires.ftc.teamcode.auto.Visualizer.Draw;
 import org.firstinspires.ftc.teamcode.pedroPathing.Constants;
 import org.firstinspires.ftc.teamcode.subsystems.intake.Intake;
 import org.firstinspires.ftc.teamcode.systems.shooterSystem.ShooterSystem;
+import org.firstinspires.ftc.teamcode.utils.gyroscopes.Otos;
+import org.firstinspires.ftc.teamcode.utils.gyroscopes.OtosConfig;
 import org.firstinspires.ftc.teamcode.vision.Limelight;
 
 @Autonomous (name="Blue 9", group = "Blue")
@@ -30,14 +34,16 @@ public class Blue9 extends CommandOpMode {
     private ShooterSystem shooterSystem;
 
     private Intake intake;
+
+    private Otos otos;
     public Limelight limelight;
 
     @Override
     public void initialize(){
         // Initializing subsystems
-        limelight = new Limelight(hardwareMap, telemetry, follower.)
+        otos = new Otos(hardwareMap, telemetry, new OtosConfig("otos", AngleUnit.DEGREES, DistanceUnit.INCH));
+        limelight = new Limelight(hardwareMap, telemetry, otos);
         intake = new Intake(hardwareMap,telemetry);
-        shooterSystem = new ShooterSystem(hardwareMap,telemetry,limelight.);
 
         follower = Constants.createFollower(hardwareMap);
         paths = new Paths(follower);

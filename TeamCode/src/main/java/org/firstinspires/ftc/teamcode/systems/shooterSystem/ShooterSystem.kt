@@ -41,7 +41,7 @@ import org.firstinspires.ftc.teamcode.utils.interpolation.InterpolatingTreeMap
 class ShooterSystem(
     hardwareMap: HardwareMap,
     val telemetry: Telemetry,
-    distanceToAprilTagInches: Supplier<Double>,
+    val distanceToAprilTagInches: Supplier<Double>,
     val isLLResultValid: Supplier<Boolean>
 ) {
 
@@ -51,7 +51,7 @@ class ShooterSystem(
     val hood: Hood
 
     // Setting the interpolation & its supplier
-    private val distanceToAprilTag = { Distance.fromInches(distanceToAprilTagInches.get()) }
+    private var distanceToAprilTag = { Distance.fromInches(0.0) }
     private val hoodInterpolator: InterpolationConstructor
     private val shooterInterpolator: InterpolationConstructor
 
@@ -64,6 +64,14 @@ class ShooterSystem(
         shooter = Shooter(hardwareMap, telemetry)
         indexer = Indexer(hardwareMap, telemetry)
         hood = Hood(hardwareMap, telemetry, hoodInterpolator)
+    }
+
+    fun periodic() {
+        distanceToAprilTag = if (isLLResultValid.get()) {
+            { Distance.fromInches(distanceToAprilTagInches.get()) }
+        } else {
+            { Distance.fromInches(0.0) }
+        }
     }
 
     // todo: fallback in case interpolation doesn't work
@@ -84,11 +92,7 @@ class ShooterSystem(
     // Command to shoot the Artifacts according to pattern
     fun shoot(motifPatterns: MotifPatterns) : Command {
         return SequentialCommandGroup(
-            shooter.shootCMD(),
-            WaitCommand(400),
             InstantCommand({ indexer.feedShooterCMD(motifPatterns).schedule() }),
-            WaitCommand(2000),
-            stopShooter()
         );
     }
 

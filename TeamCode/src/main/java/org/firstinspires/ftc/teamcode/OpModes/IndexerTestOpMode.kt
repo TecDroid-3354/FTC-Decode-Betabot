@@ -33,6 +33,7 @@ private val revHubIMUConfig = RevHubIMUConfig(
     RevHubOrientationOnRobot.UsbFacingDirection.BACKWARD
 )
 
+@Disabled
 @TeleOp(name = "Indexer + Shooter", group = "Op Mode")
 class IndexerTestOpMode: CommandOpMode() {
 

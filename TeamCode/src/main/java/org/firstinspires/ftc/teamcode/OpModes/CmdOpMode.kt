@@ -1,6 +1,7 @@
 package org.firstinspires.ftc.teamcode.OpModes
 
 import Angle
+import com.qualcomm.robotcore.eventloop.opmode.Disabled
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp
 import com.seattlesolvers.solverslib.command.CommandOpMode
 import com.seattlesolvers.solverslib.command.CommandScheduler
@@ -34,6 +35,7 @@ import org.firstinspires.ftc.teamcode.vision.Limelight
  *    http://192.168.43.1:8080/?page=connection.html&pop=true
  */
 
+@Disabled
 @TeleOp(name = "CMD", group = "Op Mode")
 class CMDOpMode : CommandOpMode() {
 
@@ -172,7 +174,7 @@ class CMDOpMode : CommandOpMode() {
             controller.readButtons()
 
             telemetry.addData("distance to apriltag", limelight.getDistanceToGoal(limelightIdFilter))
-            telemetry.addData("interpolation", shooterSystem.getObtainedSetPointForHood().degrees)
+//            telemetry.addData("interpolation", shooterSystem.getObtainedSetPointForHood().degrees)
 
 
             telemetry.addData("Pattern", limelight.getMotifPattern())

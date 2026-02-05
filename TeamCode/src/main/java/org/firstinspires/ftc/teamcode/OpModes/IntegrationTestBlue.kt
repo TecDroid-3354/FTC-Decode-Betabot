@@ -1,3 +1,4 @@
+import com.qualcomm.hardware.sparkfun.SparkFunOTOS
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp
 import com.seattlesolvers.solverslib.command.CommandOpMode
 import com.seattlesolvers.solverslib.command.CommandScheduler
@@ -10,22 +11,20 @@ import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit.normalizeDe
 import org.firstinspires.ftc.teamcode.OpModes.otosConfig
 import org.firstinspires.ftc.teamcode.commands.JoystickCmd
 import org.firstinspires.ftc.teamcode.subsystems.drivetrain.SolversMecanum
-import org.firstinspires.ftc.teamcode.subsystems.indexer.Indexer
 import org.firstinspires.ftc.teamcode.subsystems.indexer.MotifPatterns
 import org.firstinspires.ftc.teamcode.subsystems.intake.Intake
-import org.firstinspires.ftc.teamcode.subsystems.shooter.Hood
-import org.firstinspires.ftc.teamcode.subsystems.shooter.Shooter
 import org.firstinspires.ftc.teamcode.subsystems.turret.AprilTagVectorLocations
 import org.firstinspires.ftc.teamcode.subsystems.turret.AxonTurret
 import org.firstinspires.ftc.teamcode.subsystems.turret.turretConfig
+import org.firstinspires.ftc.teamcode.systems.shooterSystem.ShooterSystem
 import org.firstinspires.ftc.teamcode.utils.Alliance
 import org.firstinspires.ftc.teamcode.utils.gyroscopes.Otos
 import org.firstinspires.ftc.teamcode.vision.Limelight
 import kotlin.math.pow
 import kotlin.math.sqrt
 
-@TeleOp(name = "Integrated", group = "Op Mode")
-class IntegrationTestOpMode: CommandOpMode() {
+@TeleOp(name = "Integrated BLUE", group = "Op Mode")
+class IntegrationTestBlue: CommandOpMode() {
 
     /* ! SET UP CODE ! */
     lateinit var otos: Otos
@@ -34,20 +33,16 @@ class IntegrationTestOpMode: CommandOpMode() {
 
     lateinit var intake: Intake
 
-    lateinit var indexer: Indexer
-
-    lateinit var shooter: Shooter
-
-    lateinit var hood: Hood
-
     lateinit var limelight: Limelight
 
     lateinit var turret: AxonTurret
 
+    lateinit var shooterSystem: ShooterSystem
+
     var turretTarget: Angle = Angle.fromDegrees(0.0)
 
     // Change this line if the RED April tag location is needed
-    val alliance = Alliance.RED
+    val alliance = Alliance.BLUE
 
     var targetGoalPosition: Vector2d = Vector2d(0.0, 0.0)
     var targetAprilTagPosition: Vector2d = Vector2d(0.0, 0.0)
@@ -58,6 +53,7 @@ class IntegrationTestOpMode: CommandOpMode() {
     override fun initialize() {
 
         otos = Otos(hardwareMap, telemetry, otosConfig)
+        otos.setPosition(SparkFunOTOS.Pose2D(-64.0, 0.0, 0.0))
 
         mecanum = SolversMecanum(hardwareMap, telemetry, otos)
         mecanum.defaultCommand = JoystickCmd(
@@ -67,13 +63,14 @@ class IntegrationTestOpMode: CommandOpMode() {
             mecanum
         )
 
-        shooter = Shooter(hardwareMap, telemetry)
         intake = Intake(hardwareMap, telemetry)
-        indexer = Indexer(hardwareMap, telemetry)
-
-        hood = Hood(hardwareMap, telemetry)
 
         turret = AxonTurret(hardwareMap, telemetry, turretConfig) { turretTarget }
+
+        shooterSystem = ShooterSystem(hardwareMap, telemetry,
+            { limelight.getDistanceToGoal(intArrayOf(20, 24)).inches },
+            { limelight.llResult != null && limelight.llResult!!.isValid }
+        )
 
         limelight = Limelight(hardwareMap, telemetry, otos)
         limelight.start()
@@ -100,12 +97,12 @@ class IntegrationTestOpMode: CommandOpMode() {
     fun configureButtonBindings() {
         GamepadButton(controller, GamepadKeys.Button.A)
             .whenPressed(
-                InstantCommand({ hood.modifyCurrentPositionBy(Angle.fromRotations(0.01)) })
+                InstantCommand({ shooterSystem.hood.modifyCurrentPositionBy(Angle.fromRotations(0.01)) })
             )
 
         GamepadButton(controller, GamepadKeys.Button.B)
             .whenPressed(
-                InstantCommand({ hood.modifyCurrentPositionBy(Angle.fromRotations(-0.01)) })
+                InstantCommand({ shooterSystem.hood.modifyCurrentPositionBy(Angle.fromRotations(-0.01)) })
             )
 
         GamepadButton(controller, GamepadKeys.Button.RIGHT_BUMPER)
@@ -124,7 +121,7 @@ class IntegrationTestOpMode: CommandOpMode() {
 
         GamepadButton(controller, GamepadKeys.Button.Y)
             .whenPressed(
-                indexer.feedShooterCMD(MotifPatterns.GREEN_PURPLE_PURPLE)
+                shooterSystem.shoot(MotifPatterns.GREEN_PURPLE_PURPLE)
             )
     }
 
@@ -174,8 +171,11 @@ class IntegrationTestOpMode: CommandOpMode() {
             CommandScheduler.getInstance().run()
             calculateTurretTarget()
             distanceToAprilTagOdometry()
+            shooterSystem.periodic()
             controller.readButtons()
 
+            shooterSystem.shooter.log()
+            shooterSystem.hood.log()
             telemetry.addData("Turret target", turretTarget.degrees)
             telemetry.update()
         }

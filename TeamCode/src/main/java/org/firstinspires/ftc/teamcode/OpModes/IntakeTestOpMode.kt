@@ -1,4 +1,5 @@
 import com.qualcomm.hardware.rev.RevHubOrientationOnRobot
+import com.qualcomm.robotcore.eventloop.opmode.Disabled
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp
 import com.seattlesolvers.solverslib.command.CommandOpMode
 import com.seattlesolvers.solverslib.command.CommandScheduler
@@ -28,6 +29,7 @@ private val revHubIMUConfig = RevHubIMUConfig(
     RevHubOrientationOnRobot.UsbFacingDirection.BACKWARD
 )
 
+@Disabled
 @TeleOp(name = "IntakeTest", group = "Op Mode")
 class IntakeTestOpMode: CommandOpMode() {
 

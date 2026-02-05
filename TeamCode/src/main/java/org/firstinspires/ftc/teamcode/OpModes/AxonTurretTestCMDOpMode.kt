@@ -2,6 +2,7 @@ package org.firstinspires.ftc.teamcode.OpModes
 
 import Angle
 import com.qualcomm.hardware.rev.RevHubOrientationOnRobot
+import com.qualcomm.robotcore.eventloop.opmode.Disabled
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp
 import com.seattlesolvers.solverslib.command.CommandOpMode
 import com.seattlesolvers.solverslib.command.CommandScheduler
@@ -50,6 +51,7 @@ val otosConfig = OtosConfig(
     DistanceUnit.INCH
 )
 
+@Disabled
 @TeleOp(name = "Turret + Mecanum Test", group = "Op Mode")
 class AxonTurretTestCMDOpMode: CommandOpMode() {
 

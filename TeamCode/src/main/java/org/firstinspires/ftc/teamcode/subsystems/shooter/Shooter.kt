@@ -44,11 +44,6 @@ class Shooter(
         flyWheelVelocity = AngularVelocity.fromRpm(ShooterConstants.Velocity.shooterDesiredVelocity)
 
         setFlyWheelVelocity(flyWheelVelocity)
-
-        telemetry.addLine("// SHOOTER //")
-        telemetry.addData("Shooter velocity", getVelocity().rpm)
-        telemetry.addData("Target Velocity", flyWheelVelocity.rpm)
-        telemetry.addData("Error", flyWheelVelocity.rpm - getVelocity().rpm)
     }
 
     fun log() {
@@ -88,10 +83,7 @@ class Shooter(
     }
 
     fun shootCMD(): Command {
-        return InstantCommand({
-//            setFlyWheelVelocity(AngularVelocity.fromRpm(ShooterConstants.Velocity.shooterDesiredVelocity))
-            setFlyWheelPower(1.0)
-        })
+        return InstantCommand({})
     }
 
     /**
