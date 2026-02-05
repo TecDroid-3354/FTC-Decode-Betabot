@@ -8,6 +8,7 @@ import org.firstinspires.ftc.robotcore.external.Telemetry
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit
 import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit
 import com.qualcomm.hardware.sparkfun.SparkFunOTOS.Pose2D
+import org.firstinspires.ftc.robotcore.external.navigation.Position
 
 data class OtosConfig(
     val otosId: String,
@@ -25,6 +26,10 @@ class Otos(hardwareMap: HardwareMap, val telemetry: Telemetry, val config: OtosC
 
     fun setOffset(offset: Pose2D) {
         otos.offset = offset
+    }
+
+    fun setPosition(position: Pose2D) {
+        otos.position = position
     }
 
     fun resetTracking() {

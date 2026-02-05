@@ -1,16 +1,15 @@
 package org.firstinspires.ftc.teamcode.OpModes
 
 import Angle
+import com.pedropathing.follower.Follower
+import com.pedropathing.geometry.Pose
 import com.qualcomm.hardware.sparkfun.SparkFunOTOS
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp
 import com.seattlesolvers.solverslib.command.CommandOpMode
 import com.seattlesolvers.solverslib.command.CommandScheduler
-import com.seattlesolvers.solverslib.command.InstantCommand
-import com.seattlesolvers.solverslib.command.button.GamepadButton
-import com.seattlesolvers.solverslib.command.button.Trigger
-import com.seattlesolvers.solverslib.gamepad.GamepadEx
-import com.seattlesolvers.solverslib.gamepad.GamepadKeys
 import com.seattlesolvers.solverslib.geometry.Vector2d
+import org.firstinspires.ftc.teamcode.auto.Visualizer.Draw
+import org.firstinspires.ftc.teamcode.pedroPathing.Constants
 import org.firstinspires.ftc.teamcode.utils.gyroscopes.Otos
 import org.firstinspires.ftc.teamcode.vision.Limelight
 
@@ -33,11 +32,19 @@ class LimelightOpMode : CommandOpMode() {
     lateinit var limelight: Limelight
 
     lateinit var otos: Otos
+    /* ! SETUP CODE ! */
+
+    lateinit var follower: Follower
+
     var targetAprilTagLocation: Vector2d = Vector2d(0.0, 0.0)
 
     // Here, declare code to be executed right after pressing the INIT button
     override fun initialize() {
         /* Subsystem initialization */
+
+        // The follower is initialized & set to the starting pose
+        follower = Constants.createFollower(hardwareMap)
+        follower.setStartingPose(Pose()) //set your starting pose
 
         // Initializing the OTOS
         otos = Otos(hardwareMap, telemetry, otosConfig)
@@ -67,11 +74,35 @@ class LimelightOpMode : CommandOpMode() {
             // Command for actually running the scheduler
             CommandScheduler.getInstance().run()
 
+            val limelightPose = limelight.getRobotPoseFromMegaTag2(Angle.fromDegrees(0.0))
+
+            if (limelightPose != null) {
+                updateOdometryPose(limelightPose)
+            }
+
+            follower.update()
+
+            drawCurrent()
+
             telemetry.addData("Pattern", limelight.getMotifPattern())
             telemetry.update()
         }
 
         // Cancels all previous commands
         reset()
+    }
+
+    fun updateOdometryPose(pose: SparkFunOTOS.Pose2D) {
+        otos.setPosition(pose)
+    }
+
+
+    private fun drawCurrent() {
+        try {
+            Draw.drawRobot(follower.getPose())
+            Draw.sendPacket()
+        } catch (e: Exception) {
+            throw RuntimeException("Drawing failed " + e)
+        }
     }
 }

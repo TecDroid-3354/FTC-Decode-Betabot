@@ -18,8 +18,8 @@ class VisionConstants {
     object LimelightPhysicalDescription {
         val LLMountAngleFromHorizontal: Angle = Angle.fromDegrees(21.0)
         val LLHeightFromGroundToLens: Distance = Distance.fromMeters(0.4338038)
-        val LLXOffsetToLens: Distance = Distance.fromMeters(-0.0257415)
-        val LLYOffsetToLens: Distance = Distance.fromMeters(0.1007388)
+        val LLXOffsetToLens: Distance = Distance.fromMeters(-0.1007388)
+        val LLYOffsetToLens: Distance = Distance.fromMeters(-0.0257415)
     }
 
     // Retrieved from Decode Manual

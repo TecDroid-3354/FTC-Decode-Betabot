@@ -2,16 +2,16 @@ package org.firstinspires.ftc.teamcode.vision
 
 import Angle
 import Distance
+import com.pedropathing.geometry.Pose
 import com.qualcomm.hardware.limelightvision.LLResult
 import com.qualcomm.hardware.limelightvision.Limelight3A
+import com.qualcomm.hardware.sparkfun.SparkFunOTOS
 import com.qualcomm.robotcore.hardware.HardwareMap
 import com.seattlesolvers.solverslib.command.SubsystemBase
 import org.firstinspires.ftc.robotcore.external.Telemetry
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit
-import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit
 import org.firstinspires.ftc.robotcore.external.navigation.Pose3D
 import org.firstinspires.ftc.robotcore.external.navigation.Position
-import org.firstinspires.ftc.robotcore.external.navigation.YawPitchRollAngles
 import org.firstinspires.ftc.teamcode.subsystems.indexer.MotifPatterns
 import org.firstinspires.ftc.teamcode.utils.gyroscopes.Otos
 import org.firstinspires.ftc.teamcode.vision.VisionConstants.AprilTagsPhysicalDescription
@@ -85,11 +85,8 @@ class Limelight(
     }
 
     fun getCameraMT2Position(): Pose3D? {
-        // First, tell Limelight which way your robot is facing
-        val robotYaw: Double = getRobotHeadingDegrees()
-        limelight!!.updateRobotOrientation(robotYaw)
         if (llResult != null && llResult!!.isValid()) {
-            val botPoseMT2: Pose3D? = llResult!!.botpose_MT2
+            val botPoseMT2: Pose3D? = llResult!!.botpose
             if (botPoseMT2 != null) {
                 val x = botPoseMT2.getPosition().x
                 val y = botPoseMT2.getPosition().y
@@ -101,7 +98,7 @@ class Limelight(
         return null
     }
 
-    fun getRobotPoseFromMegaTag2(turretAngle: Angle): Pose3D? {
+    fun getRobotPoseFromMegaTag2(turretAngle: Angle): SparkFunOTOS.Pose2D? {
         val cameraPose = getCameraMT2Position()
 
         if (cameraPose != null) {
@@ -136,7 +133,7 @@ class Limelight(
             val time = System.nanoTime()
 
             // 6. Construir Pose3D del robot
-            val robotPosition = Position(
+            /* val robotPosition = Position(
                 DistanceUnit.METER,
                 xRobot,
                 yRobot,
@@ -150,9 +147,15 @@ class Limelight(
                 0.0,  // pitch (robot plano)
                 0.0,  // roll
                 time
-            )
+            ) */
 
-            return Pose3D(robotPosition, robotOrientation)
+            val xCoordinate = Distance.fromMeters(xRobot)
+            val yCoordinate = Distance.fromMeters(yRobot)
+            val heading = Angle.fromRadians(yawRobot)
+
+            telemetry.addData("Bot Location:", "(" + xCoordinate.inches + ", " + yCoordinate.inches + ")")
+
+            return SparkFunOTOS.Pose2D(xCoordinate.inches, yCoordinate.inches, heading.radians)
         }
 
         return null
