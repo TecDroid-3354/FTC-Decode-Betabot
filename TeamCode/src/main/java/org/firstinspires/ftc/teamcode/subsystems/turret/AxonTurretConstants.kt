@@ -1,5 +1,6 @@
 package org.firstinspires.ftc.teamcode.subsystems.turret
 
+import Angle
 import com.bylazar.configurables.annotations.Configurable
 import com.qualcomm.robotcore.hardware.PIDFCoefficients
 import org.firstinspires.ftc.teamcode.utils.RTPServo.RTPServo
@@ -42,9 +43,14 @@ class AxonTurretConstants {
     object PhysicalDescription {
         const val gearRatio = 1.0 / 5.5
 
-        val limits = Angle.fromDegrees(-180.0).degrees..Angle.fromDegrees(180.0).degrees
+        val limits = Limits(Angle.fromDegrees(-141.0), Angle.fromDegrees(140.0))
     }
 }
+
+data class Limits(
+    val minVal: Angle,
+    val maxVal: Angle
+)
 
 val rightServoConfig = RTPServoConfig(
     AxonTurretConstants.Identification.RightServo.servoId,

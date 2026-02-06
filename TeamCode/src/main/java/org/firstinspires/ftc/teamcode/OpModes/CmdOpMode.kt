@@ -90,7 +90,7 @@ class CMDOpMode : CommandOpMode() {
         limelight = Limelight(hardwareMap, telemetry, otos)
         limelight.start()
 
-        turret = AxonTurret(hardwareMap, telemetry, turretConfig) { turretTarget }
+        turret = AxonTurret(hardwareMap, telemetry, turretConfig)
 
         // Shooter system initialization
         shooterSystem = ShooterSystem(hardwareMap, telemetry,
@@ -151,9 +151,9 @@ class CMDOpMode : CommandOpMode() {
                 InstantCommand({ shooterSystem.indexer.feedShooterCMD(limelight.getMotifPattern()).schedule() })
             )
 
-        Trigger { controller.gamepad.right_trigger > 0.2 }
-            .whenActive(shooterSystem.shooter.shootCMD())
-            .whenInactive(shooterSystem.stopShooter())
+//        Trigger { controller.gamepad.right_trigger > 0.2 }
+//            .whenActive(shooterSystem.shooter.shootCMD())
+//            .whenInactive(shooterSystem.stopShooter())
     }
 
     // Main code body

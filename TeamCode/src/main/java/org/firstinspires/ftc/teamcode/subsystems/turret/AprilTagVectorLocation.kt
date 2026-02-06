@@ -13,12 +13,12 @@ object AprilTagVectorLocations {
     /**
      * Blue april tag location vector in inches
      */
-    val blueGoalCornerVector = Vector2d(72.0, 72.0)
+    val blueGoalCornerVector = Vector2d(-72.0, 72.0)
 
     /**
      * Red april tag location vector in inches
      */
-    val redGoalCornerVector = Vector2d(-72.0, 72.0)
+    val redGoalCornerVector = Vector2d(72.0, 72.0)
 
     val blueAprilTagLocationVector = Vector2d(-59.138 , 56.67)
 

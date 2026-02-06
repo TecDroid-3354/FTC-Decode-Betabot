@@ -20,33 +20,21 @@ class Hood(val hardwareMap: HardwareMap, val telemetry: Telemetry, val interpola
     private val servo: ServoEx
     // As SWYFT servos do not store their position, we store the commanded angle (Telemetry purposes)
     var currentAngle: Angle
-    // Our target angle we want to reach periodically
-    private var targetAngle: Angle
 
     // Initialization code //
     init {
         servo = ServoEx(hardwareMap, HoodConstants.Identification.hoodId)
         servoConfig()
-        //setHoodPosition(HoodConstants.Positions.minPosition + Angle.fromRotations(0.0001))
+        setHoodPosition(HoodConstants.Positions.minPosition + Angle.fromRotations(0.0001))
 
         // servo.position returns a value from 0.0 to 1.0, we take it as rotations.
         currentAngle = Angle.fromRotations(servo.servo.position)
-
-        // Give a starting value to the angle
-        //targetAngle = Angle.fromRotations(0.0) //todo give an initial value
-        targetAngle = HoodConstants.Positions.minPosition + Angle.fromRotations(0.0001)
     }
 
     // Code called every robot loop //
     override fun periodic() {
         // Telemetry to retrieve useful data
         currentAngle = Angle.fromRotations(servo.servo.position)
-
-        // We interpolate the angle and therefore set the target angle
-        setTargetAngle(Angle.fromDegrees(interpolator.getDesiredPoint()))
-
-        // We set what we want to reach to the target angle
-        //setHoodPosition(targetAngle)
     }
 
     fun log() {
@@ -54,11 +42,6 @@ class Hood(val hardwareMap: HardwareMap, val telemetry: Telemetry, val interpola
         telemetry.addLine()
         telemetry.addData("Hood position in rotations", currentAngle.rotations)
     }
-
-    // Our public method to change the target angle
-     fun setTargetAngle(angle : Angle){
-         targetAngle = angle
-     }
 
     // Sets the desired angle to the servo (in radians) and updates the currentAngle variable //
     fun setHoodPosition(position: Angle) {

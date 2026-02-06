@@ -75,7 +75,7 @@ class AxonTurretTestCMDOpMode: CommandOpMode() {
 
         otos = Otos(hardwareMap, telemetry, otosConfig)
 
-        turret = AxonTurret(hardwareMap, telemetry, turretConfig) { turretTarget }
+        turret = AxonTurret(hardwareMap, telemetry, turretConfig)
 
         mecanum = SolversMecanum(hardwareMap, telemetry, otos)
         mecanum.defaultCommand = JoystickCmd(

@@ -1,19 +1,25 @@
 package org.firstinspires.ftc.teamcode.systems.shooterSystem
 
 import Angle
+import AngularVelocity
 import androidx.core.util.Supplier
 import com.qualcomm.robotcore.hardware.HardwareMap
 import com.seattlesolvers.solverslib.command.Command
 import com.seattlesolvers.solverslib.command.InstantCommand
 import com.seattlesolvers.solverslib.command.SequentialCommandGroup
+import com.seattlesolvers.solverslib.command.SubsystemBase
 import com.seattlesolvers.solverslib.command.WaitCommand
+import com.seattlesolvers.solverslib.command.WaitUntilCommand
 import org.firstinspires.ftc.robotcore.external.Telemetry
 import org.firstinspires.ftc.teamcode.subsystems.indexer.Indexer
 import org.firstinspires.ftc.teamcode.subsystems.indexer.MotifPatterns
 import org.firstinspires.ftc.teamcode.subsystems.shooter.Hood
+import org.firstinspires.ftc.teamcode.subsystems.shooter.HoodConstants
 import org.firstinspires.ftc.teamcode.subsystems.shooter.Shooter
+import org.firstinspires.ftc.teamcode.subsystems.turret.turretConfig
 import org.firstinspires.ftc.teamcode.utils.interpolation.InterpolatingDouble
 import org.firstinspires.ftc.teamcode.utils.interpolation.InterpolatingTreeMap
+import java.util.function.BooleanSupplier
 
 /**
  * These values need to be measured physically
@@ -51,49 +57,69 @@ class ShooterSystem(
     val hood: Hood
 
     // Setting the interpolation & its supplier
-    private var distanceToAprilTag = { Distance.fromInches(0.0) }
     private val hoodInterpolator: InterpolationConstructor
     private val shooterInterpolator: InterpolationConstructor
 
+    private var shooterPoint = AngularVelocity.fromRpm(1000.0)
+    private var hoodPoint = Angle.fromRotations(HoodConstants.Positions.minPosition.rotations)
+
     init {
         // Starting interpolators
-        hoodInterpolator = InterpolationConstructor(distanceToAprilTag, "hood")
-        shooterInterpolator = InterpolationConstructor(distanceToAprilTag, "shooter")
+        hoodInterpolator = InterpolationConstructor("hood")
+        shooterInterpolator = InterpolationConstructor("shooter")
 
         // Assigning subsystems
-        shooter = Shooter(hardwareMap, telemetry)
         indexer = Indexer(hardwareMap, telemetry)
+        shooter = Shooter(hardwareMap, telemetry)
         hood = Hood(hardwareMap, telemetry, hoodInterpolator)
     }
 
     fun periodic() {
-        distanceToAprilTag = if (isLLResultValid.get()) {
-            { Distance.fromInches(distanceToAprilTagInches.get()) }
-        } else {
-            { Distance.fromInches(0.0) }
-        }
+        shooterPoint = AngularVelocity.fromRpm(shooterInterpolator.getDesiredPoint(Distance.fromInches(distanceToAprilTagInches.get())))
+        hoodPoint = Angle.fromRotations(hoodInterpolator.getDesiredPoint(Distance.fromInches(distanceToAprilTagInches.get())))
+
+        telemetry.addData("Shooter Interpolation", shooterPoint.rpm)
+        telemetry.addData("Hood Interpolation", hoodPoint.rotations)
+        telemetry.addData("Distance to AprilTag (supplier) (Shooter system)", Distance.fromInches(distanceToAprilTagInches.get()).inches)
+        //hoodInterpolator.log(distanceToAprilTag, telemetry)
+        //telemetry.update()
     }
-
-    // todo: fallback in case interpolation doesn't work
-    // Uses interpolation to get desired hood values
-    /*fun getHoodTarget(): Angle {
-        return Angle.fromDegrees(interpolator.getDesiredPoint())
-    }*/
-
-    // todo: test
-    /*fun getObtainedSetPointForHood(): Angle {
-        if (isLLResultValid.get()) {
-            return interpolator.getDesiredPoint()
-        } else {
-            return HoodConstants.Positions.homePosition
-        }
-    }*/
 
     // Command to shoot the Artifacts according to pattern
     fun shoot(motifPatterns: MotifPatterns) : Command {
-        return SequentialCommandGroup(
+        val sequentialCMD = SequentialCommandGroup(
+            InstantCommand({
+                shooter.setFlyWheelVelocityFunc(AngularVelocity.fromRpm(shooterPoint.rpm))
+            }),
+            InstantCommand({ hood.setHoodPosition(hoodPoint) }),
+//          shooter.setFlyWheelVelocity(AngularVelocity.fromRpm(4500.0)),
+            WaitCommand(500),
             InstantCommand({ indexer.feedShooterCMD(motifPatterns).schedule() }),
-        );
+            WaitCommand(1600),
+            shooter.setFlyWheelVelocity(AngularVelocity.fromRpm(1000.0))
+        )
+
+        for (subsystem in listOf<SubsystemBase>(shooter, indexer, hood)) {
+            sequentialCMD.addRequirements(subsystem)
+        }
+
+        return sequentialCMD
+    }
+
+    fun shoot(motifPatterns: MotifPatterns, velocity: AngularVelocity) : Command {
+        val sequentialCMD =  SequentialCommandGroup(
+            shooter.setFlyWheelVelocity(velocity),
+            WaitCommand(100),
+            InstantCommand({ indexer.feedShooterCMD(motifPatterns).schedule() }, indexer),
+            WaitCommand(400),
+            shooter.setFlyWheelVelocity(AngularVelocity.fromRpm(1000.0))
+        )
+
+        for (subsystem in listOf<SubsystemBase>(shooter, indexer, hood)) {
+            sequentialCMD.addRequirements(subsystem)
+        }
+
+        return sequentialCMD
     }
 
     // Command to stop the shooter
@@ -102,11 +128,11 @@ class ShooterSystem(
     }
 
     // Returns whether the indexer is full or not
-    fun isFull(): Boolean {
-        return indexer.isFull()
+    fun isFull(): BooleanSupplier {
+        return BooleanSupplier { indexer.isFull() }
     }
 
-    fun isShooterActive():Boolean{
+    fun isShooterActive():Boolean {
         return shooter.isActive()
     }
 }

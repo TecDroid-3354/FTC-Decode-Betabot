@@ -12,6 +12,7 @@ import org.firstinspires.ftc.robotcore.external.Telemetry
 import org.firstinspires.ftc.teamcode.subsystems.drivetrain.MecanumConstants.Ids
 import org.firstinspires.ftc.teamcode.subsystems.drivetrain.MecanumConstants.Physics
 import org.firstinspires.ftc.teamcode.utils.gyroscopes.Otos
+import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit.normalizeDegrees
 import java.util.function.DoubleSupplier
 
 
@@ -26,6 +27,8 @@ class SolversMecanum(
     lateinit var frontLeftMotor: Motor
     lateinit var backRightMotor: Motor
     lateinit var backLeftMotor: Motor
+
+    var headingOffset: Angle = Angle.fromDegrees(0.0)
 
     // Declaring mecanum from solverslib
     var mecanum: MecanumDrive
@@ -42,6 +45,10 @@ class SolversMecanum(
     }
 
     constructor(hardwareMap: HardwareMap, telemetry: Telemetry, otos: Otos): this(hardwareMap, telemetry, otos.getSensorInstance())
+
+    constructor(hardwareMap: HardwareMap, telemetry: Telemetry, otos: Otos, headingOffset: Angle): this(hardwareMap, telemetry, otos) {
+        this.headingOffset = headingOffset
+    }
 
     override fun periodic() {
         // Telemetry to retrieve useful data
@@ -65,7 +72,7 @@ class SolversMecanum(
             chassisSpeeds.vyMetersPerSecond,
             chassisSpeeds.vxMetersPerSecond,
             chassisSpeeds.omegaRadiansPerSecond,
-            getRobotYaw().degrees)
+            normalizeDegrees(getRobotYaw().degrees + headingOffset.degrees))
     }
 
     fun getRobotYaw(): Angle = Angle.fromDegrees(otos.position.h)

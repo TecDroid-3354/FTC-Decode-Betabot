@@ -90,6 +90,10 @@ class Limelight(
         }
     }
 
+    fun llResultIsValid(): Boolean {
+        return llResult != null && llResult!!.isValid
+    }
+
     override fun periodic() {
 
         // Updating limelights' robot orientation with the Yaw
@@ -130,11 +134,11 @@ class Limelight(
                     angleToGoalRadians
                 )
 
-            telemetry.addLine("// Limelight //")
+            /*telemetry.addLine("// Limelight //")
             telemetry.addData(
                 "Limelight TargetDistanceInches",
                 distanceFromLimelightToGoalInches.inches
-            )
+            )*/
 
 //            telemetry.addData(
 //                "MT2 distance to goal",

@@ -4,6 +4,7 @@ import Angle
 import AngularVelocity
 import Distance
 import com.seattlesolvers.solverslib.command.SubsystemBase
+import org.firstinspires.ftc.robotcore.external.Telemetry
 import java.util.function.Supplier
 import org.firstinspires.ftc.teamcode.utils.interpolation.InterpolatingDouble
 import org.firstinspires.ftc.teamcode.utils.interpolation.InterpolatingTreeMap
@@ -19,7 +20,7 @@ data class ShooterPoint(
     val yShooterRPM: AngularVelocity
 )
 
-class InterpolationConstructor(private var distanceToGoal: Supplier<Distance>, subsystem: String) {
+class InterpolationConstructor(subsystem: String) {
     // This @maximumSize param represents the max number of allowed elements in the tree map
     // Once this number is surpassed, old data, i.e. the oldest data entries, is removed
     // to allow new entries to come in
@@ -59,7 +60,7 @@ class InterpolationConstructor(private var distanceToGoal: Supplier<Distance>, s
                 for (point in hoodPoints) {
                     map.put(
                         InterpolatingDouble(point.xDistanceToGoal.inches),
-                        InterpolatingDouble(point.yHoodAngle.degrees))
+                        InterpolatingDouble(point.yHoodAngle.rotations))
                 }
             }
 
@@ -75,7 +76,11 @@ class InterpolationConstructor(private var distanceToGoal: Supplier<Distance>, s
         }
     }
 
-    fun getDesiredPoint(): Double {
-        return map.getInterpolated(InterpolatingDouble(distanceToGoal.get().inches)).value
+    fun log(distanceToGoal: Distance, telemetry: Telemetry) {
+        telemetry.addData("Distance to AprilTag (Interpolator)", distanceToGoal.inches)
+    }
+
+    fun getDesiredPoint(distanceToGoal: Distance): Double {
+        return map.getInterpolated(InterpolatingDouble(distanceToGoal.inches)).value
     }
 }

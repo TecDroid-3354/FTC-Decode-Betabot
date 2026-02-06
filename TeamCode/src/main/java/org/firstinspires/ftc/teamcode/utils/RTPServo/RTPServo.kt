@@ -49,8 +49,6 @@ class RTPServo(hw: HardwareMap, val telemetry: Telemetry, val config: RTPServoCo
     // Keeps track of the number of full rotations in order to obtain the correct servo position along time
     private var fullRotations = 0
 
-    private var transformedAngle = Angle.fromDegrees(0.0)
-
     // The turret controller
     private val pidfController = PIDFController(config.pidfCoefficients)
 
@@ -65,7 +63,7 @@ class RTPServo(hw: HardwareMap, val telemetry: Telemetry, val config: RTPServoCo
         previousAngle = getServoAbsoluteAngle()
 
         // Setting a default position tolerance
-        pidfController.setTolerance(2.0)
+        pidfController.setTolerance(1.0)
 
         // Must call servo.setPower() for correct servo working
         setPower(0.0)
@@ -96,7 +94,7 @@ class RTPServo(hw: HardwareMap, val telemetry: Telemetry, val config: RTPServoCo
      * @param target the desired target angle
      */
     fun setTargetAngle(target: Angle) {
-        targetRotation = target
+        targetRotation = target / config.gearRatio
         pidfController.clearTotalError()
     }
 
@@ -107,7 +105,7 @@ class RTPServo(hw: HardwareMap, val telemetry: Telemetry, val config: RTPServoCo
      * @param change the desired change in the target rotation
      */
     fun changeTargetAngle(change: Angle) {
-        targetRotation += change
+        targetRotation += (change / config.gearRatio)
     }
 
     /**
@@ -199,10 +197,8 @@ class RTPServo(hw: HardwareMap, val telemetry: Telemetry, val config: RTPServoCo
         // keeps track of the previous servo angle
         previousAngle = currentAngle
 
-        transformedAngle = getAngle()
-
         // PID control
-        val output = pidfController.calculate(transformedAngle.degrees, targetRotation.degrees)
+        val output = pidfController.calculate(totalRotation.degrees, targetRotation.degrees)
 
         // If at set point, no power is requested.
         if (isAtSetPoint().not()) {

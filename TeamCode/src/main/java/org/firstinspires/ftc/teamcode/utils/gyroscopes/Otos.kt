@@ -24,6 +24,7 @@ class Otos(hardwareMap: HardwareMap, val telemetry: Telemetry, val config: OtosC
 
     init {
         sensorConfiguration()
+
     }
 
     fun setOffset(offset: Pose2D) {
@@ -47,8 +48,8 @@ class Otos(hardwareMap: HardwareMap, val telemetry: Telemetry, val config: OtosC
 
     fun log() {
         telemetry.addLine("// OTOS //")
-        telemetry.addData("Y position", otos.position.y)
-        telemetry.addData("X position", otos.position.x)
+        telemetry.addData("Y position", -otos.position.y)
+        telemetry.addData("X position", -otos.position.x)
         telemetry.addData("Heading", otos.position.h)
     }
 
@@ -58,7 +59,7 @@ class Otos(hardwareMap: HardwareMap, val telemetry: Telemetry, val config: OtosC
 
         WaitCommand(50)
         otos.calibrateImu()
-        setOffset(Pose2D(0.0, 0.0, Math.PI / 2))
+        setOffset(Pose2D(0.0, -0.70637, -Math.PI)   )
         otos.resetTracking()
         WaitCommand(50)
     }

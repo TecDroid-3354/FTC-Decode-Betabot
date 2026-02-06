@@ -22,7 +22,7 @@ public class Constants {
     // Follower constants ///
     // Consists of values from the automatic, PID, and centripetal tuners
     public static FollowerConstants followerConstants = new FollowerConstants()
-            .mass(13.55) // Robot's mass. Compensates for the centripetal force
+            .mass(15.0) // Robot's mass. Compensates for the centripetal force
             .forwardZeroPowerAcceleration(-27.7404) // 👍 Measures how the robot decelerates when moving forward & power is cut
             // It should be negative. Otherwise, it'll accelerate when getting closer to 0
             .lateralZeroPowerAcceleration(-72.9878) //👍 Measures how the robot decelerates when moving sideways & power is cut
@@ -62,9 +62,9 @@ public class Constants {
             // translated 1/4 in to the left, which would be a translation in the y axis since OTOS
             // axes are flipped.
 //            .offset(new SparkFunOTOS.Pose2D(0.0,-0.25,-Math.PI / 2.0))
-            .offset(new SparkFunOTOS.Pose2D(0.0, -0.70637, Math.PI / 2))
-            .linearScalar(0.9484) // Done 👍
-            .angularScalar(0.9939); // Done 👍
+            .offset(new SparkFunOTOS.Pose2D(0.0, -0.70637, -Math.PI / 2))
+            .linearScalar(-1.1658) // Done 👍
+            .angularScalar(0.9898); // Done 👍
 
 
     // Path constraints //

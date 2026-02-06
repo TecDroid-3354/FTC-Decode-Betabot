@@ -13,7 +13,6 @@ import com.seattlesolvers.solverslib.gamepad.whenInactive
 import org.firstinspires.ftc.teamcode.subsystems.shooter.Hood
 import org.firstinspires.ftc.teamcode.subsystems.shooter.Shooter
 
-@Disabled
 @TeleOp(name = "ShooterTest", group = "Op Mode")
 class ShooterTestOpMode: CommandOpMode() {
 
@@ -69,6 +68,8 @@ class ShooterTestOpMode: CommandOpMode() {
 
             // Command for actually running the scheduler
             CommandScheduler.getInstance().run()
+
+            shooter.log()
 
             // Read the controller's buttons states
             controller.readButtons()

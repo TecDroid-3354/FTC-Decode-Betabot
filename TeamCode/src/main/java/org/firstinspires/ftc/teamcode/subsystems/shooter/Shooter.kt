@@ -7,6 +7,7 @@ import com.qualcomm.robotcore.hardware.HardwareMap
 import com.qualcomm.robotcore.hardware.PIDFCoefficients
 import com.seattlesolvers.solverslib.command.Command
 import com.seattlesolvers.solverslib.command.InstantCommand
+import com.seattlesolvers.solverslib.command.RunCommand
 import com.seattlesolvers.solverslib.command.SubsystemBase
 import com.seattlesolvers.solverslib.util.MathUtils
 import org.firstinspires.ftc.robotcore.external.Telemetry
@@ -25,7 +26,7 @@ class Shooter(
     lateinit var firstMotor: DcMotorEx
     lateinit var secondMotor: DcMotorEx
 
-    private var flyWheelVelocity = AngularVelocity.fromRpm(0.0)
+    var targetVelocity = AngularVelocity.fromRpm(0.0)
 
     // Initialization //
 
@@ -41,16 +42,16 @@ class Shooter(
         // Try to reach to the minimum error possible and a high output when ramping down when a ball passes through.
         setPIDCoefficients(ShooterConstants.PIDF.pidfCoefficients)
 
-        flyWheelVelocity = AngularVelocity.fromRpm(ShooterConstants.Velocity.shooterDesiredVelocity)
-
-        setFlyWheelVelocity(flyWheelVelocity)
+//        targetVelocity = AngularVelocity.fromRpm(ShooterConstants.Velocity.shooterDesiredVelocity)
+//
+//        setFlyWheelVelocityFunc(targetVelocity)
     }
 
     fun log() {
         telemetry.addLine("// SHOOTER //")
         telemetry.addData("Shooter velocity", getVelocity().rpm)
-        telemetry.addData("Target Velocity", flyWheelVelocity.rpm)
-        telemetry.addData("Error", flyWheelVelocity.rpm - getVelocity().rpm)
+        telemetry.addData("Target Velocity", targetVelocity.rpm)
+        telemetry.addData("Error", targetVelocity.rpm - getVelocity().rpm)
     }
 
     // Functional code //
@@ -72,14 +73,24 @@ class Shooter(
     /**
      * Sets the motor's velocity to a desired angular velocity
      */
-    fun setFlyWheelVelocity(velocity: AngularVelocity) {
+    fun setFlyWheelVelocity(velocity: AngularVelocity): Command {
+        return InstantCommand({
+            targetVelocity = velocity
+            setVelocity(firstMotor, velocity)
+            setVelocity(secondMotor, velocity)
+        }, this)
+    }
+
+    fun setFlyWheelVelocityFunc(velocity: AngularVelocity): Unit {
         setVelocity(firstMotor, velocity)
         setVelocity(secondMotor, velocity)
     }
 
-    fun setFlyWheelPower(outPut: Double) {
-        firstMotor.power = outPut
-        secondMotor.power = outPut
+    fun setFlyWheelPower(outPut: Double): Command {
+        return InstantCommand({
+            firstMotor.power = outPut
+            secondMotor.power = outPut
+        })
     }
 
     fun shootCMD(): Command {

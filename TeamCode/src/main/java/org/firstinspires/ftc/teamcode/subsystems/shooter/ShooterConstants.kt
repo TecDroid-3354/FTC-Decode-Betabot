@@ -33,7 +33,7 @@ class ShooterConstants {
         companion object {
             @JvmField
             // The PID controller used for the subsytem's motor
-            var pidfCoefficients = PIDFCoefficients(1.5, 0.0, 0.0, 14.24)
+            var pidfCoefficients = PIDFCoefficients(3.0, 0.0, 0.0, 12.92)
         }
     }
 
@@ -41,7 +41,7 @@ class ShooterConstants {
     class Velocity {
 
         object Limits {
-            val minimumVel: AngularVelocity = AngularVelocity.fromRpm(2000.0)
+            val minimumVel: AngularVelocity = AngularVelocity.fromRpm(1000.0)
             val maximumVel: AngularVelocity = AngularVelocity.fromRpm(5000.0)
         }
 

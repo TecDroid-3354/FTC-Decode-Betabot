@@ -111,12 +111,14 @@ class Indexer(
      * @return true if every single slot in our indexer currently has a ball
      */
     fun isFull(): Boolean {
+        var index = 0
+
         for (slot in slotList) {
-            if (slot.getDetectedColor() == DetectedColor.UNKNOWN) {
-                return false
+            if (slot.getDetectedColor() != DetectedColor.UNKNOWN) {
+                index++
             }
         }
-        return true
+        return index == 3
     }
 
     /**
@@ -246,10 +248,10 @@ class Indexer(
      */
     private fun feedCMD(slot: Slot): Command {
         return SequentialCommandGroup(
-            WaitCommand(300),
             InstantCommand({ slot.feed() }),
             WaitCommand(200),
-            InstantCommand({ slot.home() })
+            InstantCommand({ slot.home() }),
+            WaitCommand(350),
         )
     }
 }
