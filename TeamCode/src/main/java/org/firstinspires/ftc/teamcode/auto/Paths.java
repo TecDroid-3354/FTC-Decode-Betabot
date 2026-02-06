@@ -51,6 +51,13 @@ public class Paths {
             blue9Plus3PickSecondRow, blue9Plus3ShootSecondRow,
             blue9Plus3PickThirdRow, blue9Plus3ShootThirdRow;
 
+    //Blue 6 + 3
+    Blue6Plus3Poses blue6Plus3Poses;
+    public PathChain blue6Plus3ShootPrecharged,
+    blue6Plus3PickRowOne,blue6Plus3ShootRowOne,
+    blue6Plus3PickRowTwo,blue6Plus3ShootRowTwo;
+
+
 
     // In this case, the constructor will only take the Follower, which will allow us to build the paths
     public Paths(Follower follower) {
@@ -106,7 +113,7 @@ public class Paths {
 
         //RedTwo
         red6Plus3Poses = new Red6Plus3Poses();
-        RedTwoPaths(follower);
+        Red6Plus3(follower);
 
 
         // Blue side //
@@ -115,6 +122,7 @@ public class Paths {
         blue9Plus3Poses = new Blue9Plus3Poses();
         Blue9Plus3Paths(follower);
 
+        blue6Plus3Poses = new Blue6Plus3Poses();
 
 
 
@@ -343,15 +351,9 @@ public class Paths {
             .build();
     }
 
-    private void RedTwoPaths(Follower follower){
+    private void Red6Plus3(Follower follower){
         red6Plus3ShootPrecharged = follower.pathBuilder()
-                .addPath(
-                        new BezierLine(
-                                red6Plus3Poses.red6Plus3StartPose,
-                                red9Plus3Poses.red9Plus3ShootingPose
-
-                        )
-                ).setLinearHeadingInterpolation(
+                .setLinearHeadingInterpolation(
                         red6Plus3Poses.red6Plus3StartPose.getHeading(),
                         red6Plus3Poses.red6Plus3ShootingPose.getHeading()
                 ).build();
@@ -365,12 +367,17 @@ public class Paths {
                 ).setLinearHeadingInterpolation(
                         red6Plus3Poses.red6Plus3ShootingPose.getHeading(),
                         Math.toRadians(0)
+                ).addPath(
+                        new BezierLine(
+                                new Pose(100,35),
+                                new Pose(130,35)
+                        )
                 ).build();
 
         red6Plus3ShootRowOne = follower.pathBuilder()
                 .addPath(
                         new BezierLine(
-                                new Pose(100,35),
+                                new Pose(130,35),
                                 red6Plus3Poses.red6Plus3ShootingPose
                         )
                 ).setLinearHeadingInterpolation(
@@ -387,6 +394,11 @@ public class Paths {
                 ).setLinearHeadingInterpolation(
                         red6Plus3Poses.red6Plus3ShootingPose.getHeading(),
                         Math.toRadians(0)
+                ).addPath(
+                        new BezierLine(
+                                new Pose(100,60),
+                                new Pose(130,60)
+                        )
                 ).build();
 
         red6Plus3ShootRowTwo = follower.pathBuilder()
@@ -400,6 +412,69 @@ public class Paths {
                         red6Plus3Poses.red6Plus3ShootingPose.getHeading()
                 ).build();
     }
+    private void Blue6Plus3(Follower follower){
+        blue6Plus3ShootPrecharged = follower.pathBuilder()
+                .setLinearHeadingInterpolation(
+                        blue6Plus3Poses.blue6Plus3StartPose.getHeading(),
+                        blue6Plus3Poses.blue6Plus3ShootingPose.getHeading()
+                ).build();
+
+        blue6Plus3PickRowOne = follower.pathBuilder()
+                .addPath(
+                        new BezierLine(
+                                blue6Plus3Poses.blue6Plus3ShootingPose,
+                                new Pose(46,35)
+                        )
+                ).setLinearHeadingInterpolation(
+                        blue6Plus3Poses.blue6Plus3ShootingPose.getHeading(),
+                        Math.toRadians(130)
+                ).addPath(
+                        new BezierLine(
+                                new Pose(46,35),
+                                new Pose(16,35)
+                        )
+                ).build();
+
+        blue6Plus3ShootRowOne = follower.pathBuilder()
+                .addPath(
+                        new BezierLine(
+                                new Pose(46,35),
+                                blue6Plus3Poses.blue6Plus3ShootingPose
+                        )
+                ).setLinearHeadingInterpolation(
+                        Math.toRadians(180),
+                        blue6Plus3Poses.blue6Plus3ShootingPose.getHeading()
+                ).build();
+
+        blue6Plus3PickRowTwo = follower.pathBuilder()
+                .addPath(
+                        new BezierLine(
+                                blue6Plus3Poses.blue6Plus3ShootingPose,
+                                new Pose(46, 30)
+                        )
+                ).setLinearHeadingInterpolation(
+                      blue6Plus3Poses.blue6Plus3ShootingPose.getHeading(),
+                      Math.toRadians(180)
+                ).addPath(
+                        new BezierLine(
+                                new Pose(46,60),
+                                new Pose(16,60)
+                        )
+                ).build();
+
+        blue6Plus3ShootRowTwo = follower.pathBuilder()
+                .addPath(
+                        new BezierLine(
+                                new Pose(16,60),
+                                blue6Plus3Poses.blue6Plus3ShootingPose
+                        )
+                ).setLinearHeadingInterpolation(
+                        Math.toRadians(180),
+                        blue6Plus3Poses.blue6Plus3ShootingPose.getHeading()
+                ).build();
+    }
+
+
 
 
 }
