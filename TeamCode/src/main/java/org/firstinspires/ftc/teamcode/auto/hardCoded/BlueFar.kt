@@ -92,12 +92,12 @@ class BlueFar : CommandOpMode() {
                 ).schedule()*/
 
                 turret.setTurretVoltage(1.0)
-                sleep(200)
+                sleep(250)
                 turret.setTurretVoltage(0.0)
                 sleep(200)
                 shooterSystem.shoot(
                     limelight.getMotifPattern(),
-                    AngularVelocity.fromRpm(4200.0),
+                    AngularVelocity.fromRpm(4300.0),
                     Angle.fromRotations(0.8)
                 ).schedule()
                 setPathState(-1)

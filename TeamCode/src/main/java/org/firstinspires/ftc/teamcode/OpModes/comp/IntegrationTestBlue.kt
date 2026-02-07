@@ -146,7 +146,7 @@ class IntegrationTestBlue: CommandOpMode() {
 
         Trigger { controller.gamepad.left_trigger > 0.5 }
             .whenActive(
-                shooterSystem.shoot(limelight.getMotifPattern(), AngularVelocity.fromRpm(4500.0 - 300.0), Angle.fromRotations(0.90))
+                shooterSystem.shoot(limelight.getMotifPattern(), AngularVelocity.fromRpm(4500.0 - 200.0), Angle.fromRotations(0.90))
             )
 
         // Shooting from th far launch zone

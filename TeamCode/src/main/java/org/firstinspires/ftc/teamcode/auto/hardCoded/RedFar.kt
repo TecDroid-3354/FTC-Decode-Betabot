@@ -20,8 +20,8 @@ import org.firstinspires.ftc.teamcode.utils.gyroscopes.Otos
 import org.firstinspires.ftc.teamcode.utils.gyroscopes.OtosConfig
 import org.firstinspires.ftc.teamcode.vision.Limelight
 
-@Autonomous(name = "Blue Far", group = "Blue")
-class BlueFar : CommandOpMode() {
+@Autonomous(name = "Red Far", group = "Blue")
+class RedFar : CommandOpMode() {
     //Pedro ´Pathin
     //Variables
     private var pathState = 0

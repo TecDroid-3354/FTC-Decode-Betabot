@@ -50,9 +50,9 @@ class InterpolationConstructor(subsystem: String) {
 //        ShooterPoint(Distance.fromInches(167.0), AngularVelocity.fromRpm(4500.0 - 300.0 - 200.0)),
 //        ShooterPoint(Distance.fromInches(194.0), AngularVelocity.fromRpm(4600.0 - 300.0 - 200.0)),
 
-        ShooterPoint(Distance.fromInches(25.7), AngularVelocity.fromRpm(3100.0)),
-        ShooterPoint(Distance.fromInches(41.1), AngularVelocity.fromRpm(3200.0)),
-        ShooterPoint(Distance.fromInches(67.4), AngularVelocity.fromRpm(3350.0)),
+        ShooterPoint(Distance.fromInches(25.7), AngularVelocity.fromRpm(3100.0 + 100.0)),
+        ShooterPoint(Distance.fromInches(41.1), AngularVelocity.fromRpm(3200.0 + 100.0)),
+        ShooterPoint(Distance.fromInches(67.4), AngularVelocity.fromRpm(3350.0 + 100.0)),
         ShooterPoint(Distance.fromInches(88.0), AngularVelocity.fromRpm(3700.0)),
         ShooterPoint(Distance.fromInches(116.0), AngularVelocity.fromRpm(3940.0)),
         ShooterPoint(Distance.fromInches(142.0), AngularVelocity.fromRpm(4200.0)),

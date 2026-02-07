@@ -37,7 +37,7 @@ class AxonTurretConstants {
 
     companion object {
         @JvmField
-        var turretControllerCoefficients = PIDFCoefficients(0.024, 0.0, 0.0, 0.0)
+        var turretControllerCoefficients = PIDFCoefficients(0.021, 0.0, 0.0, 0.0)
     }
 
     object PhysicalDescription {
