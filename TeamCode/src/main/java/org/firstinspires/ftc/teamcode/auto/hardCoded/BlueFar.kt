@@ -74,10 +74,10 @@ class BlueFar : CommandOpMode() {
 
             // Updating the telemetry
             telemetry.addData("current pathState", pathState)
-            shooterSystem.shooter.log()
-            shooterSystem.hood.log()
-            shooterSystem.indexer.log()
-            otos.log()
+//            shooterSystem.shooter.log()
+//            shooterSystem.hood.log()
+//            shooterSystem.indexer.log()
+//            otos.log()
             telemetry.update()
         }
     }
@@ -93,19 +93,19 @@ class BlueFar : CommandOpMode() {
                 ).schedule()*/
 
                 turret.setTurretVoltage(1.0)
-                sleep(245)
+                sleep(200)
                 turret.setTurretVoltage(0.0)
                 sleep(200)
                 shooterSystem.shooter.setFlyWheelVelocity(AngularVelocity.fromRpm(4250.0)).schedule()
                 shooterSystem.hood.setHoodPosition(Angle.fromRotations(0.8))
-                sleep(800)
+                sleep(1300)
 
                 shooterSystem.indexer.slotList[0].feed()
                 sleep(800)
                 shooterSystem.indexer.slotList[0].home()
                 sleep(450)
                 shooterSystem.indexer.slotList[1].feed()
-                sleep(800)
+                sleep(850)
                 shooterSystem.indexer.slotList[1].home()
                 sleep(450)
                 shooterSystem.indexer.slotList[2].feed()
