@@ -31,19 +31,19 @@ class AxonTurretConstants {
         object AbsoluteEncoder {
 
             val maximumVoltage = Voltage.fromVolts(3.23)
-            val offset = Angle.fromDegrees(175.68 - 177.24)
+            val offset = Angle.fromDegrees(175.68 - 177.24 - 35.0)
         }
     }
 
     companion object {
         @JvmField
-        var turretControllerCoefficients = PIDFCoefficients(0.006, 0.0, 0.0, 0.000025)
+        var turretControllerCoefficients = PIDFCoefficients(0.024, 0.0, 0.0, 0.0)
     }
 
     object PhysicalDescription {
         const val gearRatio = 1.0 / 5.5
 
-        val limits = Limits(Angle.fromDegrees(-141.0), Angle.fromDegrees(140.0))
+        val limits = Limits(Angle.fromDegrees(-141.0), Angle.fromDegrees(120.0))
     }
 }
 
@@ -74,7 +74,7 @@ val leftServoConfig = RTPServoConfig(
     AxonTurretConstants.turretControllerCoefficients
 )
 
-val turretConfig = AxonTurretConfig(
+ val turretConfig = AxonTurretConfig(
     rightServoConfig,
     leftServoConfig,
     AxonTurretConstants.PhysicalDescription.limits

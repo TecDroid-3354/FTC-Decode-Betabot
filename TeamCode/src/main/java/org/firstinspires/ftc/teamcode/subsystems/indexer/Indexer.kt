@@ -249,9 +249,9 @@ class Indexer(
     private fun feedCMD(slot: Slot): Command {
         return SequentialCommandGroup(
             InstantCommand({ slot.feed() }),
-            WaitCommand(200),
+            WaitCommand(150),
             InstantCommand({ slot.home() }),
-            WaitCommand(350),
+            WaitCommand(250),
         )
     }
 }

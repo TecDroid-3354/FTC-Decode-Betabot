@@ -197,12 +197,12 @@ class RTPServo(hw: HardwareMap, val telemetry: Telemetry, val config: RTPServoCo
         // keeps track of the previous servo angle
         previousAngle = currentAngle
 
-        // PID control
-        val output = pidfController.calculate(totalRotation.degrees, targetRotation.degrees)
-
-        // If at set point, no power is requested.
-        if (isAtSetPoint().not()) {
-            setPower(output)
-        }
+//        // PID control
+//        val output = pidfController.calculate(totalRotation.degrees, targetRotation.degrees)
+//
+//        // If at set point, no power is requested.
+//        if (isAtSetPoint().not()) {
+//            setPower(output)
+//        }
     }
 }

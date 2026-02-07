@@ -33,7 +33,7 @@ class ShooterConstants {
         companion object {
             @JvmField
             // The PID controller used for the subsytem's motor
-            var pidfCoefficients = PIDFCoefficients(3.0, 0.0, 0.0, 12.92)
+            var pidfCoefficients = PIDFCoefficients(2.85, 0.0, 0.0, 13.0)
         }
     }
 

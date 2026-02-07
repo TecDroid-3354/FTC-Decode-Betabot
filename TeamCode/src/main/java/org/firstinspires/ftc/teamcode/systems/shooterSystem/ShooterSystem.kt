@@ -95,7 +95,7 @@ class ShooterSystem(
 //          shooter.setFlyWheelVelocity(AngularVelocity.fromRpm(4500.0)),
             WaitCommand(500),
             InstantCommand({ indexer.feedShooterCMD(motifPatterns).schedule() }),
-            WaitCommand(1600),
+            WaitCommand(2500),
             shooter.setFlyWheelVelocity(AngularVelocity.fromRpm(1000.0))
         )
 
@@ -106,12 +106,13 @@ class ShooterSystem(
         return sequentialCMD
     }
 
-    fun shoot(motifPatterns: MotifPatterns, velocity: AngularVelocity) : Command {
+    fun shoot(motifPatterns: MotifPatterns, velocity: AngularVelocity, hoodAngle: Angle) : Command {
         val sequentialCMD =  SequentialCommandGroup(
+            InstantCommand({ hood.setHoodPosition(hoodAngle) }),
             shooter.setFlyWheelVelocity(velocity),
-            WaitCommand(100),
+            WaitCommand(800),
             InstantCommand({ indexer.feedShooterCMD(motifPatterns).schedule() }, indexer),
-            WaitCommand(400),
+            WaitCommand(2600),
             shooter.setFlyWheelVelocity(AngularVelocity.fromRpm(1000.0))
         )
 

@@ -22,11 +22,6 @@ class Otos(hardwareMap: HardwareMap, val telemetry: Telemetry, val config: OtosC
 
     val otos: SparkFunOTOS = hardwareMap.get(SparkFunOTOS::class.java, config.otosId)
 
-    init {
-        sensorConfiguration()
-
-    }
-
     fun setOffset(offset: Pose2D) {
         otos.setOffset(offset)
     }
@@ -48,8 +43,8 @@ class Otos(hardwareMap: HardwareMap, val telemetry: Telemetry, val config: OtosC
 
     fun log() {
         telemetry.addLine("// OTOS //")
-        telemetry.addData("Y position", -otos.position.y)
-        telemetry.addData("X position", -otos.position.x)
+        telemetry.addData("X position", otos.position.x)
+        telemetry.addData("Y position", otos.position.y)
         telemetry.addData("Heading", otos.position.h)
     }
 
@@ -59,7 +54,7 @@ class Otos(hardwareMap: HardwareMap, val telemetry: Telemetry, val config: OtosC
 
         WaitCommand(50)
         otos.calibrateImu()
-        setOffset(Pose2D(0.0, -0.70637, -Math.PI)   )
+        setOffset(Pose2D(0.0, -0.70637, -90.0))
         otos.resetTracking()
         WaitCommand(50)
     }

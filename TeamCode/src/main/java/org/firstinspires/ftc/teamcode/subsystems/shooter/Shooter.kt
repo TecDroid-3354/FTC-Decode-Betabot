@@ -41,7 +41,7 @@ class Shooter(
         // After you've tuned that, you can start tuning the p value by transitioning from a hiw velocity to a low one
         // Try to reach to the minimum error possible and a high output when ramping down when a ball passes through.
         setPIDCoefficients(ShooterConstants.PIDF.pidfCoefficients)
-
+//
 //        targetVelocity = AngularVelocity.fromRpm(ShooterConstants.Velocity.shooterDesiredVelocity)
 //
 //        setFlyWheelVelocityFunc(targetVelocity)

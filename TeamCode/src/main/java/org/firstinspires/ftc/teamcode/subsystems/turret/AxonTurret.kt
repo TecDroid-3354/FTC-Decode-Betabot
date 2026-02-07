@@ -9,6 +9,7 @@ import com.seattlesolvers.solverslib.command.CommandBase
 import com.seattlesolvers.solverslib.command.InstantCommand
 import com.seattlesolvers.solverslib.command.RunCommand
 import com.seattlesolvers.solverslib.command.SubsystemBase
+import com.seattlesolvers.solverslib.controller.PIDFController
 import com.seattlesolvers.solverslib.util.MathUtils
 import org.firstinspires.ftc.robotcore.external.Supplier
 import org.firstinspires.ftc.robotcore.external.Telemetry
@@ -27,14 +28,21 @@ class AxonTurret(val hw: HardwareMap, val telemetry: Telemetry, val config: Axon
     lateinit var leftServo: RTPServo
     lateinit var absoluteEncoder: AnalogInput
 
+    var appliedPower = 0.0
+
+    var pidController = PIDFController(AxonTurretConstants.turretControllerCoefficients)
+
     init {
         servoConfig()
     }
 
     override fun periodic() {
         telemetry.addData("Turret current angle", getAbsoluteAngle().degrees)
-        setPIDFCoefficients(rightServo, AxonTurretConstants.turretControllerCoefficients)
-        setPIDFCoefficients(leftServo, AxonTurretConstants.turretControllerCoefficients)
+        telemetry.addData("PIDF", AxonTurretConstants.turretControllerCoefficients)
+//        setPIDFCoefficients(rightServo, AxonTurretConstants.turretControllerCoefficients)
+//        setPIDFCoefficients(leftServo, AxonTurretConstants.turretControllerCoefficients)
+
+        pidController = PIDFController(AxonTurretConstants.turretControllerCoefficients)
         rightServo.periodic()
         leftServo.periodic()
     }
@@ -58,6 +66,24 @@ class AxonTurret(val hw: HardwareMap, val telemetry: Telemetry, val config: Axon
                 stopTurret()
             }
         }, this)
+    }
+
+    fun setTurretVoltage(power: Double) {
+        if ((getAbsoluteAngle().degrees <= AxonTurretConstants.PhysicalDescription.limits.minVal.degrees && power < 0.0) ||
+            (getAbsoluteAngle().degrees >= AxonTurretConstants.PhysicalDescription.limits.maxVal.degrees && power > 0.0)) {
+            rightServo.stop()
+            leftServo.stop()
+        } else {
+            rightServo.setPower(power)
+            leftServo.setPower(power)
+        }
+    }
+
+    fun alignToAprilTag(tx: Supplier<Angle>): Command {
+        return RunCommand({
+            val power = pidController.calculate(tx.get().degrees, 0.0)
+            setTurretVoltage(power)
+        })
     }
 
     // Just need one encoder's reading

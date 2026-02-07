@@ -62,13 +62,13 @@ class IntegrationTestRed: CommandOpMode() {
     override fun initialize() {
 
         otos = Otos(hardwareMap, telemetry, otosConfig)
-        otos.setPosition(SparkFunOTOS.Pose2D(0.0, 0.0, 0.0))
-//        otos.setPosition(SparkFunOTOS.Pose2D(64.0, -16.0, 0.0))
+        otos.sensorConfiguration()
+        otos.setPosition(SparkFunOTOS.Pose2D(8.0, -64.0, 0.0))
 
         mecanum = SolversMecanum(hardwareMap, telemetry, otos)
         mecanum.defaultCommand = JoystickCmd(
-            { -controller.leftY },
             { controller.leftX },
+            { controller.leftY },
             { controller.rightX },
             mecanum
         )
@@ -76,14 +76,13 @@ class IntegrationTestRed: CommandOpMode() {
         intake = Intake(hardwareMap, telemetry)
 
         turret = AxonTurret(hardwareMap, telemetry, turretConfig)
-        turret.defaultCommand = turret.setTurretAngle { turretTarget }
 
         limelight = Limelight(hardwareMap, telemetry, otos)
         limelight.start()
 
         shooterSystem = ShooterSystem(
             hardwareMap, telemetry,
-            { limelight.getDistanceToGoal(intArrayOf(20, 24)).inches },
+            { limelight.getDistanceToGoal(intArrayOf(20)).inches },
             { limelight.llResult != null }
         )
 
@@ -140,6 +139,11 @@ class IntegrationTestRed: CommandOpMode() {
                 shooterSystem.shoot(limelight.getMotifPattern())
             )
 
+        Trigger { controller.gamepad.left_trigger > 0.5 }
+            .whenActive(
+                shooterSystem.shoot(limelight.getMotifPattern(), AngularVelocity.fromRpm(4500.0), Angle.fromRotations(0.72))
+            )
+
         // Shooting from th far launch zone
 //        Trigger { controller.gamepad.left_trigger > 0.5 }
 //            .whenActive(
@@ -157,12 +161,9 @@ class IntegrationTestRed: CommandOpMode() {
 //        // Aligning with LL
         Trigger { limelight.llResultIsValid() }
             .whenActive(
-                InstantCommand({
-                    isLLCMDActive = true
-                    turret.setTurretAngle { turretTarget - Angle.fromDegrees(limelight.getTx()) }
-                }, turret), true
+                turret.alignToAprilTag({ limelight.getFilteredTx(alliance) })
             ).whenInactive(
-                InstantCommand({ isLLCMDActive = false })
+                turret.stopTurret()
             )
     }
 
@@ -172,15 +173,16 @@ class IntegrationTestRed: CommandOpMode() {
         // Get the robot's heading
         val robotHeading = otos.getHeading()
         // Get the vector difference from the goal's and robot position
-        val newVector = targetGoalPosition - Vector2d(-robotLocation.x, -robotLocation.y)
+        val newVector = targetGoalPosition - Vector2d(robotLocation.x, robotLocation.y)
         // The angle to the positive x axis of the vector difference
         val angleToGoal = Angle.fromRadians(newVector.angle())
         // Getting the turret angle by subtracting the robot's rotation to the field target angle
         turretTarget = Angle.fromDegrees(
-            AngleUnit.normalizeDegrees(angleToGoal.degrees - robotHeading.degrees)
+            AngleUnit.normalizeDegrees(angleToGoal.degrees - robotHeading.degrees - 90.0)
         )
     }
 
+    // DO NOT USE AS IT NOT WORKS
     private fun distanceToAprilTagOdometry() {
         // Get robot's location in a vector
         val robotLocationX = -otos.getPositionVector().x
@@ -215,7 +217,7 @@ class IntegrationTestRed: CommandOpMode() {
 
             shooterSystem.shooter.log()
             shooterSystem.hood.log()
-            //otos.log()
+            otos.log()
             telemetry.addData("Distance to april tag otos", distanceToAprilTag.inches)
             telemetry.addData("Distance to Goal LL in", limelight.getDistanceToGoal(intArrayOf(20, 24)).inches)
             telemetry.addData("Turret target", turretTarget.degrees)

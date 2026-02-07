@@ -1,7 +1,9 @@
 package org.firstinspires.ftc.teamcode.vision
 
+import Angle
 import Distance
 import com.qualcomm.hardware.limelightvision.LLResult
+import com.qualcomm.hardware.limelightvision.LLResultTypes
 import com.qualcomm.hardware.limelightvision.Limelight3A
 import com.qualcomm.hardware.sparkfun.SparkFunOTOS
 import com.qualcomm.robotcore.hardware.HardwareMap
@@ -12,6 +14,7 @@ import org.firstinspires.ftc.teamcode.vision.VisionConstants.AprilTagsPhysicalDe
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit
 import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit
 import org.firstinspires.ftc.teamcode.subsystems.indexer.MotifPatterns
+import org.firstinspires.ftc.teamcode.utils.Alliance
 import org.firstinspires.ftc.teamcode.utils.gyroscopes.Otos
 import kotlin.math.tan
 
@@ -52,9 +55,28 @@ class Limelight(
         limelight!!.start()
     }
 
-    fun getTx(): Double = tx
+    private fun getTx(): Double = tx
     fun getTy(): Double = ty
     fun getTa(): Double = ta
+
+    fun getFilteredTx(alliance: Alliance): Angle {
+        val filteredId = when (alliance) {
+            Alliance.BLUE -> 20
+            Alliance.RED -> 24
+        }
+
+        if (llResultIsValid()) {
+            val fiducialResult = llResult!!.fiducialResults
+
+            for (id in fiducialResult) {
+                if (id.fiducialId == filteredId) {
+                    return Angle.fromDegrees(getTx())
+                }
+            }
+        }
+
+        return Angle.fromDegrees(0.0)
+    }
 
     /**
      * Gets the distance from the limelight lenses to a filtered id and returns the distance in any unit desired
@@ -134,11 +156,11 @@ class Limelight(
                     angleToGoalRadians
                 )
 
-            /*telemetry.addLine("// Limelight //")
+            telemetry.addLine("// Limelight //")
             telemetry.addData(
                 "Limelight TargetDistanceInches",
                 distanceFromLimelightToGoalInches.inches
-            )*/
+            )
 
 //            telemetry.addData(
 //                "MT2 distance to goal",
