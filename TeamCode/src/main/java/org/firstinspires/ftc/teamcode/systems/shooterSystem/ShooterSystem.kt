@@ -78,9 +78,9 @@ class ShooterSystem(
         shooterPoint = AngularVelocity.fromRpm(shooterInterpolator.getDesiredPoint(Distance.fromInches(distanceToAprilTagInches.get())))
         hoodPoint = Angle.fromRotations(hoodInterpolator.getDesiredPoint(Distance.fromInches(distanceToAprilTagInches.get())))
 
-        telemetry.addData("Shooter Interpolation", shooterPoint.rpm)
-        telemetry.addData("Hood Interpolation", hoodPoint.rotations)
-        telemetry.addData("Distance to AprilTag (supplier) (Shooter system)", Distance.fromInches(distanceToAprilTagInches.get()).inches)
+//        telemetry.addData("Shooter Interpolation", shooterPoint.rpm)
+//        telemetry.addData("Hood Interpolation", hoodPoint.rotations)
+//        telemetry.addData("Distance to AprilTag (supplier) (Shooter system)", Distance.fromInches(distanceToAprilTagInches.get()).inches)
         //hoodInterpolator.log(distanceToAprilTag, telemetry)
         //telemetry.update()
     }

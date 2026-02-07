@@ -13,6 +13,7 @@ import com.seattlesolvers.solverslib.command.button.GamepadButton
 import com.seattlesolvers.solverslib.command.button.Trigger
 import com.seattlesolvers.solverslib.gamepad.GamepadEx
 import com.seattlesolvers.solverslib.gamepad.GamepadKeys
+import com.seattlesolvers.solverslib.gamepad.whileActiveContinuous
 import com.seattlesolvers.solverslib.geometry.Vector2d
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit
 import org.firstinspires.ftc.teamcode.OpModes.otosConfig
@@ -67,8 +68,8 @@ class IntegrationTestRed: CommandOpMode() {
 
         mecanum = SolversMecanum(hardwareMap, telemetry, otos)
         mecanum.defaultCommand = JoystickCmd(
-            { controller.leftX },
-            { controller.leftY },
+            { -controller.leftX },
+            { -controller.leftY },
             { controller.rightX },
             mecanum
         )
@@ -133,15 +134,19 @@ class IntegrationTestRed: CommandOpMode() {
                 intake.stopBothIntakes()
             )
 
+//        GamepadButton(controller, GamepadKeys.Button.DPAD_DOWN)
+//            .whenPressed(
+//                InstantCommand({ turret.setTurretVoltage(1.0) })
+//            )
         // Shooting normally
-        Trigger { controller.gamepad.right_trigger > 0.5 }
+        Trigger { controller.gamepad.right_trigger > 0.7 }
             .whenActive(
                 shooterSystem.shoot(limelight.getMotifPattern())
             )
 
-        Trigger { controller.gamepad.left_trigger > 0.5 }
+        Trigger { controller.gamepad.left_trigger > 0.7 }
             .whenActive(
-                shooterSystem.shoot(limelight.getMotifPattern(), AngularVelocity.fromRpm(4500.0), Angle.fromRotations(0.72))
+                shooterSystem.shoot(limelight.getMotifPattern(), AngularVelocity.fromRpm(4500.0 - 200.0), Angle.fromRotations(0.90))
             )
 
         // Shooting from th far launch zone
@@ -160,10 +165,16 @@ class IntegrationTestRed: CommandOpMode() {
 
 //        // Aligning with LL
         Trigger { limelight.llResultIsValid() }
-            .whenActive(
-                turret.alignToAprilTag({ limelight.getFilteredTx(alliance) })
+            .whileActiveContinuous(
+                SequentialCommandGroup(
+                    InstantCommand({ isLLCMDActive = true }),
+                    turret.alignToAprilTag { limelight.getFilteredTx(alliance) }
+                )
             ).whenInactive(
-                turret.stopTurret()
+                SequentialCommandGroup(
+                    InstantCommand({ isLLCMDActive = false }),
+                    turret.stopTurret()
+                )
             )
     }
 
@@ -215,13 +226,13 @@ class IntegrationTestRed: CommandOpMode() {
             shooterSystem.periodic()
             controller.readButtons()
 
-            shooterSystem.shooter.log()
-            shooterSystem.hood.log()
-            otos.log()
-            telemetry.addData("Distance to april tag otos", distanceToAprilTag.inches)
-            telemetry.addData("Distance to Goal LL in", limelight.getDistanceToGoal(intArrayOf(20, 24)).inches)
-            telemetry.addData("Turret target", turretTarget.degrees)
-//            telemetry.addData("Is LL command enabled", isLLCMDActive)
+//            shooterSystem.shooter.log()
+            telemetry.addData("Distance to Goal LL in", limelight.getDistanceToGoal(intArrayOf(
+                when (alliance) {
+                    Alliance.BLUE -> 20
+                    Alliance.RED -> 24
+                }
+            )).inches)
             telemetry.update()
         }
 

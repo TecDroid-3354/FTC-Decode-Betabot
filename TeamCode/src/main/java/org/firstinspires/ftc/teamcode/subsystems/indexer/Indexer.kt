@@ -205,11 +205,11 @@ class Indexer(
      * and lowers it after the ball was launched.
      * @param  slot , it must be initialized [Slot]
      */
-    fun feedAuto(slot: Slot) {
+    private fun feedAuto(slot: Slot) {
         slot.feed()
-        WaitCommand(100)
+        WaitCommand(150).schedule()
         slot.home()
-        WaitCommand(300)
+        WaitCommand(250).schedule()
     }
 
 // MAY NEED THIS FUNCTION LATER, NOW ITS NOT USEFUL //

@@ -3,6 +3,7 @@ package org.firstinspires.ftc.teamcode.auto.hardCoded
 import com.pedropathing.util.Timer
 import com.qualcomm.hardware.sparkfun.SparkFunOTOS
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous
+import com.seattlesolvers.solverslib.command.Command
 import com.seattlesolvers.solverslib.command.CommandOpMode
 import com.seattlesolvers.solverslib.command.CommandScheduler
 import com.seattlesolvers.solverslib.command.InstantCommand
@@ -92,14 +93,30 @@ class BlueFar : CommandOpMode() {
                 ).schedule()*/
 
                 turret.setTurretVoltage(1.0)
-                sleep(250)
+                sleep(245)
                 turret.setTurretVoltage(0.0)
                 sleep(200)
-                shooterSystem.shoot(
-                    limelight.getMotifPattern(),
-                    AngularVelocity.fromRpm(4300.0),
-                    Angle.fromRotations(0.8)
-                ).schedule()
+                shooterSystem.shooter.setFlyWheelVelocity(AngularVelocity.fromRpm(4250.0)).schedule()
+                shooterSystem.hood.setHoodPosition(Angle.fromRotations(0.8))
+                sleep(800)
+
+                shooterSystem.indexer.slotList[0].feed()
+                sleep(800)
+                shooterSystem.indexer.slotList[0].home()
+                sleep(450)
+                shooterSystem.indexer.slotList[1].feed()
+                sleep(800)
+                shooterSystem.indexer.slotList[1].home()
+                sleep(450)
+                shooterSystem.indexer.slotList[2].feed()
+                sleep(800)
+                shooterSystem.indexer.slotList[2].home()
+
+                sleep(2600)
+                shooterSystem.shooter.setFlyWheelVelocity(AngularVelocity.fromRpm(1000.0)).schedule()
+                mecanum.setChassisSpeeds(ChassisSpeeds(1.0, 0.0, 0.0))
+                sleep(500)
+                mecanum.setChassisSpeeds(ChassisSpeeds(0.0, 0.0, 0.0))
                 setPathState(-1)
             }
         }
@@ -108,6 +125,14 @@ class BlueFar : CommandOpMode() {
     private fun setPathState(number: Int) {
         pathState = number
         telemetry.addData("Current path state to be followed", number)
+    }
+
+    fun shootCMD(): Unit {
+        shooterSystem.shoot(
+            limelight.getMotifPattern(),
+            AngularVelocity.fromRpm(4250.0),
+            Angle.fromRotations(0.8)
+        ).schedule()
     }
 
     private fun shootOut() {

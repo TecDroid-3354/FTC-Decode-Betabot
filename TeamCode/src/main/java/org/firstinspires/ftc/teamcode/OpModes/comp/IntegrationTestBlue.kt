@@ -139,12 +139,12 @@ class IntegrationTestBlue: CommandOpMode() {
 //                InstantCommand({ turret.setTurretVoltage(1.0) })
 //            )
         // Shooting normally
-        Trigger { controller.gamepad.right_trigger > 0.5 }
+        Trigger { controller.gamepad.right_trigger > 0.7 }
             .whenActive(
                 shooterSystem.shoot(limelight.getMotifPattern())
             )
 
-        Trigger { controller.gamepad.left_trigger > 0.5 }
+        Trigger { controller.gamepad.left_trigger > 0.7 }
             .whenActive(
                 shooterSystem.shoot(limelight.getMotifPattern(), AngularVelocity.fromRpm(4500.0 - 200.0), Angle.fromRotations(0.90))
             )
@@ -226,11 +226,13 @@ class IntegrationTestBlue: CommandOpMode() {
             shooterSystem.periodic()
             controller.readButtons()
 
-            shooterSystem.shooter.log()
-            telemetry.addData("Distance to Goal LL in", limelight.getDistanceToGoal(intArrayOf(20, 24)).inches)
-            telemetry.addData("LL command active", isLLCMDActive)
-//            telemetry.addData("Turret target", turretTarget.degrees)
-//            telemetry.addData("Is LL command enabled", isLLCMDActive)
+//            shooterSystem.shooter.log()
+            telemetry.addData("Distance to Goal LL in", limelight.getDistanceToGoal(intArrayOf(
+                when (alliance) {
+                    Alliance.BLUE -> 20
+                    Alliance.RED -> 24
+                }
+            )).inches)
             telemetry.update()
         }
 
