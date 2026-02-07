@@ -23,9 +23,9 @@ public class Constants {
     // Consists of values from the automatic, PID, and centripetal tuners
     public static FollowerConstants followerConstants = new FollowerConstants()
             .mass(15.0) // Robot's mass. Compensates for the centripetal force
-            .forwardZeroPowerAcceleration(-27.7404) // 👍 Measures how the robot decelerates when moving forward & power is cut
+            .forwardZeroPowerAcceleration(-29.7404) // 👍 Measures how the robot decelerates when moving forward & power is cut
             // It should be negative. Otherwise, it'll accelerate when getting closer to 0
-            .lateralZeroPowerAcceleration(-72.9878) //👍 Measures how the robot decelerates when moving sideways & power is cut
+            .lateralZeroPowerAcceleration(-68.9878) //👍 Measures how the robot decelerates when moving sideways & power is cut
             // It should be negative. Otherwise, it'll accelerate when getting closer to 0
             .useSecondaryTranslationalPIDF(true)
             .useSecondaryHeadingPIDF(true)
@@ -47,8 +47,8 @@ public class Constants {
             .leftRearMotorDirection(DcMotorSimple.Direction.FORWARD)
             .rightFrontMotorDirection(DcMotorSimple.Direction.REVERSE)
             .rightRearMotorDirection(DcMotorSimple.Direction.REVERSE)
-            .xVelocity(75.0414) // 👍 The final velocity achieved by the robot after forward/backward testing
-            .yVelocity(53.0291); // 👍 The final velocity achieved by the robot after lateral testing
+            .xVelocity(56.5904) // 👍 The final velocity achieved by the robot after forward/backward testing
+            .yVelocity(24.3991); // The final velocity achieved by the robot after lateral testing
 
 
     // Localizer constants //
@@ -62,8 +62,13 @@ public class Constants {
             // translated 1/4 in to the left, which would be a translation in the y axis since OTOS
             // axes are flipped.
 //            .offset(new SparkFunOTOS.Pose2D(0.0,-0.25,-Math.PI / 2.0))
-            .offset(new SparkFunOTOS.Pose2D(0.0, -0.70637, -Math.PI / 2))
-            .linearScalar(-1.1658) // Done 👍
+            //.offset(new SparkFunOTOS.Pose2D(0.0, -0.70637, Math.PI / 2))
+            .offset(new SparkFunOTOS.Pose2D(0.0, -0.70637, -110.0 * (Math.PI / 180)))
+            //.offset(new SparkFunOTOS.Pose2D(0.0, -0.70637, Math.PI / 2)) // works with translational & rotational tuning
+
+
+            //.offset(new SparkFunOTOS.Pose2D(0.0, -0.70637, -Math.PI))
+            .linearScalar(1.1658) // Done 👍
             .angularScalar(0.9898); // Done 👍
 
 
