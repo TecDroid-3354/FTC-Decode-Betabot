@@ -95,6 +95,7 @@ class RedFar : CommandOpMode() {
                 sleep(200)
                 turret.setTurretVoltage(0.0)
                 sleep(200)
+
                 shooterSystem.shooter.setFlyWheelVelocity(AngularVelocity.fromRpm(4000.0)).schedule()
                 shooterSystem.hood.setHoodPosition(Angle.fromRotations(0.8))
                 sleep(1500)
