@@ -83,7 +83,7 @@ class IntegrationTestRed: CommandOpMode() {
 
         shooterSystem = ShooterSystem(
             hardwareMap, telemetry,
-            { limelight.getDistanceToGoal(intArrayOf(20)).inches },
+            { limelight.getDistanceToGoal(intArrayOf(24)).inches },
             { limelight.llResult != null }
         )
 
@@ -146,7 +146,7 @@ class IntegrationTestRed: CommandOpMode() {
 
         Trigger { controller.gamepad.left_trigger > 0.7 }
             .whenActive(
-                shooterSystem.shoot(limelight.getMotifPattern(), AngularVelocity.fromRpm(4500.0 - 250.0), Angle.fromRotations(0.90))
+                shooterSystem.shoot(limelight.getMotifPattern(), AngularVelocity.fromRpm(4000.0), Angle.fromRotations(0.90))
             )
 
         // Shooting from th far launch zone
